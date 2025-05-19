@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodieX - Order Food</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            scroll-behavior: smooth;
+        }
+        .navbar {
+            background-color: #1f2937; /* Dark gray-blue */
+        }
+        .coming-soon-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 64px - 84px); /* Full height minus navbar and footer */
+            text-align: center;
+            padding: 2rem;
+        }
+        .icon-large {
+            font-size: 4rem; /* text-6xl */
+            color: #f97316; /* orange-500 */
+            margin-bottom: 1.5rem;
+        }
+        /* Mobile Menu (Basic for consistency, not interactive for this page) */
+        .mobile-menu { display: none; }
+        @media (max-width: 768px) { /* md breakpoint */
+            .desktop-menu { display: none; }
+        }
+         .btn-orange {
+            background-color: #f97316; /* orange-500 */
+            color: white;
+        }
+        .btn-orange:hover {
+            background-color: #ea580c; /* orange-600 */
+        }
+        .btn-gray {
+            background-color: #4b5563; /* gray-600 */
+            color: white;
+        }
+        .btn-gray:hover {
+            background-color: #374151; /* gray-700 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 pt-16">
+
+    <!-- Navigation Bar (Simplified for "Coming Soon" page) -->
+    <nav class="navbar p-4 text-white fixed w-full top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="/index.html" class="text-2xl font-bold">FoodieX</a>
+            <div class="hidden md:flex space-x-6 items-center desktop-menu">
+                <a href="/index.html" class="hover:text-gray-300">Home</a>
+                <a href="/restaurants.html" class="hover:text-gray-300">Restaurants</a>
+                <a href="/foods.html" class="hover:text-gray-300">Foods</a>
+            </div>
+            <div class="md:hidden">
+                <i class="fas fa-bars fa-lg"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Coming Soon Content -->
+    <main class="coming-soon-container">
+        <i class="fas fa-cogs icon-large"></i>
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">Online Ordering Coming Soon!</h1>
+        <p class="text-lg md:text-xl text-gray-600 mb-8">
+            We're working hard to bring you a seamless online ordering experience.
+            Stay tuned for updates!
+        </p>
+        <div class="w-full max-w-xs sm:max-w-md flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
+            <!-- Explore Restaurants (Orange) -->
+            <a href="/restaurants.html" class="btn-orange font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 ease-in-out w-full sm:w-auto text-center">
+                Explore Restaurants
+            </a>
+            <!-- Go Back (Gray) -->
+            <button onclick="goBack()" class="btn-gray font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 ease-in-out w-full sm:w-auto">
+                <i class="fas fa-arrow-left mr-2"></i>Go Back
+            </button>
+        </div>
+         <div class="mt-8 text-gray-500 text-sm">
+            <p>You might have been redirected here with item details:</p>
+            <p id="item-details-placeholder">Checking for item details...</p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-gray-300 py-6">
+        <div class="container mx-auto px-4 text-center">
+            <p>© <span id="current-year"></span> FoodieX. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+
+        // Display query parameters if any, to show what would have been ordered
+        const urlParams = new URLSearchParams(window.location.search);
+        // const restaurantId = urlParams.get('restaurantId'); // Not displayed anymore
+        // const foodId = urlParams.get('foodId'); // Not displayed anymore
+        const foodName = urlParams.get('foodName');
+        const foodPrice = urlParams.get('foodPrice');
+        const itemDetailsPlaceholder = document.getElementById('item-details-placeholder');
+
+        if (foodName && foodPrice) {
+            itemDetailsPlaceholder.innerHTML = `
+                <strong>Item:</strong> ${decodeURIComponent(foodName)} <br>
+                <strong>Price:</strong> ₹${parseFloat(foodPrice).toFixed(2)}
+            `;
+        } else {
+            itemDetailsPlaceholder.textContent = "No specific item details found in URL.";
+        }
+    </script>
+
+</body>
+</html>

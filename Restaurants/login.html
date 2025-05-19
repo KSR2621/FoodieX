@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodieX - Restaurant Partner Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+        }
+        .navbar {
+            background-color: #1f2937; 
+        }
+        .btn-primary, .btn-orange { 
+            background-color: #ea580c; 
+            color: white;
+        }
+        .btn-primary:hover, .btn-orange:hover {
+            background-color: #c2410c; 
+        }
+        .card {
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .form-input { 
+            width: 100%;
+            padding: 0.75rem; 
+            border: 1px solid #fed7aa; 
+            border-radius: 0.5rem; 
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #fb923c; 
+            box-shadow: 0 0 0 2px rgba(251, 146, 60, 0.5); 
+        }
+        .form-label {
+            display: block;
+            color: #7c2d12; 
+            margin-bottom: 0.5rem; 
+            font-weight: 500;
+        }
+        .text-main-title { color: #7c2d12; } 
+        .text-subtitle { color: #9a3412; } 
+        .text-link { color: #c2410c; } 
+        .text-link:hover { text-decoration: underline; }
+        .mobile-menu { display: none; } 
+        .mobile-menu.open { display: block; }
+
+    </style>
+</head>
+<body class="bg-orange-50">
+    <!-- Navigation Bar -->
+    <nav class="navbar p-4 text-white shadow-md fixed w-full top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="/index.html" class="text-2xl font-bold">FoodieX</a>
+            <div class="hidden md:flex space-x-6 items-center">
+                <a href="/login.html" class="hover:text-gray-300 font-semibold">Restaurant Portal</a>
+                <!-- Profile link removed as per request -->
+            </div>
+            <div class="md:hidden">
+                <button id="mobile-menu-button-login" class="text-white focus:outline-none">
+                    <i class="fas fa-bars fa-lg"></i>
+                </button>
+            </div>
+        </div>
+        <div id="mobile-menu-items-login" class="mobile-menu md:hidden mt-3 bg-gray-700 bg-opacity-90 rounded-md">
+            <a href="/login.html" class="block px-4 py-2 text-sm hover:bg-gray-600 font-semibold rounded-md">Restaurant Portal</a>
+            <!-- Mobile Profile link removed as per request -->
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="container mx-auto py-12 px-4 pt-24">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-main-title mb-4">FoodieX Restaurant Partner Portal</h1>
+            <p class="text-xl text-subtitle max-w-2xl mx-auto">
+                Join our platform to showcase your restaurant, manage your menu, and connect with a vibrant community of food lovers.
+            </p>
+        </div>
+
+        <!-- Card Section -->
+        <div class="max-w-md mx-auto">
+            <!-- Restaurant Owner Card -->
+            <div class="card bg-white p-8 rounded-lg shadow-lg text-center">
+                <div class="text-orange-500 mb-4">
+                    <i class="fas fa-store-alt fa-3x mx-auto"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-main-title mb-4">Restaurant Partner</h2>
+                <p class="text-gray-600 mb-6">
+                    Register your restaurant or login to manage your profile, menu, and engage with customers.
+                </p>
+                <div class="space-y-4 sm:space-y-0 sm:flex sm:space-x-4 justify-center">
+                    <button onclick="showForm('restaurant-signup')" class="w-full sm:w-auto btn-orange text-white py-2 px-6 rounded-lg font-medium">
+                        Register Your Restaurant
+                    </button>
+                    <button onclick="showForm('login')" class="w-full sm:w-auto btn-orange bg-orange-600 hover:bg-orange-700 text-white py-2 px-6 rounded-lg font-medium">
+                        Login to Dashboard
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Forms Section (Hidden by default) -->
+    <section id="forms-section" class="container mx-auto py-8 px-4 hidden">
+        <div class="max-w-lg mx-auto bg-white p-8 rounded-lg shadow-xl">
+            <div class="flex justify-end mb-4">
+                <button onclick="hideForms()" class="text-orange-600 hover:text-orange-800">
+                    <i class="fas fa-times fa-lg"></i>
+                </button>
+            </div>
+
+            <div id="restaurant-signup" class="form hidden">
+                <h2 class="text-2xl font-bold text-main-title mb-6 text-center">Register Your Restaurant</h2>
+                <form id="restaurant-signup-form">
+                    <div class="mb-4">
+                        <label for="restaurant-name" class="form-label">Restaurant Name</label>
+                        <input type="text" id="restaurant-name" class="form-input" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="restaurant-email" class="form-label">Business Email</label>
+                        <input type="email" id="restaurant-email" class="form-input" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="restaurant-password" class="form-label">Password</label>
+                        <input type="password" id="restaurant-password" class="form-input" required minlength="6">
+                    </div>
+                    <div class="mb-4">
+                        <label for="restaurant-address" class="form-label">Full Address</label>
+                        <input type="text" id="restaurant-address" class="form-input" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="restaurant-contact" class="form-label">Contact Number</label>
+                        <input type="tel" id="restaurant-contact" class="form-input" placeholder="e.g., +911234567890" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="restaurant-cuisine" class="form-label">Cuisine Type(s)</label>
+                        <input type="text" id="restaurant-cuisine" class="form-input" placeholder="e.g., Italian, North Indian, Chinese" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="restaurant-hours" class="form-label">Operating Hours</label>
+                        <textarea id="restaurant-hours" class="form-input" rows="3" placeholder="e.g., Mon-Fri: 9 AM - 10 PM, Sat-Sun: 11 AM - 11 PM" required></textarea>
+                    </div>
+                     <div class="mb-4">
+                        <label for="restaurant-description" class="form-label">Short Description (Max 200 chars)</label>
+                        <textarea id="restaurant-description" class="form-input" rows="3" maxlength="200" placeholder="Tell us a bit about your restaurant..." required></textarea>
+                    </div>
+                    <div class="mb-6">
+                        <label for="restaurant-image" class="form-label">Restaurant Display Image (Logo/Facade, max 500KB)</label>
+                        <input type="file" id="restaurant-image" accept="image/jpeg, image/png" class="form-input">
+                        <p class="text-xs text-gray-500 mt-1">Optional. Recommended for better visibility.</p>
+                    </div>
+                    <button type="submit" class="w-full btn-orange text-white p-3 rounded-lg font-medium">
+                        Register Restaurant
+                    </button>
+                </form>
+                <p class="text-center mt-4 text-gray-600">
+                    Already registered? <a href="#" onclick="showForm('login')" class="text-link">Login</a>
+                </p>
+                <p id="restaurant-signup-error" class="text-red-500 mt-4 text-sm text-center hidden"></p>
+            </div>
+
+            <div id="login" class="form hidden">
+                <h2 class="text-2xl font-bold text-main-title mb-6 text-center">Restaurant Login</h2>
+                <form id="login-form">
+                    <div class="mb-4">
+                        <label for="login-email" class="form-label">Email</label>
+                        <input type="email" id="login-email" class="form-input" required>
+                    </div>
+                    <div class="mb-6">
+                        <label for="login-password" class="form-label">Password</label>
+                        <input type="password" id="login-password" class="form-input" required>
+                    </div>
+                    <button type="submit" class="w-full btn-orange text-white p-3 rounded-lg font-medium">
+                        Login
+                    </button>
+                </form>
+                <p class="text-center mt-4 text-gray-600">
+                    New here? <a href="#" onclick="showForm('restaurant-signup')" class="text-link">Register Your Restaurant</a>
+                </p>
+                <p id="login-error" class="text-red-500 mt-4 text-sm text-center hidden"></p>
+            </div>
+        </div>
+    </section>
+    
+    <footer class="bg-orange-100 py-8 mt-12">
+        <div class="container mx-auto text-center text-orange-700">
+            <p>© <span id="current-year"></span> FoodieX. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
+        import { getDatabase, ref, set, get } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyABlpJruz0pZN7K6bQgRuqDxPVAG1bi9q8",
+            authDomain: "daily-menu-bc700.firebaseapp.com",
+            databaseURL: "https://daily-menu-bc700-default-rtdb.firebaseio.com",
+            projectId: "daily-menu-bc700",
+            storageBucket: "daily-menu-bc700.firebasestorage.app",
+            messagingSenderId: "87059586917",
+            appId: "1:87059586917:web:d2787e9d4d12dc47decb8c",
+            measurementId: "G-QJJYDQ9M2J"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+
+        // Removed navProfileLink and mobileNavProfileLink constant declarations as elements are removed.
+        const mobileMenuButton = document.getElementById('mobile-menu-button-login');
+        const mobileMenuItems = document.getElementById('mobile-menu-items-login');
+
+        if(mobileMenuButton) {
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenuItems.classList.toggle('open'); 
+            });
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            // Logic for showing/hiding profile links removed as the elements are removed.
+            // If you re-add profile links, this is where you'd manage their visibility.
+            // For example, if a user is logged in AND is a restaurant, show a link to their dashboard.
+        });
+
+        async function compressAndConvertToBase64(file) {
+            return new Promise((resolve, reject) => {
+                if (!file) return resolve('');
+                if (file.size > 500 * 1024) {
+                    reject(new Error('Image size exceeds 500KB. Please upload a smaller image.'));
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        const maxWidth = 400; 
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > maxWidth) {
+                            height = (maxWidth / width) * height;
+                            width = maxWidth;
+                        }
+                        canvas.width = width;
+                        canvas.height = height;
+                        ctx.drawImage(img, 0, 0, width, height);
+                        const base64 = canvas.toDataURL('image/jpeg', 0.75); 
+                        resolve(base64);
+                    };
+                    img.onerror = () => reject(new Error('Failed to process image.'));
+                };
+                reader.onerror = () => reject(new Error('Failed to read image file.'));
+                reader.readAsDataURL(file);
+            });
+        }
+
+        window.showForm = function(formId) {
+            document.getElementById('forms-section').classList.remove('hidden');
+            document.querySelectorAll('.form').forEach(form => form.classList.add('hidden'));
+            document.getElementById(formId).classList.remove('hidden');
+            
+            const errorPIds = ['restaurant-signup-error', 'login-error'];
+            errorPIds.forEach(id => {
+                const errorEl = document.getElementById(id);
+                if (errorEl) { 
+                    errorEl.textContent = '';
+                    errorEl.classList.add('hidden');
+                }
+            });
+            document.getElementById('forms-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        };
+
+        window.hideForms = function() {
+            document.getElementById('forms-section').classList.add('hidden');
+        };
+
+        function displayError(elementId, message) {
+            const errorEl = document.getElementById(elementId);
+            if (errorEl) { 
+                errorEl.textContent = message;
+                errorEl.classList.remove('hidden');
+            } else {
+                console.warn(`Error element with ID '${elementId}' not found.`);
+            }
+        }
+        
+        if (window.location.hash === '#restaurant-signup') {
+            showForm('restaurant-signup');
+        } else if (window.location.hash === '#login') { 
+            showForm('login');
+        }
+
+
+        const restaurantSignupForm = document.getElementById('restaurant-signup-form');
+        if(restaurantSignupForm){
+            restaurantSignupForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const name = document.getElementById('restaurant-name').value;
+                const email = document.getElementById('restaurant-email').value;
+                const password = document.getElementById('restaurant-password').value;
+                const address = document.getElementById('restaurant-address').value;
+                const contact = document.getElementById('restaurant-contact').value;
+                const cuisine = document.getElementById('restaurant-cuisine').value;
+                const hours = document.getElementById('restaurant-hours').value;
+                const description = document.getElementById('restaurant-description').value;
+                const imageFile = document.getElementById('restaurant-image').files[0];
+                
+                try {
+                    const imageBase64 = await compressAndConvertToBase64(imageFile);
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+
+                    await set(ref(database, 'restaurants/' + user.uid), {
+                        name: name,
+                        email: email,
+                        address: address,
+                        contact: contact,
+                        cuisine: cuisine,
+                        operatingHours: hours,
+                        description: description,
+                        type: 'restaurant',
+                        imageBase64: imageBase64 || '', 
+                        foods: {}, 
+                        dailyMenu: {} 
+                    });
+                    window.location.href = '/Restaurants/index.html';
+                } catch (err) {
+                     displayError('restaurant-signup-error', err.message);
+                }
+            });
+        }
+
+        const loginForm = document.getElementById('login-form');
+        if(loginForm) {
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                try {
+                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+
+                    const restaurantDbRef = ref(database, 'restaurants/' + user.uid);
+                    const restaurantSnapshot = await get(restaurantDbRef);
+
+                    if (restaurantSnapshot.exists() && restaurantSnapshot.val().type === 'restaurant') {
+                        window.location.href = '/Restaurants/index.html'; 
+                    } else {
+                        await auth.signOut(); 
+                        displayError('login-error', "Access denied. This portal is for restaurants only.");
+                    }
+                } catch (err) {
+                    let errorMessage = "Login failed. Please check your credentials.";
+                    if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+                        errorMessage = "Invalid email or password.";
+                    } else {
+                        errorMessage = err.message; 
+                    }
+                    displayError('login-error', errorMessage);
+                }
+            });
+        }
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>

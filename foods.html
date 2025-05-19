@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodieX - Explore All Foods</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            scroll-behavior: smooth;
+        }
+        .navbar {
+            background-color: #1f2937; /* Dark gray-blue */
+        }
+        .food-card {
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+        .food-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .food-image {
+            width: 100%;
+            height: 160px; /* Reduced height */
+            object-fit: cover;
+            border-radius: 0.5rem 0.5rem 0 0;
+        }
+        .loading-placeholder, .error-message {
+            min-height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #9ca3af; /* gray-400 */
+            text-align: center;
+            padding: 2rem;
+        }
+        .error-message {
+            color: #ef4444; /* red-500 */
+        }
+        .mobile-menu { display: none; }
+        @media (max-width: 768px) { /* md breakpoint */
+            .desktop-menu { display: none; }
+            .mobile-menu.open { display: block; }
+        }
+        .welcome-message { color: #d1d5db; margin-right: 1rem; }
+
+        .search-bar {
+            max-width: 600px;
+            margin: 0 auto 2rem auto;
+        }
+        .btn-orange {
+            background-color: #f97316; /* orange-500 */
+            color: white;
+        }
+        .btn-orange:hover {
+            background-color: #ea580c; /* orange-600 */
+        }
+        .btn-order-now { /* Consistent Orange Order Button */
+            background-color: #f97316; /* orange-500 */
+            color: white;
+            padding: 0.375rem 0.75rem; /* py-1.5 px-3 */
+            border-radius: 0.375rem;
+            text-align: center;
+            display: block;
+            font-weight: 600;
+            font-size: 0.875rem; /* text-sm */
+            transition: background-color 0.3s ease;
+        }
+        .btn-order-now:hover {
+            background-color: #ea580c; /* orange-600 */
+        }
+        .restaurant-link {
+            color: #3b82f6; /* blue-500 */
+            text-decoration: none;
+        }
+        .restaurant-link:hover {
+            color: #2563eb; /* blue-600 */
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 pt-16">
+
+<nav class="navbar p-4 text-white fixed w-full top-0 z-50">
+    <div class="container mx-auto flex justify-between items-center">
+        <a href="/index.html" class="text-2xl font-bold">FoodieX</a>
+        <div class="hidden md:flex space-x-6 items-center desktop-menu">
+            <span id="welcome-message" class="welcome-message hidden"></span>
+            <a href="/index.html" class="hover:text-gray-300">Home</a>
+            <a href="/restaurants.html" class="hover:text-gray-300">Restaurants</a>
+            <a href="/foods.html" class="hover:text-gray-300 font-semibold">Foods</a>
+            <a href="/login.html" id="nav-login" class="hover:text-gray-300">Login / Signup</a>
+            <a href="/profile.html" id="nav-profile" class="hover:text-gray-300 hidden">Profile</a>
+            <a href="#" id="nav-logout" class="hover:text-gray-300 hidden">Logout</a>
+        </div>
+        <div class="md:hidden">
+            <button id="mobile-menu-button" class="text-white focus:outline-none">
+                <i class="fas fa-bars fa-lg"></i>
+            </button>
+        </div>
+    </div>
+    <div id="mobile-menu-items" class="mobile-menu md:hidden mt-3">
+        <span id="mobile-welcome-message" class="block px-2 py-1 text-sm welcome-message hidden"></span>
+        <a href="/index.html" class="block px-2 py-1 text-sm hover:bg-gray-700">Home</a>
+        <a href="/restaurants.html" class="block px-2 py-1 text-sm hover:bg-gray-700">Restaurants</a>
+        <a href="/foods.html" class="block px-2 py-1 text-sm hover:bg-gray-700 font-semibold">Foods</a>
+        <a href="/login.html" id="mobile-nav-login" class="block px-2 py-1 text-sm hover:bg-gray-700">Login / Signup</a>
+        <a href="/profile.html" id="mobile-nav-profile" class="block px-2 py-1 text-sm hover:bg-gray-700 hidden">Profile</a>
+        <a href="#" id="mobile-nav-logout" class="block px-2 py-1 text-sm hover:bg-gray-700 hidden">Logout</a>
+    </div>
+</nav>
+
+<section class="container mx-auto py-12 px-4">
+    <h2 class="text-4xl font-bold text-center mb-8 text-gray-800">Explore All Our Delicious Dishes</h2>
+
+    <!-- Search Bar -->
+    <div class="search-bar">
+        <div class="relative">
+            <input type="text" id="food-search" placeholder="Search food items by name..."
+                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+            <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                <i class="fas fa-search"></i>
+            </span>
+        </div>
+    </div>
+
+    <div id="foods-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+        <div class="loading-placeholder col-span-full">Loading all food items...</div>
+    </div>
+</section>
+
+<footer class="bg-gray-800 text-gray-300 py-12 mt-10">
+    <div class="container mx-auto px-4 text-center">
+        <p>© <span id="current-year"></span> FoodieX. All rights reserved.</p>
+    </div>
+</footer>
+
+<script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
+    import { getDatabase, ref, get } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js';
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyABlpJruz0pZN7K6bQgRuqDxPVAG1bi9q8", // Replace with your actual API key
+        authDomain: "daily-menu-bc700.firebaseapp.com",
+        databaseURL: "https://daily-menu-bc700-default-rtdb.firebaseio.com",
+        projectId: "daily-menu-bc700",
+        storageBucket: "daily-menu-bc700.firebasestorage.app",
+        messagingSenderId: "87059586917",
+        appId: "1:87059586917:web:d2787e9d4d12dc47decb8c",
+        measurementId: "G-QJJYDQ9M2J"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const database = getDatabase(app);
+
+    const navLogin = document.getElementById('nav-login');
+    const navProfile = document.getElementById('nav-profile');
+    const navLogout = document.getElementById('nav-logout');
+    const mobileNavLogin = document.getElementById('mobile-nav-login');
+    const mobileNavProfile = document.getElementById('mobile-nav-profile');
+    const mobileNavLogout = document.getElementById('mobile-nav-logout');
+    const welcomeMessage = document.getElementById('welcome-message');
+    const mobileWelcomeMessage = document.getElementById('mobile-welcome-message');
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenuItems = document.getElementById('mobile-menu-items');
+    const foodsContainer = document.getElementById('foods-container');
+    const foodSearchInput = document.getElementById('food-search');
+
+    let allFoodItems = []; 
+
+    mobileMenuButton.addEventListener('click', () => {
+        mobileMenuItems.classList.toggle('open');
+    });
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            navLogin.classList.add('hidden');
+            mobileNavLogin.classList.add('hidden');
+            navProfile.classList.remove('hidden');
+            mobileNavProfile.classList.remove('hidden');
+            navLogout.classList.remove('hidden');
+            mobileNavLogout.classList.remove('hidden');
+
+            const userDbRef = ref(database, `users/${user.uid}`);
+            get(userDbRef).then(snapshot => {
+                let userName = "User";
+                if (snapshot.exists() && snapshot.val().name) {
+                    userName = snapshot.val().name.split(" ")[0];
+                } else {
+                    const restaurantOwnerRef = ref(database, `restaurants/${user.uid}`);
+                    return get(restaurantOwnerRef).then(restoSnapshot => {
+                        if (restoSnapshot.exists() && restoSnapshot.val().name) {
+                            userName = restoSnapshot.val().name; 
+                        }
+                        return userName;
+                    });
+                }
+                return userName;
+            }).then(name => {
+                welcomeMessage.textContent = `Hello, ${name}!`;
+                welcomeMessage.classList.remove('hidden');
+                mobileWelcomeMessage.textContent = `Hello, ${name}!`;
+                mobileWelcomeMessage.classList.remove('hidden');
+            }).catch(error => {
+                console.error("Error fetching user/restaurant name:", error);
+                welcomeMessage.textContent = `Hello!`; 
+                welcomeMessage.classList.remove('hidden');
+                mobileWelcomeMessage.textContent = `Hello!`; 
+                mobileWelcomeMessage.classList.remove('hidden');
+            });
+
+        } else {
+            navLogin.classList.remove('hidden');
+            mobileNavLogin.classList.remove('hidden');
+            navProfile.classList.add('hidden');
+            mobileNavProfile.classList.add('hidden');
+            navLogout.classList.add('hidden');
+            mobileNavLogout.classList.add('hidden');
+            welcomeMessage.classList.add('hidden');
+            mobileWelcomeMessage.classList.add('hidden');
+        }
+    });
+
+    function handleLogout(e) {
+        e.preventDefault();
+        signOut(auth).then(() => {
+            window.location.href = '/login.html';
+        }).catch((error) => {
+            console.error('Logout error:', error);
+            alert('Failed to logout.');
+        });
+    }
+    navLogout.addEventListener('click', handleLogout);
+    mobileNavLogout.addEventListener('click', handleLogout);
+
+    async function loadAllFoods() {
+        foodsContainer.innerHTML = '<div class="loading-placeholder col-span-full">Loading all food items...</div>';
+        allFoodItems = []; 
+        const restaurantsRef = ref(database, 'restaurants');
+
+        try {
+            const snapshot = await get(restaurantsRef);
+            if (snapshot.exists()) {
+                const restaurantsData = snapshot.val();
+                for (const restaurantId in restaurantsData) {
+                    const restaurant = restaurantsData[restaurantId];
+                    if (restaurant.foods) {
+                        for (const foodId in restaurant.foods) {
+                            const foodItem = restaurant.foods[foodId];
+                            allFoodItems.push({
+                                ...foodItem,
+                                foodId: foodId,
+                                restaurantId: restaurantId,
+                                restaurantName: restaurant.name || 'Unknown Restaurant'
+                            });
+                        }
+                    }
+                }
+                renderFoodItems(allFoodItems);
+            } else {
+                foodsContainer.innerHTML = '<p class="error-message col-span-full">No restaurants found to fetch food items from.</p>';
+            }
+        } catch (error) {
+            console.error('Error loading food items:', error);
+            foodsContainer.innerHTML = '<p class="error-message col-span-full">Failed to load food items. Please try again.</p>';
+        }
+    }
+
+    function renderFoodItems(foodItemsToRender) {
+        foodsContainer.innerHTML = ''; 
+
+        if (foodItemsToRender.length === 0) {
+            foodsContainer.innerHTML = '<p class="error-message col-span-full">No food items found matching your criteria.</p>';
+            return;
+        }
+
+        foodItemsToRender.forEach(food => {
+            const card = document.createElement('div');
+            card.className = 'food-card bg-white rounded-lg shadow-md overflow-hidden flex flex-col';
+
+            const foodName = food.name || 'Unnamed Food';
+            const foodPrice = typeof food.price === 'number' ? food.price.toFixed(2) : 'N/A';
+            const orderUrl = `/order.html?restaurantId=${food.restaurantId}&foodId=${food.foodId}&foodName=${encodeURIComponent(foodName)}&foodPrice=${food.price || 0}`;
+
+            // Corrected card.innerHTML with comments removed
+            card.innerHTML = `
+                <img class="food-image" src="${food.imageBase64 || 'https://via.placeholder.com/400x200?text=Food+Image'}" alt="${foodName}">
+                <div class="p-3 flex flex-col flex-grow">
+                    <h3 class="text-lg font-semibold mb-1 text-gray-800">${foodName}</h3>
+                    <p class="text-xs text-gray-600 mb-1 flex-grow">${(food.description || 'No description available.').substring(0, 60)}${food.description && food.description.length > 60 ? '...' : ''}</p>
+                    <p class="text-gray-500 text-xs mb-1">
+                        From: <a href="/restaurant-details.html?id=${food.restaurantId}" class="restaurant-link">${food.restaurantName}</a>
+                    </p>
+                    <p class="text-md font-bold text-green-600 mb-2">₹${foodPrice}</p>
+                    <div class="mt-auto">
+                        <a href="${orderUrl}" class="btn-order-now w-full">Order Now</a>
+                    </div>
+                </div>
+            `;
+            foodsContainer.appendChild(card);
+        });
+    }
+
+    foodSearchInput.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase().trim();
+        if (!searchTerm) {
+            renderFoodItems(allFoodItems); 
+            return;
+        }
+
+        const filteredFoods = allFoodItems.filter(food =>
+            (food.name && food.name.toLowerCase().includes(searchTerm)) ||
+            (food.restaurantName && food.restaurantName.toLowerCase().includes(searchTerm))
+        );
+        renderFoodItems(filteredFoods);
+    });
+
+    loadAllFoods();
+    document.getElementById('current-year').textContent = new Date().getFullYear();
+
+</script>
+</body>
+</html>
