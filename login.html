@@ -57,13 +57,13 @@
     <!-- Navigation Bar -->
     <nav class="navbar p-4 text-white shadow-md fixed w-full top-0 z-50">
         <div class="container mx-auto flex justify-between items-center">
-            <a href="/index.html" class="text-2xl font-bold">FoodieX</a>
+            <a href="index.html" class="text-2xl font-bold">FoodieX</a>
             <div class="hidden md:flex space-x-6 items-center">
-                <a href="/index.html" class="hover:text-gray-300">Home</a>
-                <a href="/restaurants.html" class="hover:text-gray-300">Restaurants</a>
-                <a href="/foods.html" class="hover:text-gray-300">Foods</a>
-                <a href="/login.html" class="hover:text-gray-300 font-semibold">Join Us</a>
-                <a href="/profile.html" id="nav-profile-link" class="hover:text-gray-300 hidden">Profile</a>
+                <a href="index.html" class="hover:text-gray-300">Home</a>
+                <a href="restaurants.html" class="hover:text-gray-300">Restaurants</a>
+                <a href="foods.html" class="hover:text-gray-300">Foods</a>
+                <a href="login.html" class="hover:text-gray-300 font-semibold">Join Us</a>
+                <a href="profile.html" id="nav-profile-link" class="hover:text-gray-300 hidden">Profile</a>
             </div>
             <div class="md:hidden">
                 <button id="mobile-menu-button-login" class="text-white focus:outline-none">
@@ -72,11 +72,11 @@
             </div>
         </div>
         <div id="mobile-menu-items-login" class="mobile-menu md:hidden mt-3 bg-gray-700 bg-opacity-90 rounded-md">
-            <a href="/index.html" class="block px-4 py-2 text-sm hover:bg-gray-600 rounded-t-md">Home</a>
-            <a href="/restaurants.html" class="block px-4 py-2 text-sm hover:bg-gray-600">Restaurants</a>
-            <a href="/foods.html" class="block px-4 py-2 text-sm hover:bg-gray-600">Foods</a>
-            <a href="/login.html" class="block px-4 py-2 text-sm hover:bg-gray-600 font-semibold">Join Us</a>
-            <a href="/profile.html" id="mobile-nav-profile-link" class="block px-4 py-2 text-sm hover:bg-gray-600 rounded-b-md hidden">Profile</a>
+            <a href="index.html" class="block px-4 py-2 text-sm hover:bg-gray-600 rounded-t-md">Home</a>
+            <a href="restaurants.html" class="block px-4 py-2 text-sm hover:bg-gray-600">Restaurants</a>
+            <a href="foods.html" class="block px-4 py-2 text-sm hover:bg-gray-600">Foods</a>
+            <a href="login.html" class="block px-4 py-2 text-sm hover:bg-gray-600 font-semibold">Join Us</a>
+            <a href="profile.html" id="mobile-nav-profile-link" class="block px-4 py-2 text-sm hover:bg-gray-600 rounded-b-md hidden">Profile</a>
         </div>
     </nav>
 
@@ -365,7 +365,7 @@
                         type: 'user',
                         favorites: {} 
                     });
-                    window.location.href = '/index.html';
+                    window.location.href = 'index.html';
                 } catch (err) {
                     displayError('user-signup-error', err.message);
                 }
@@ -405,7 +405,7 @@
                         dailyMenu: {} 
                     });
                     // After restaurant signup, redirect to their dashboard.
-                    window.location.href = '/Restaurants/index.html';
+                    window.location.href = 'Restaurants/index.html';
                 } catch (err) {
                      displayError('restaurant-signup-error', err.message);
                 }
@@ -430,14 +430,14 @@
                         const restaurantData = restaurantSnapshot.val();
                         // Ensure the type is 'restaurant' (as set during signup)
                         if (restaurantData && restaurantData.type === 'restaurant') {
-                            window.location.href = '/Restaurants/index.html'; // Redirect restaurant to their specific page
+                            window.location.href = 'Restaurants/index.html'; // Redirect restaurant to their specific page
                             return; // Important: stop further execution to prevent fallback redirect
                         }
                     }
                     
                     // Fallback: if not a restaurant or data is missing/malformed, redirect to general index page
                     // This will also handle regular users (food lovers)
-                    window.location.href = '/index.html';
+                    window.location.href = 'index.html';
 
                 } catch (err) {
                     displayError('login-error', err.message);
