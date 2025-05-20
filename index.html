@@ -3,568 +3,1460 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Foodie - Find Your Favorite Meal</title>
+    <title>FoodieX - Your Profile</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        :root {
+            --theme-orange: #F97316;
+            --theme-orange-dark: #EA580C;
+            --theme-orange-light: #FB923C;
+        }
         body {
             font-family: 'Arial', sans-serif;
             scroll-behavior: smooth;
+            background-color: #f1f5f9;
         }
-        .navbar {
-            background-color: #1f2937; /* Dark gray-blue */
-        }
-        .hero-section {
-            background-image: url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80');
-            background-size: cover;
-            background-position: center;
-            height: 60vh;
+        .profile-image, .restaurant-logo-display {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 1rem;
+            border: 4px solid #e5e7eb;
         }
         .card {
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            background-color: #f9fafb;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -1px rgba(0,0,0,0.04);
+            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
         }
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 12px -3px rgba(0,0,0,0.1), 0 3px 7px -2px rgba(0,0,0,0.06);
         }
-        .item-image {
+        .card-image {
             width: 100%;
-            height: 150px;
+            height: 120px;
             object-fit: cover;
             border-radius: 0.5rem 0.5rem 0 0;
         }
-        .menu-item-list li {
-            padding: 0.25rem 0;
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 100;
         }
-        .loading-placeholder {
-            min-height: 150px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #9ca3af;
-            background-color: #f9fafb;
-            border-radius: 0.5rem;
-            padding: 1rem;
+        .modal-content {
+            background-color: white; padding: 2rem; border-radius: 0.5rem;
+            max-width: 500px; width: 90%; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
         }
-        /* Hamburger Menu */
-        .mobile-menu {
-            display: none;
+        .hidden-important { display: none !important; }
+        .form-label { display: block; font-weight: 500; color: #374151; margin-bottom: 0.5rem; }
+        .form-input, .form-textarea, .form-select {
+            width: 100%; padding: 0.75rem 1rem; border: 1px solid #d1d5db;
+            border-radius: 0.375rem; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
-        @media (max-width: 768px) {
-            .desktop-menu {
-                display: none;
-            }
-            .mobile-menu.open {
-                display: block;
-            }
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none; border-color: var(--theme-orange);
+            box-shadow: 0 0 0 3px rgba(249,115,22,0.3);
         }
-        .welcome-message {
-            color: #d1d5db;
-            margin-right: 1rem;
+        .btn {
+            padding: 0.75rem 1.5rem; border-radius: 0.375rem; font-weight: 600;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease; text-align: center;
         }
-        .favorite-heart-btn i.fas.fa-heart {
-            color: #ef4444;
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
         }
-        .favorite-heart-btn:hover i.far.fa-heart {
-             color: #ef4444;
-        }
-        /* Orange buttons */
         .btn-orange {
-            background-color: #F97316;
-            color: white;
+            background-color: var(--theme-orange); color: white; border: 1px solid var(--theme-orange);
         }
-        .btn-orange:hover {
-            background-color: #EA580C;
+        .btn-orange:hover:not(:disabled) {
+            background-color: var(--theme-orange-dark); border-color: var(--theme-orange-dark);
         }
         .btn-orange-outline {
-            background-color: transparent;
-            border: 2px solid #F97316;
-            color: #F97316;
+            background-color: white; color: var(--theme-orange); border: 1px solid var(--theme-orange);
         }
-        .btn-orange-outline:hover {
-            background-color: #F97316;
-            color: white;
+        .btn-orange-outline:hover:not(:disabled) {
+            background-color: #FFF7ED; color: var(--theme-orange-dark); border-color: var(--theme-orange-dark);
         }
-        /* Custom scrollbar for Webkit browsers */
-        #daily-menu-container::-webkit-scrollbar {
-            height: 8px;
+        .error-feedback { color: #dc2626; font-size: 0.875rem; margin-top: 0.25rem; }
+        .success-feedback { color: #16a34a; font-size: 0.875rem; margin-top: 0.25rem; }
+        .neutral-feedback { color: #4b5563; font-size: 0.875rem; margin-top: 0.25rem; }
+
+        .auth-prompt {
+            text-align: center; padding: 3rem 1rem; border: 2px dashed #d1d5db;
+            border-radius: 0.5rem; background-color: white;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 20px 40px -10px rgba(0,0,0,0.1);
         }
-        #daily-menu-container::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
+        .auth-prompt h2 { font-size: 1.5rem; color: #1f2937; margin-bottom: 1rem; }
+        .auth-prompt p { color: #4b5563; margin-bottom: 1.5rem; }
+        #auth-required-prompt .btn-primary { background-color: var(--theme-orange); color: white; border-color: var(--theme-orange);}
+        #auth-required-prompt .btn-primary:hover { background-color: var(--theme-orange-dark); border-color: var(--theme-orange-dark);}
+        #auth-required-prompt .btn-success { background-color: #16a34a; color: white; }
+        #auth-required-prompt .btn-success:hover { background-color: #15803d; }
+        
+        #initial-loading-state {
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            min-height: 80vh; text-align: center;
         }
-        #daily-menu-container::-webkit-scrollbar-thumb {
-            background: #ccc;
-            border-radius: 10px;
+        #initial-loading-state p { font-size: 1.2rem; color: #4b5563; margin-top: 1rem; }
+        .spinner {
+            border: 4px solid #f3f3f3; border-top: 4px solid var(--theme-orange);
+            border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;
         }
-        #daily-menu-container::-webkit-scrollbar-thumb:hover {
-            background: #bbb;
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        #unified-dashboard-container { display: flex; min-height: 100vh; }
+        .dashboard-sidebar {
+            width: 260px; background-color: #1F2937; color: #D1D5DB; padding: 1.5rem 1rem;
+            display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh;
+            z-index: 40; transition: transform 0.3s ease-in-out;
         }
-        /* For Firefox */
-        #daily-menu-container {
-            scrollbar-width: thin;
-            scrollbar-color: #ccc #f1f1f1;
+        @media (max-width: 768px) {
+            .dashboard-sidebar { transform: translateX(-100%); z-index: 60; }
+            .dashboard-sidebar.open { transform: translateX(0); }
+        }
+        .dashboard-sidebar-header { display: flex; align-items: center; padding: 0.5rem 1rem; margin-bottom: 1.5rem; }
+        .dashboard-sidebar-header i.sidebar-main-icon { font-size: 1.75rem; color: var(--theme-orange); margin-right: 0.75rem; }
+        .dashboard-sidebar-header span { font-size: 1.25rem; font-weight: 600; color: #FFF; }
+        .dashboard-sidebar-nav ul { list-style: none; padding: 0; margin: 0; }
+        .dashboard-sidebar-nav li a {
+            display: flex; align-items: center; padding: 0.875rem 1rem; margin-bottom: 0.5rem;
+            border-radius: 0.375rem; color: #D1D5DB; text-decoration: none;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .dashboard-sidebar-nav li a i { margin-right: 0.875rem; width: 20px; text-align: center; }
+        .dashboard-sidebar-nav li a:hover { background-color: #374151; color: #FFF; }
+        .dashboard-sidebar-nav li a.active { background-color: var(--theme-orange); color: #FFF; font-weight: 500; }
+        .dashboard-sidebar-nav li a.active:hover { background-color: var(--theme-orange-dark); }
+        .dashboard-sidebar-logout { margin-top: auto; }
+        .dashboard-sidebar-logout a {
+            display: flex; align-items: center; padding: 0.875rem 1rem; margin-bottom: 0.5rem;
+            border-radius: 0.375rem; color: #D1D5DB; text-decoration: none;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .dashboard-sidebar-logout a:hover { background-color: #374151; color: #FFF; }
+        .dashboard-sidebar-logout a i { margin-right: 0.875rem; width: 20px; text-align: center; }
+        .dashboard-mobile-menu-toggle-btn {
+            display: none; background: none; border: none; color: #1F2937; font-size: 1.5rem;
+            padding: 0.5rem; margin-right: 1rem;
+        }
+        .dashboard-mobile-menu-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.5); z-index: 50;
+        }
+        @media (max-width: 768px) {
+            .dashboard-mobile-menu-toggle-btn { display: block; }
+            .dashboard-mobile-menu-overlay.open { display: block; }
+        }
+        .dashboard-content-area {
+            flex-grow: 1; margin-left: 260px; padding: 1.5rem 2rem;
+            background-color: #F3F4F6; min-height:100vh;
+        }
+        @media (max-width: 768px) {
+            .dashboard-content-area { margin-left: 0; padding: 1rem; }
+        }
+        .dashboard-content-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;
+        }
+        .dashboard-content-header-title-group { display:flex; align-items: center; }
+        .dashboard-content-header h1 { font-size: 1.75rem; font-weight: 700; color: #111827; }
+        @media (max-width: 768px) {
+            .dashboard-content-header h1 { font-size: 1.5rem; }
+            .dashboard-content-header p.subtitle { font-size: 0.8rem; }
+        }
+        .dashboard-content-header p.subtitle { font-size: 0.875rem; color: #6B7280; margin-top: 0.25rem; }
+        .dashboard-header-action-btn {
+            padding: 0.625rem 1.25rem;
+        }
+        .dashboard-header-action-btn i { margin-right: 0.5rem; }
+        @media (max-width: 768px) {
+            .dashboard-header-action-btn { padding: 0.5rem 1rem; font-size: 0.875rem; }
+            .dashboard-header-action-btn i { margin-right: 0.25rem; }
+        }
+        .dashboard-search-bar { margin-bottom: 1.5rem; }
+        .dashboard-search-bar input {
+            width: 100%; max-width: 400px; padding: 0.75rem 1rem; border: 1px solid #D1D5DB;
+            border-radius: 0.375rem;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%239CA3AF'%3E%3Cpath fill-rule='evenodd' d='M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z' clip-rule='evenodd' /%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: 0.75rem center; background-size: 1rem; padding-left: 2.5rem;
+        }
+        .dashboard-search-bar input:focus { border-color: var(--theme-orange); box-shadow: 0 0 0 3px rgba(249,115,22,0.3); }
+        @media (max-width: 768px) { .dashboard-search-bar input { max-width: 100%; } }
+        .ro-menu-items-container {
+            background-color: white; border-radius: 0.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px 0 rgba(0,0,0,0.06); overflow-x: auto;
+        }
+        .ro-menu-items-container h2.table-title {
+            padding: 1rem 1.5rem; font-size: 1.125rem; font-weight: 600; color: #1F2937;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        @media (max-width: 768px) {
+            .ro-menu-items-container { background-color: transparent; box-shadow: none; overflow-x: visible; }
+            .ro-menu-items-container h2.table-title {
+                padding: 0.75rem 0; margin-bottom: 0.75rem; font-size: 1.1rem;
+                background-color: white; padding-left:1rem; padding-right:1rem;
+                border-radius: 0.5rem 0.5rem 0 0;
+            }
+        }
+        .ro-menu-items-table { width: 100%; min-width: 800px; border-collapse: collapse; }
+        .ro-menu-items-table th, .ro-menu-items-table td {
+            padding: 1rem 1.5rem; text-align: left; border-bottom: 1px solid #E5E7EB; vertical-align: middle;
+        }
+        .ro-menu-items-table th {
+            font-size: 0.75rem; font-weight: 600; color: #6B7280;
+            text-transform: uppercase; letter-spacing: 0.05em; background-color: #F9FAFB;
+        }
+        .ro-menu-items-table td.item-cell { display: flex; align-items: center; }
+        .ro-menu-items-table td.item-cell img {
+            width: 50px; height: 50px; object-fit: cover; border-radius: 0.375rem; margin-right: 1rem;
+        }
+        .ro-menu-items-table td .item-name { font-weight: 500; color: #111827; }
+        .ro-menu-items-table td .item-description {
+            font-size: 0.875rem; color: #6B7280; max-width: 250px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .ro-status-badge {
+            padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; display: inline-block;
+        }
+        .ro-status-badge.available { background-color: #D1FAE5; color: #065F46; }
+        .ro-status-badge.unavailable { background-color: #E5E7EB; color: #4B5563; }
+        .ro-action-btn {
+            background: none; border: none; cursor: pointer; color: #6B7280; padding: 0.5rem;
+            margin-right: 0.25rem; border-radius: 0.25rem; transition: color 0.2s ease, background-color 0.2s ease;
+        }
+        .ro-action-btn:hover { color: var(--theme-orange-dark); background-color: #FFF7ED; }
+        @media (max-width: 768px) {
+            .ro-menu-items-table { min-width: 100%; border: none; }
+            .ro-menu-items-table thead { display: none; }
+            .ro-menu-items-table tr {
+                display: block; margin-bottom: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem;
+                padding: 1rem; background-color: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            }
+            .ro-menu-items-table td {
+                display: block; text-align: right !important; padding: 0.6rem 0; font-size: 0.875rem;
+                border-bottom: 1px dashed #f3f4f6; position: relative; padding-left: 45%; min-height: 1.5em;
+            }
+            .ro-menu-items-table td:last-child { border-bottom: none; }
+            .ro-menu-items-table td::before {
+                content: attr(data-label); position: absolute; left: 0; width: 40%; padding-right: 10px;
+                font-weight: 600; color: #374151; text-align: left !important; font-size: 0.8em;
+            }
+            .ro-menu-items-table td.item-cell {
+                padding-left: 0; text-align: left !important; display: flex; align-items: flex-start;
+                border-bottom: 1px solid #e5e7eb; padding-bottom: 0.75rem; margin-bottom: 0.5rem;
+            }
+            .ro-menu-items-table td.item-cell::before { display: none; }
+            .ro-menu-items-table td.item-cell img {
+                width: 50px; height: 50px; margin-right: 0.75rem; flex-shrink: 0; border-radius: 0.375rem;
+            }
+            .ro-menu-items-table td.item-cell > div { flex-grow: 1; }
+            .ro-menu-items-table td.item-cell .item-name { font-weight: 600; color: #111827; font-size: 1rem; }
+            .ro-menu-items-table td.item-cell .item-description {
+                white-space: normal; max-width: none; font-size: 0.8rem; margin-top: 0.2rem; color: #4b5563;
+            }
+            .ro-menu-items-table td[data-label="Actions"] { text-align: left !important; padding-left: 0; padding-top: 0.75rem; }
+            .ro-menu-items-table td[data-label="Actions"]::before { display: none; }
+            .ro-menu-items-table td[data-label="Actions"] .ro-action-btn { margin-right: 0.5rem; padding: 0.5rem 0.75rem; }
+            .ro-menu-items-table td[data-label="Actions"] .ro-action-btn i { font-size: 0.9rem; }
+        }
+        .dashboard-panel-content {
+            padding: 1.5rem; background-color: white; border-radius: 0.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px 0 rgba(0,0,0,0.06);
+        }
+        .dashboard-panel-content .panel-main-title {
+            font-size: 1.5rem; font-weight: 600; color: #1F2937; margin-bottom: 1.5rem;
         }
     </style>
 </head>
 <body class="bg-gray-100">
 
-    <!-- Navigation Bar -->
-    <nav class="navbar p-4 text-white fixed w-full top-0 z-50">
-        <div class="container mx-auto flex justify-between items-center">
-            <a href="index.html" class="text-2xl font-bold">FoodieX</a>
-            
-            <div class="hidden md:flex space-x-6 items-center desktop-menu">
-                <span id="welcome-message" class="welcome-message hidden"></span>
-                <a href="index.html" class="hover:text-gray-300">Home</a>
-                <a href="restaurants.html" class="hover:text-gray-300">Restaurants</a>
-                <a href="foods.html" class="hover:text-gray-300">Foods</a>
-                <a href="login.html" id="nav-login" class="hover:text-gray-300">Login / Signup</a>
-                <a href="profile.html" id="nav-profile" class="hover:text-gray-300 hidden">Profile</a>
-                <a href="#" id="nav-logout" class="hover:text-gray-300 hidden">Logout</a>
-            </div>
+    <div id="initial-loading-state">
+        <div class="spinner"></div>
+        <p>Loading your profile...</p>
+    </div>
 
-            <div class="md:hidden">
-                <button id="mobile-menu-button" class="text-white focus:outline-none">
-                    <i class="fas fa-bars fa-lg"></i>
+    <div id="auth-required-prompt" class="auth-prompt p-6 md:p-8 hidden-important mt-8 mx-auto max-w-2xl">
+        <h2>Access Your Account</h2>
+        <p>Please log in or sign up to manage your profile and preferences.</p>
+        <div class="flex justify-center space-x-4">
+            <a href="/login.html" class="btn btn-primary">Login</a>
+            <a href="/login.html#user-signup" class="btn btn-success">Sign Up</a>
+        </div>
+    </div>
+
+    <div id="unified-dashboard-container" class="hidden-important">
+        <div id="dashboard-mobile-menu-overlay" class="dashboard-mobile-menu-overlay"></div>
+        <aside id="dashboard-sidebar-nav-menu" class="dashboard-sidebar">
+            <div class="dashboard-sidebar-header">
+                <i id="sidebar-main-icon-dynamic" class="fas fa-user-circle sidebar-main-icon"></i>
+                <span id="sidebar-username-restaurant-name">User / Restaurant</span>
+            </div>
+            <nav class="dashboard-sidebar-nav">
+                <ul id="dashboard-sidebar-nav-list"></ul>
+            </nav>
+            <div class="dashboard-sidebar-logout">
+                <a href="#" id="dashboard-logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>Logout
+                </a>
+            </div>
+        </aside>
+
+        <main id="dashboard-content-area-main" class="dashboard-content-area">
+            <div class="dashboard-content-header">
+                <div class="dashboard-content-header-title-group">
+                    <button id="dashboard-mobile-menu-toggle-btn" class="dashboard-mobile-menu-toggle-btn"><i class="fas fa-bars"></i></button>
+                    <div>
+                        <h1 id="dashboard-content-area-title">Dashboard</h1>
+                        <p id="dashboard-content-area-subtitle" class="subtitle">Manage your account</p>
+                    </div>
+                </div>
+                <button id="dashboard-header-action-btn" class="btn btn-orange dashboard-header-action-btn hidden-important">
+                    <i class="fas fa-plus"></i>Add New Item
                 </button>
             </div>
-        </div>
-        <div id="mobile-menu-items" class="mobile-menu md:hidden mt-3">
-            <span id="mobile-welcome-message" class="block px-2 py-1 text-sm welcome-message hidden"></span>
-            <a href="index.html" class="block px-2 py-1 text-sm hover:bg-gray-700">Home</a>
-            <a href="restaurants.html" class="block px-2 py-1 text-sm hover:bg-gray-700">Restaurants</a>
-            <a href="foods.html" class="block px-2 py-1 text-sm hover:bg-gray-700">Foods</a>
-            <a href="login.html" id="mobile-nav-login" class="block px-2 py-1 text-sm hover:bg-gray-700">Login / Signup</a>
-            <a href="profile.html" id="mobile-nav-profile" class="block px-2 py-1 text-sm hover:bg-gray-700 hidden">Profile</a>
-            <a href="#" id="mobile-nav-logout" class="block px-2 py-1 text-sm hover:bg-gray-700 hidden">Logout</a>
-        </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <section class="hero-section flex items-center justify-center text-white pt-16">
-        <div class="text-center bg-black bg-opacity-50 p-8 rounded-lg">
-            <h1 class="text-5xl font-bold mb-4">Find Your Favorite Meal Today!</h1>
-            <p class="text-xl mb-8">Discover the best local restaurants and dishes.</p>
-            <div class="flex flex-col space-y-4 items-center md:flex-row md:space-y-0 md:space-x-4 md:justify-center">
-                <a href="restaurants.html" class="btn-orange hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300 w-full md:w-auto text-center">Explore Restaurants</a>
-                <a href="login.html#user-signup" id="hero-signup-btn" class="btn-orange-outline hover:bg-orange-500 hover:text-white text-orange-500 font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300 w-full md:w-auto text-center">Sign Up Now</a>
+            <div id="dashboard-search-bar-container" class="dashboard-search-bar hidden-important">
+                <input type="search" id="dashboard-ro-menu-items-search" placeholder="Search menu items...">
             </div>
-        </div>
-    </section>
 
-    <!-- Daily Menu of Favorite Restaurants -->
-    <section id="daily-menu-favorites-section" class="container mx-auto py-12 px-4 hidden">
-        <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">Today's Specials from Your Favorites</h2>
-        <div id="daily-menu-container" class="flex overflow-x-auto gap-4 pb-4">
-            <!-- Content dynamically loaded by JS -->
-        </div>
-        <p id="no-favorites-message" class="text-center text-gray-600 mt-6 hidden">
-            Add restaurants to your favorites to see their daily specials here!
-        </p>
-    </section>
-
-    <!-- Restaurants Preview Section -->
-    <section class="bg-gray-50 py-12 px-4">
-        <div class="container mx-auto">
-            <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">Featured Restaurants</h2>
-            <div id="restaurants-preview-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="loading-placeholder col-span-full">Loading restaurants...</div>
-            </div>
-            <div class="text-center mt-8">
-                <a href="restaurants.html" class="btn-orange hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300">View All Restaurants</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Foods Preview Section -->
-    <section class="py-12 px-4">
-        <div class="container mx-auto">
-            <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">Popular Dishes</h2>
-            <div id="foods-preview-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="loading-placeholder col-span-full">Loading popular dishes...</div>
-            </div>
-             <div class="text-center mt-8">
-                <a href="foods.html" class="btn-orange hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300">Explore All Foods</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-gray-300 py-12">
-        <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div>
-                    <h3 class="text-xl font-semibold text-white mb-4">FoodieX</h3>
-                    <p class="text-sm">Your go-to platform for discovering delicious meals and supporting local restaurants.</p>
+            <div id="panel-user-personal-info" class="dashboard-panel dashboard-panel-content hidden-important">
+                <h2 class="panel-main-title">Personal Information</h2>
+                <div class="text-center">
+                    <img id="display-user-profile-image" class="profile-image mx-auto" src="https://via.placeholder.com/150?text=P" alt="Profile Image">
+                    <h3 id="display-user-profile-name" class="text-2xl font-semibold mb-1 text-gray-800">Full Name</h3>
+                    <p id="display-user-profile-email" class="text-gray-600 mb-6">email@example.com</p>
+                    <button id="edit-user-profile-toggle-btn" class="btn btn-orange-outline"><i class="fas fa-edit mr-2"></i>Edit Profile</button>
                 </div>
-                <div>
-                    <h3 class="text-xl font-semibold text-white mb-4">Quick Links</h3>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="index.html" class="hover:text-white">Home</a></li>
-                        <li><a href="restaurants.html" class="hover:text-white">Restaurants</a></li>
-                        <li><a href="foods.html" class="hover:text-white">Foods</a></li>
-                        <li><a href="https://wa.me/918789548725" target="_blank" rel="noopener noreferrer" class="hover:text-white">Contact Us (WhatsApp)</a></li>
-                    </ul>
+                <div id="edit-user-profile-form-container" class="hidden-important mt-8 max-w-lg mx-auto">
+                    <form id="update-user-profile-details-form" class="space-y-6">
+                        <div><label for="edit-user-form-name" class="form-label">Full Name</label><input type="text" id="edit-user-form-name" class="form-input" required></div>
+                        <div>
+                            <label for="edit-user-form-image" class="form-label">Profile Image (Max 500KB)</label>
+                            <input type="file" id="edit-user-form-image" class="form-input" accept="image/*">
+                            <p class="text-xs text-gray-500 mt-1">Leave blank to keep current image.</p>
+                        </div>
+                        <button type="submit" class="btn btn-orange w-full">Save Changes</button>
+                        <p id="edit-user-profile-feedback" class="text-center"></p>
+                    </form>
                 </div>
-                <div>
-                    <h3 class="text-xl font-semibold text-white mb-4">Connect With Us</h3>
-                    <div class="flex flex-col space-y-2">
-                        <a href="https://wa.me/918789548725" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white flex items-center">
-                            <i class="fab fa-whatsapp fa-lg mr-2"></i> WhatsApp 1
-                        </a>
-                        <a href="https://wa.me/917987693299" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white flex items-center">
-                            <i class="fab fa-whatsapp fa-lg mr-2"></i> WhatsApp 2
-                        </a>
+            </div>
+
+            <div id="panel-user-my-orders" class="dashboard-panel dashboard-panel-content hidden-important">
+                <h2 class="panel-main-title">My Orders</h2>
+                <div class="text-center py-8 bg-gray-50 rounded-lg">
+                    <i class="fas fa-receipt fa-3x text-gray-400 mb-4"></i>
+                    <p class="text-gray-600 text-lg">Your order history will be displayed here.</p>
+                    <p class="text-gray-500 text-sm mt-2">This feature is coming soon!</p>
+                </div>
+            </div>
+
+            <div id="panel-user-my-favorites" class="dashboard-panel dashboard-panel-content hidden-important">
+                <h2 class="panel-main-title">My Favorite Restaurants</h2>
+                <div id="user-favorites-list-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <p class="text-gray-600 col-span-full text-center py-4">Loading favorites...</p> 
+                </div>
+            </div>
+
+            <div id="panel-ro-food-items" class="dashboard-panel hidden-important">
+                <div id="ro-add-edit-food-form-container" class="hidden-important mb-8 max-w-xl mx-auto bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-700" id="ro-food-item-form-title">Add New Food Item</h3>
+                    <form id="ro-food-item-form" class="space-y-4">
+                        <input type="hidden" id="ro-food-item-form-id">
+                        <div><label for="ro-food-item-form-name" class="form-label">Food Name</label><input type="text" id="ro-food-item-form-name" class="form-input" required></div>
+                        <div><label for="ro-food-item-form-description" class="form-label">Description</label><textarea id="ro-food-item-form-description" class="form-textarea" rows="3" required></textarea></div>
+                        <div><label for="ro-food-item-form-category" class="form-label">Category</label><input type="text" id="ro-food-item-form-category" class="form-input" placeholder="e.g., Pizza, Sides, Dessert" required></div>
+                        <div><label for="ro-food-item-form-price" class="form-label">Price (₹)</label><input type="number" id="ro-food-item-form-price" class="form-input" step="0.01" min="0" required></div>
+                        <div>
+                            <label for="ro-food-item-form-status" class="form-label">Status</label>
+                            <select id="ro-food-item-form-status" class="form-input form-select">
+                                <option value="Available">Available</option>
+                                <option value="Unavailable">Unavailable</option>
+                            </select>
+                        </div>
+                        <div><label for="ro-food-item-form-image" class="form-label">Image (Max 500KB)</label><input type="file" id="ro-food-item-form-image" class="form-input" accept="image/*"> <small class="text-xs text-gray-500">Leave blank or upload new to replace.</small></div>
+                        <button type="submit" id="ro-food-item-form-submit-btn" class="btn btn-orange w-full">Add Food Item</button>
+                        <p id="ro-food-item-form-feedback" class="text-center"></p>
+                    </form>
+                </div>
+                <div class="ro-menu-items-container">
+                    <h2 class="table-title">Menu Items</h2>
+                    <table class="ro-menu-items-table">
+                        <thead>
+                            <tr><th>Item</th><th>Category</th><th>Price (₹)</th><th>Status</th><th>Actions</th></tr>
+                        </thead>
+                        <tbody id="ro-foods-list-container"></tbody>
+                    </table>
+                    <div id="ro-foods-list-placeholder" class="p-8 text-center text-gray-500 hidden-important bg-white rounded-b-lg">
+                        No food items added yet. Click "Add New Item" to get started.
                     </div>
                 </div>
             </div>
-            <div class="mt-8 border-t border-gray-700 pt-8 text-center text-sm">
-                <p>© <span id="current-year"></span> FoodieX. All rights reserved.</p>
+
+            <div id="panel-ro-daily-menu" class="dashboard-panel dashboard-panel-content hidden-important">
+                <h2 class="panel-main-title">Manage Daily Menu</h2>
+                <form id="ro-update-daily-menu-form" class="space-y-4 max-w-lg mx-auto bg-gray-50 p-6 rounded-lg">
+                    <div><label for="ro-daily-menu-form-date" class="form-label">Select Date</label><input type="date" id="ro-daily-menu-form-date" class="form-input" required></div>
+                    <div><label for="ro-daily-menu-form-items" class="form-label">Menu Items (one per line)</label><textarea id="ro-daily-menu-form-items" class="form-textarea" rows="5" placeholder="e.g., Special Pizza..." required></textarea></div>
+                    <button type="submit" class="btn btn-orange w-full">Update Daily Menu</button>
+                    <p id="ro-daily-menu-feedback" class="text-center"></p>
+                </form>
+                <div id="ro-display-current-daily-menu" class="mt-6 max-w-lg mx-auto text-sm">Loading current menu...</div>
             </div>
+
+            <div id="panel-ro-restaurant-details" class="dashboard-panel dashboard-panel-content hidden-important">
+                <h2 class="panel-main-title">Restaurant Information</h2>
+                <div class="text-center mb-6">
+                    <img id="display-ro-restaurant-logo" class="restaurant-logo-display mx-auto" src="https://via.placeholder.com/150?text=L" alt="Restaurant Logo">
+                    <h4 id="display-ro-restaurant-name" class="text-xl font-semibold text-gray-800 mt-2">Restaurant Name</h4>
+                    <p id="display-ro-restaurant-address" class="text-gray-600 text-sm">Address</p>
+                    <p id="display-ro-restaurant-contact" class="text-gray-600 text-sm">Contact</p>
+                    <p id="display-ro-restaurant-cuisine" class="text-gray-600 text-sm mb-4">Cuisine</p>
+                    <button id="edit-ro-restaurant-toggle-btn" class="btn btn-orange-outline btn-sm"><i class="fas fa-edit mr-2"></i>Edit Restaurant Info</button>
+                </div>
+                <div id="edit-ro-restaurant-form-container" class="hidden-important mt-6 max-w-lg mx-auto">
+                    <form id="update-ro-restaurant-details-form" class="space-y-4">
+                        <div><label for="edit-ro-form-restaurant-name" class="form-label">Name</label><input type="text" id="edit-ro-form-restaurant-name" class="form-input" required></div>
+                        <div><label for="edit-ro-form-restaurant-address" class="form-label">Address</label><input type="text" id="edit-ro-form-restaurant-address" class="form-input" required></div>
+                        <div><label for="edit-ro-form-restaurant-contact" class="form-label">Contact</label><input type="text" id="edit-ro-form-restaurant-contact" class="form-input" required></div>
+                        <div><label for="edit-ro-form-restaurant-cuisine" class="form-label">Cuisine</label><input type="text" id="edit-ro-form-restaurant-cuisine" class="form-input" required></div>
+                        <div><label for="edit-ro-form-restaurant-logo" class="form-label">Logo (Max 500KB)</label><input type="file" id="edit-ro-form-restaurant-logo" class="form-input" accept="image/*"></div>
+                        <button type="submit" class="btn btn-orange w-full">Save Changes</button>
+                        <p id="edit-ro-restaurant-feedback" class="text-center"></p>
+                    </form>
+                </div>
+            </div>
+
+            <div id="panel-common-settings" class="dashboard-panel dashboard-panel-content hidden-important">
+                <h2 class="panel-main-title">Account Settings</h2>
+                <div class="max-w-lg mx-auto space-y-8">
+                    <form id="common-change-password-form" class="space-y-4 bg-gray-50 p-6 rounded-lg">
+                        <h3 class="text-lg font-medium text-gray-700">Change Password</h3>
+                        <div><label for="common-current-password" class="form-label">Current Password</label><input type="password" id="common-current-password" class="form-input" required></div>
+                        <div><label for="common-new-password" class="form-label">New Password</label><input type="password" id="common-new-password" class="form-input" required></div>
+                        <div><label for="common-confirm-new-password" class="form-label">Confirm New Password</label><input type="password" id="common-confirm-new-password" class="form-input" required></div>
+                        <button type="submit" class="btn btn-orange w-full">Update Password</button>
+                        <p id="common-change-password-feedback" class="text-center"></p>
+                    </form>
+                    <div class="text-center">
+                        <a href="#" id="common-forgot-password-link" class="text-blue-600 hover:underline">Forgot Password?</a>
+                        <p id="common-forgot-password-feedback" class="text-center mt-2"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="panel-ro-analytics" class="dashboard-panel dashboard-panel-content hidden-important">
+                <h2 class="panel-main-title">Analytics</h2>
+                <p class="text-gray-600">Analytics features are coming soon!</p>
+            </div>
+        </main>
+    </div>
+
+    <div id="confirmation-dialog-modal" class="modal">
+        <div class="modal-content">
+            <h3 class="text-xl font-semibold mb-4" id="modal-dialog-title">Confirm Action</h3>
+            <p id="modal-dialog-message" class="mb-6 text-gray-700">Are you sure?</p>
+            <div class="flex justify-end space-x-3">
+                <button id="modal-dialog-cancel-btn" class="btn btn-orange-outline">Cancel</button>
+                <button id="modal-dialog-confirm-btn" class="btn btn-orange">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-gray-800 text-gray-300 py-10 mt-12">
+        <div class="container mx-auto px-4 text-center text-sm">
+            <p>© <span id="current-year"></span> FoodieX. All rights reserved.</p>
         </div>
     </footer>
 
-    <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
-        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
-        import { getDatabase, ref, get, onValue, query, limitToFirst, set, remove } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js';
+        import { getAuth, onAuthStateChanged, updatePassword, signOut, sendPasswordResetEmail, reauthenticateWithCredential, EmailAuthProvider } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
+        import { getDatabase, ref, get, set, update, onValue, push, remove } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js';
 
+        // =====================================================================================
+        // CRITICAL: Firebase Configuration
+        // YOU MUST REPLACE THE PLACEHOLDER VALUES BELOW WITH YOUR ACTUAL FIREBASE PROJECT CONFIGURATION.
+        // Find these in your Firebase project: Settings > General > Your apps > SDK setup and configuration.
+        // If these are not correct, NOTHING WILL WORK.
+        // =====================================================================================
         const firebaseConfig = {
-            apiKey: "AIzaSyABlpJruz0pZN7K6bQgRuqDxPVAG1bi9q8",
-            authDomain: "daily-menu-bc700.firebaseapp.com",
-            databaseURL: "https://daily-menu-bc700-default-rtdb.firebaseio.com",
-            projectId: "daily-menu-bc700",
-            storageBucket: "daily-menu-bc700.firebasestorage.app",
-            messagingSenderId: "87059586917",
-            appId: "1:87059586917:web:d2787e9d4d12dc47decb8c",
-            measurementId: "G-QJJYDQ9M2J"
+            apiKey: "YOUR_API_KEY", // <-- REPLACE THIS!
+            authDomain: "YOUR_AUTH_DOMAIN", // <-- REPLACE THIS!
+            databaseURL: "YOUR_DATABASE_URL", // <-- REPLACE THIS!
+            projectId: "YOUR_PROJECT_ID", // <-- REPLACE THIS!
+            storageBucket: "YOUR_STORAGE_BUCKET", // <-- REPLACE THIS!
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID", // <-- REPLACE THIS!
+            appId: "YOUR_APP_ID", // <-- REPLACE THIS!
         };
+        // =====================================================================================
+        // END OF Firebase Configuration - Double check the values above!
+        // =====================================================================================
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const database = getDatabase(app);
+        let app;
+        let auth;
+        let database;
 
-        const navLogin = document.getElementById('nav-login');
-        const navProfile = document.getElementById('nav-profile');
-        const navLogout = document.getElementById('nav-logout');
-        const mobileNavLogin = document.getElementById('mobile-nav-login');
-        const mobileNavProfile = document.getElementById('mobile-nav-profile');
-        const mobileNavLogout = document.getElementById('mobile-nav-logout');
-        const welcomeMessage = document.getElementById('welcome-message');
-        const mobileWelcomeMessage = document.getElementById('mobile-welcome-message');
-        const heroSignupBtn = document.getElementById('hero-signup-btn');
-        const dailyMenuFavoritesSection = document.getElementById('daily-menu-favorites-section');
-        const dailyMenuContainer = document.getElementById('daily-menu-container');
-        const noFavoritesMessage = document.getElementById('no-favorites-message');
-        const restaurantsPreviewContainer = document.getElementById('restaurants-preview-container');
-        const foodsPreviewContainer = document.getElementById('foods-preview-container');
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            database = getDatabase(app);
+            console.log("Firebase initialized successfully.");
+        } catch (error) {
+            console.error("CRITICAL: Firebase initialization failed!", error);
+            console.error("PLEASE CHECK YOUR `firebaseConfig` object in the script. It likely contains placeholder values like 'YOUR_API_KEY'.");
+            const loadingState = document.getElementById('initial-loading-state');
+            if(loadingState) {
+                loadingState.innerHTML = `<p style="color: red; font-weight: bold;">Firebase Initialization Failed!<br>Check console for details and verify your <code>firebaseConfig</code>.</p>`;
+            }
+            // Stop further script execution if Firebase fails to initialize
+            throw new Error("Firebase init failed, stopping script execution.");
+        }
 
-        const mobileMenuButton = document.getElementById('mobile-menu-button');
-        const mobileMenuItems = document.getElementById('mobile-menu-items');
-        mobileMenuButton.addEventListener('click', () => {
-            mobileMenuItems.classList.toggle('open');
+
+        const initialLoadingState = document.getElementById('initial-loading-state');
+        const authRequiredPrompt = document.getElementById('auth-required-prompt');
+        const unifiedDashboardContainer = document.getElementById('unified-dashboard-container');
+        const dashboardMobileMenuToggleBtn = document.getElementById('dashboard-mobile-menu-toggle-btn');
+        const dashboardSidebarNavMenu = document.getElementById('dashboard-sidebar-nav-menu');
+        const dashboardMobileMenuOverlay = document.getElementById('dashboard-mobile-menu-overlay');
+        const sidebarMainIcon = document.getElementById('sidebar-main-icon-dynamic');
+        const sidebarUsernameRestaurantName = document.getElementById('sidebar-username-restaurant-name');
+        const dashboardSidebarNavList = document.getElementById('dashboard-sidebar-nav-list');
+        const dashboardLogoutBtn = document.getElementById('dashboard-logout-btn');
+        const dashboardContentAreaTitle = document.getElementById('dashboard-content-area-title');
+        const dashboardContentAreaSubtitle = document.getElementById('dashboard-content-area-subtitle');
+        const dashboardHeaderActionBtn = document.getElementById('dashboard-header-action-btn');
+        const dashboardSearchBarContainer = document.getElementById('dashboard-search-bar-container');
+        const dashboardRoMenuItemsSearch = document.getElementById('dashboard-ro-menu-items-search');
+        const allDashboardPanels = document.querySelectorAll('.dashboard-panel');
+        const displayUserProfileImage = document.getElementById('display-user-profile-image');
+        const displayUserProfileName = document.getElementById('display-user-profile-name');
+        const displayUserProfileEmail = document.getElementById('display-user-profile-email');
+        const editUserProfileToggleBtn = document.getElementById('edit-user-profile-toggle-btn');
+        const editUserProfileFormContainer = document.getElementById('edit-user-profile-form-container');
+        const updateUserProfileDetailsForm = document.getElementById('update-user-profile-details-form');
+        const editUserFormName = document.getElementById('edit-user-form-name');
+        const editUserFormImage = document.getElementById('edit-user-form-image');
+        const editUserProfileFeedback = document.getElementById('edit-user-profile-feedback');
+        const userFavoritesListContainer = document.getElementById('user-favorites-list-container');
+        const roAddEditFoodFormContainer = document.getElementById('ro-add-edit-food-form-container');
+        const roFoodItemForm = document.getElementById('ro-food-item-form');
+        const roFoodItemFormId = document.getElementById('ro-food-item-form-id');
+        const roFoodItemFormTitle = document.getElementById('ro-food-item-form-title');
+        const roFoodItemFormName = document.getElementById('ro-food-item-form-name');
+        const roFoodItemFormDescription = document.getElementById('ro-food-item-form-description');
+        const roFoodItemFormCategory = document.getElementById('ro-food-item-form-category');
+        const roFoodItemFormPrice = document.getElementById('ro-food-item-form-price');
+        const roFoodItemFormStatus = document.getElementById('ro-food-item-form-status');
+        const roFoodItemFormImage = document.getElementById('ro-food-item-form-image');
+        const roFoodItemFormSubmitBtn = document.getElementById('ro-food-item-form-submit-btn');
+        const roFoodItemFormFeedback = document.getElementById('ro-food-item-form-feedback');
+        const roFoodsListContainer = document.getElementById('ro-foods-list-container');
+        const roFoodsListPlaceholder = document.getElementById('ro-foods-list-placeholder');
+        const roUpdateDailyMenuForm = document.getElementById('ro-update-daily-menu-form');
+        const roDailyMenuFormDate = document.getElementById('ro-daily-menu-form-date');
+        const roDailyMenuFormItems = document.getElementById('ro-daily-menu-form-items');
+        const roDailyMenuFeedback = document.getElementById('ro-daily-menu-feedback');
+        const roDisplayCurrentDailyMenu = document.getElementById('ro-display-current-daily-menu');
+        const displayRoRestaurantLogo = document.getElementById('display-ro-restaurant-logo');
+        const displayRoRestaurantName = document.getElementById('display-ro-restaurant-name');
+        const displayRoRestaurantAddress = document.getElementById('display-ro-restaurant-address');
+        const displayRoRestaurantContact = document.getElementById('display-ro-restaurant-contact');
+        const displayRoRestaurantCuisine = document.getElementById('display-ro-restaurant-cuisine');
+        const editRoRestaurantToggleBtn = document.getElementById('edit-ro-restaurant-toggle-btn');
+        const editRoRestaurantFormContainer = document.getElementById('edit-ro-restaurant-form-container');
+        const updateRoRestaurantDetailsForm = document.getElementById('update-ro-restaurant-details-form');
+        const editRoFormRestaurantName = document.getElementById('edit-ro-form-restaurant-name');
+        const editRoFormRestaurantAddress = document.getElementById('edit-ro-form-restaurant-address');
+        const editRoFormRestaurantContact = document.getElementById('edit-ro-form-restaurant-contact');
+        const editRoFormRestaurantCuisine = document.getElementById('edit-ro-form-restaurant-cuisine');
+        const editRoFormRestaurantLogo = document.getElementById('edit-ro-form-restaurant-logo');
+        const editRoRestaurantFeedback = document.getElementById('edit-ro-restaurant-feedback');
+        const commonChangePasswordForm = document.getElementById('common-change-password-form');
+        const commonCurrentPasswordInput = document.getElementById('common-current-password');
+        const commonNewPasswordInput = document.getElementById('common-new-password');
+        const commonConfirmNewPasswordInput = document.getElementById('common-confirm-new-password');
+        const commonChangePasswordFeedback = document.getElementById('common-change-password-feedback');
+        const commonForgotPasswordLink = document.getElementById('common-forgot-password-link');
+        const commonForgotPasswordFeedback = document.getElementById('common-forgot-password-feedback');
+        const confirmationDialogModal = document.getElementById('confirmation-dialog-modal');
+        const modalDialogTitle = document.getElementById('modal-dialog-title');
+        const modalDialogMessage = document.getElementById('modal-dialog-message');
+        const modalDialogCancelBtn = document.getElementById('modal-dialog-cancel-btn');
+        const modalDialogConfirmBtn = document.getElementById('modal-dialog-confirm-btn');
+
+        if(document.getElementById('current-year')) {
+            document.getElementById('current-year').textContent = new Date().getFullYear();
+        }
+
+        let currentUser = null;
+        let currentUserDbData = null;
+        let currentDbListener = null; 
+        let currentRestaurantFoodsUnsubscribe = null;
+        let currentRestaurantDailyMenuUnsubscribe = null;
+        let allRoFoods = [];
+
+        async function compressAndEncodeImage(file, maxWidth = 300, quality = 0.7) {
+            return new Promise((resolve, reject) => {
+                if (!file) return resolve('');
+                if (file.size > 500 * 1024) {
+                    const actualSize = (file.size / 1024).toFixed(2);
+                    return reject(new Error(`Image too large (${actualSize}KB). Max 500KB allowed.`));
+                }
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let { width, height } = img;
+                        if (width > maxWidth) { height = (maxWidth / width) * height; width = maxWidth; }
+                        canvas.width = width; canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    };
+                    img.onerror = (err) => {
+                        console.error("Image load error in compressAndEncodeImage:", err);
+                        reject(new Error('Image load error. Please try a different image.'));
+                    }
+                    img.src = e.target.result;
+                };
+                reader.onerror = (err) => {
+                    console.error("File read error in compressAndEncodeImage:", err);
+                    reject(new Error('File read error.'));
+                }
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function showFeedback(element, message, isSuccess = true, isNeutral = false) {
+            if (!element) {
+                console.warn("showFeedback: Element not found to display message:", message);
+                return;
+            }
+            element.textContent = message;
+            if (isNeutral) {
+                element.className = 'text-center text-sm neutral-feedback';
+            } else {
+                element.className = `text-center text-sm ${isSuccess ? 'success-feedback' : 'error-feedback'}`;
+            }
+            if (!isNeutral) { 
+                setTimeout(() => { if(element && element.textContent === message) element.textContent = '';}, 4000);
+            }
+        }
+
+        let confirmActionCallback = null;
+        function openConfirmationModal(title, message, onConfirm) {
+            if(modalDialogTitle) modalDialogTitle.textContent = title;
+            if(modalDialogMessage) modalDialogMessage.textContent = message;
+            confirmActionCallback = onConfirm;
+            if(confirmationDialogModal) confirmationDialogModal.style.display = 'flex';
+        }
+        if(modalDialogCancelBtn) modalDialogCancelBtn.addEventListener('click', () => {
+            if(confirmationDialogModal) confirmationDialogModal.style.display = 'none';
+        });
+        if(modalDialogConfirmBtn) modalDialogConfirmBtn.addEventListener('click', () => {
+            if (confirmActionCallback) confirmActionCallback();
+            if(confirmationDialogModal) confirmationDialogModal.style.display = 'none';
         });
 
-        let currentUserFavorites = {};
+        if(dashboardLogoutBtn) dashboardLogoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            openConfirmationModal('Confirm Logout', 'Are you sure you want to log out?', () => {
+                signOut(auth).catch(err => console.error("Logout error:", err));
+            });
+        });
 
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                navLogin.classList.add('hidden');
-                mobileNavLogin.classList.add('hidden');
-                navProfile.classList.remove('hidden');
-                mobileNavProfile.classList.remove('hidden');
-                navLogout.classList.remove('hidden');
-                mobileNavLogout.classList.remove('hidden');
-                heroSignupBtn.classList.add('hidden');
+        function populateSidebar(role) {
+            if(!dashboardSidebarNavList) {
+                console.error("populateSidebar: dashboardSidebarNavList element not found.");
+                return;
+            }
+            dashboardSidebarNavList.innerHTML = '';
+            let navItems = [];
 
-                const userRef = ref(database, `users/${user.uid}`);
-                const userSnapshot = await get(userRef);
-                let userName = "User";
-                if (userSnapshot.exists() && userSnapshot.val().name) {
-                    userName = userSnapshot.val().name.split(" ")[0];
-                } else {
-                    const restaurantRef = ref(database, `restaurants/${user.uid}`);
-                    const restaurantSnapshot = await get(restaurantRef);
-                    if (restaurantSnapshot.exists() && restaurantSnapshot.val().name) {
-                         userName = restaurantSnapshot.val().name;
-                    }
-                }
-                welcomeMessage.textContent = `Hello, ${userName}!`;
-                welcomeMessage.classList.remove('hidden');
-                mobileWelcomeMessage.textContent = `Hello, ${userName}!`;
-                mobileWelcomeMessage.classList.remove('hidden');
+            if (role === 'user') {
+                navItems = [
+                    { id: 'panel-user-personal-info', icon: 'fa-user-circle', text: 'Personal Info', title: 'Your Profile' },
+                    { id: 'panel-user-my-orders', icon: 'fa-receipt', text: 'My Orders', title: 'My Orders'},
+                    { id: 'panel-user-my-favorites', icon: 'fa-heart', text: 'My Favorites', title: 'My Favorites' },
+                    { id: 'panel-common-settings', icon: 'fa-cog', text: 'Settings', title: 'Account Settings' }
+                ];
+                if(sidebarMainIcon) sidebarMainIcon.className = 'fas fa-user-circle sidebar-main-icon';
+                if(dashboardContentAreaSubtitle) dashboardContentAreaSubtitle.textContent = "Manage your account and preferences.";
+            } else if (role === 'restaurant') {
+                navItems = [
+                    { id: 'panel-ro-food-items', icon: 'fa-clipboard-list', text: 'Food Items', title: 'Menu Items Management' },
+                    { id: 'panel-ro-daily-menu', icon: 'fa-calendar-alt', text: 'Daily Menu', title: 'Daily Menu Management' },
+                    { id: 'panel-ro-restaurant-details', icon: 'fa-store-alt', text: 'Restaurant Details', title: 'Restaurant Information' },
+                    { id: 'panel-common-settings', icon: 'fa-cog', text: 'Settings', title: 'Account Settings' },
+                    { id: 'panel-ro-analytics', icon: 'fa-chart-line', text: 'Analytics', title: 'Restaurant Analytics' }
+                ];
+                if(sidebarMainIcon) sidebarMainIcon.className = 'fas fa-utensils sidebar-main-icon';
+                if(dashboardContentAreaSubtitle) dashboardContentAreaSubtitle.textContent = "Manage your restaurant operations.";
+            }
 
-                const userFavoritesRef = ref(database, `users/${user.uid}/favorites`);
-                const favSnapshot = await get(userFavoritesRef);
-                currentUserFavorites = favSnapshot.exists() ? favSnapshot.val() : {};
+            navItems.forEach(item => {
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = '#';
+                a.dataset.panel = item.id;
+                a.dataset.title = item.title;
+                a.innerHTML = `<i class="fas ${item.icon}"></i>${item.text}`;
+                a.addEventListener('click', handleNavClick);
+                li.appendChild(a);
+                dashboardSidebarNavList.appendChild(li);
+            });
+        }
+
+        function handleNavClick(e) {
+            e.preventDefault();
+            const panelId = e.currentTarget.dataset.panel;
+            const panelTitle = e.currentTarget.dataset.title;
+            setActiveDashboardPanel(panelId, panelTitle);
+            if(dashboardSidebarNavList) {
+                dashboardSidebarNavList.querySelectorAll('a').forEach(link => link.classList.remove('active'));
+            }
+            e.currentTarget.classList.add('active');
+        }
+
+        function setActiveDashboardPanel(panelId, panelTitle) {
+            if(allDashboardPanels) allDashboardPanels.forEach(panel => panel.classList.add('hidden-important'));
+            const activePanel = document.getElementById(panelId);
+            if (activePanel) {
+                activePanel.classList.remove('hidden-important');
+                if(dashboardContentAreaTitle) dashboardContentAreaTitle.textContent = panelTitle || 'Dashboard';
+            } else {
+                console.warn(`setActiveDashboardPanel: Panel with ID "${panelId}" not found.`);
+            }
+
+            if (panelId === 'panel-ro-food-items') {
+                if(dashboardHeaderActionBtn) dashboardHeaderActionBtn.classList.remove('hidden-important');
+                if(dashboardSearchBarContainer) dashboardSearchBarContainer.classList.remove('hidden-important');
+                if(roAddEditFoodFormContainer) roAddEditFoodFormContainer.classList.add('hidden-important'); 
+                if(dashboardHeaderActionBtn) dashboardHeaderActionBtn.innerHTML = '<i class="fas fa-plus"></i>Add New Item';
                 
-                loadDailyMenuFavorites(user.uid);
-                dailyMenuFavoritesSection.classList.remove('hidden');
-                updateFavoriteHeartsVisuals();
+                const searchTerm = dashboardRoMenuItemsSearch ? dashboardRoMenuItemsSearch.value.toLowerCase().trim() : "";
+                if(searchTerm === "" && allRoFoods.length > 0){
+                    renderRoFoodItems(allRoFoods);
+                } else if (searchTerm !== "" && dashboardRoMenuItemsSearch) { 
+                    dashboardRoMenuItemsSearch.dispatchEvent(new Event('input'));
+                } else { 
+                    renderRoFoodItems(allRoFoods);
+                }
 
             } else {
-                navLogin.classList.remove('hidden');
-                mobileNavLogin.classList.remove('hidden');
-                navProfile.classList.add('hidden');
-                mobileNavProfile.classList.add('hidden');
-                navLogout.classList.add('hidden');
-                mobileNavLogout.classList.add('hidden');
-                welcomeMessage.classList.add('hidden');
-                mobileWelcomeMessage.classList.add('hidden');
-                heroSignupBtn.classList.remove('hidden');
+                if(dashboardHeaderActionBtn) dashboardHeaderActionBtn.classList.add('hidden-important');
+                if(dashboardSearchBarContainer) dashboardSearchBarContainer.classList.add('hidden-important');
+            }
 
-                dailyMenuFavoritesSection.classList.add('hidden');
-                currentUserFavorites = {};
-                updateFavoriteHeartsVisuals();
+            if(dashboardSidebarNavMenu) dashboardSidebarNavMenu.classList.remove('open');
+            if(dashboardMobileMenuOverlay) dashboardMobileMenuOverlay.classList.remove('open');
+        }
+
+        if(dashboardMobileMenuToggleBtn) dashboardMobileMenuToggleBtn.addEventListener('click', () => {
+            if(dashboardSidebarNavMenu) dashboardSidebarNavMenu.classList.toggle('open');
+            if(dashboardMobileMenuOverlay) dashboardMobileMenuOverlay.classList.toggle('open');
+        });
+        if(dashboardMobileMenuOverlay) dashboardMobileMenuOverlay.addEventListener('click', () => {
+            if(dashboardSidebarNavMenu) dashboardSidebarNavMenu.classList.remove('open');
+            if(dashboardMobileMenuOverlay) dashboardMobileMenuOverlay.classList.remove('open');
+        });
+
+        function displayUserProfileInfo(userData) {
+            if(displayUserProfileName) displayUserProfileName.textContent = userData.name || 'N/A';
+            if(displayUserProfileEmail) displayUserProfileEmail.textContent = userData.email || 'N/A';
+            if(displayUserProfileImage) displayUserProfileImage.src = userData.imageBase64 || 'https://via.placeholder.com/150?text=P';
+            if(editUserFormName) editUserFormName.value = userData.name || '';
+        }
+
+        function displayUserFavorites(favoriteRestaurantIds = []) {
+            if(!userFavoritesListContainer) {
+                console.error("displayUserFavorites: userFavoritesListContainer element not found.");
+                return;
+            }
+            if (!Array.isArray(favoriteRestaurantIds)) { 
+                console.error("displayUserFavorites expects an array, got:", favoriteRestaurantIds);
+                favoriteRestaurantIds = [];
+            }
+
+            if (favoriteRestaurantIds.length === 0) {
+                userFavoritesListContainer.innerHTML = '<p class="text-gray-600 col-span-full text-center py-4">You haven\'t added any favorites yet.</p>';
+                return;
+            }
+            userFavoritesListContainer.innerHTML = '<p class="text-gray-500 col-span-full text-center py-4">Loading favorites...</p>';
+            
+            const favoritePromises = favoriteRestaurantIds.map(id => get(ref(database, `restaurants/${id}`)));
+            
+            Promise.all(favoritePromises).then(snapshots => {
+                userFavoritesListContainer.innerHTML = ''; 
+                let favoritesDisplayed = 0;
+                snapshots.forEach((snapshot, index) => {
+                    if (snapshot.exists()) {
+                        const restaurant = snapshot.val();
+                        const restaurantId = favoriteRestaurantIds[index]; 
+                        const card = document.createElement('div');
+                        card.className = 'card p-4 flex flex-col';
+                        card.innerHTML = `
+                            <img class="card-image mb-3" src="${restaurant.imageBase64 || 'https://via.placeholder.com/300x120?text=Restaurant'}" alt="${restaurant.name || 'Restaurant'}">
+                            <h4 class="text-lg font-semibold text-gray-800 mb-1">${restaurant.name || 'Unnamed Restaurant'}</h4>
+                            <p class="text-xs text-gray-500 mb-3">${restaurant.address || 'Address not available'}</p>
+                            <div class="mt-auto flex justify-between items-center">
+                                <a href="/restaurant-details.html?id=${restaurantId}" class="text-blue-600 hover:underline text-sm font-medium">View Details</a>
+                                <button class="remove-favorite-btn btn btn-orange-outline btn-sm py-1 px-2" data-id="${restaurantId}"><i class="fas fa-trash-alt mr-1"></i>Remove</button>
+                            </div>
+                        `;
+                        userFavoritesListContainer.appendChild(card);
+                        favoritesDisplayed++;
+                    }
+                });
+                if(favoritesDisplayed === 0 && favoriteRestaurantIds.length > 0) { 
+                    userFavoritesListContainer.innerHTML = '<p class="text-gray-600 col-span-full text-center py-4">Could not load details for your favorite restaurants. They may no longer exist.</p>';
+                } else if (favoritesDisplayed === 0 && favoriteRestaurantIds.length === 0) { 
+                     userFavoritesListContainer.innerHTML = '<p class="text-gray-600 col-span-full text-center py-4">You haven\'t added any favorites yet.</p>';
+                }
+            }).catch(error => {
+                console.error("Error fetching favorite restaurants:", error);
+                userFavoritesListContainer.innerHTML = '<p class="text-red-500 col-span-full text-center py-4">Could not load your favorites.</p>';
+            });
+        }
+
+        if(userFavoritesListContainer) userFavoritesListContainer.addEventListener('click', e => {
+            const removeButton = e.target.closest('.remove-favorite-btn');
+            if (removeButton && currentUser) {
+                const restaurantIdToRemove = removeButton.dataset.id;
+                openConfirmationModal('Remove Favorite', `Are you sure you want to remove this restaurant from your favorites?`, () => {
+                    const favoriteRef = ref(database, `users/${currentUser.uid}/favorites/${restaurantIdToRemove}`);
+                    remove(favoriteRef)
+                        .then(() => {
+                            showFeedback(editUserProfileFeedback, 'Favorite removed successfully.', true);
+                        })
+                        .catch(err => {
+                            console.error("Failed to remove favorite:", err);
+                            showFeedback(editUserProfileFeedback, 'Failed to remove favorite. ' + err.message, false);
+                        });
+                });
             }
         });
 
-        function handleLogout(e) {
-            e.preventDefault();
-            signOut(auth).then(() => {
-                window.location.href = 'login.html';
-            }).catch((error) => {
-                console.error('Logout error:', error);
-                alert('Failed to logout.');
+
+        function displayRoProfileInfo(roData) {
+            if(displayRoRestaurantName) displayRoRestaurantName.textContent = roData.name || 'N/A';
+            if(displayRoRestaurantAddress) displayRoRestaurantAddress.textContent = roData.address || 'N/A';
+            if(displayRoRestaurantContact) displayRoRestaurantContact.textContent = roData.contact || roData.email || 'N/A';
+            if(displayRoRestaurantCuisine) displayRoRestaurantCuisine.textContent = roData.cuisine || 'N/A';
+            if(displayRoRestaurantLogo) displayRoRestaurantLogo.src = roData.imageBase64 || 'https://via.placeholder.com/150?text=L';
+            
+            if(editRoFormRestaurantName) editRoFormRestaurantName.value = roData.name || '';
+            if(editRoFormRestaurantAddress) editRoFormRestaurantAddress.value = roData.address || '';
+            if(editRoFormRestaurantContact) editRoFormRestaurantContact.value = roData.contact || roData.email || '';
+            if(editRoFormRestaurantCuisine) editRoFormRestaurantCuisine.value = roData.cuisine || '';
+        }
+
+        function setupRoDailyMenuManagement(restaurantId) {
+            if(!roDailyMenuFormDate || !roDisplayCurrentDailyMenu || !roUpdateDailyMenuForm) {
+                console.error("setupRoDailyMenuManagement: One or more required DOM elements not found.");
+                return;
+            }
+            roDailyMenuFormDate.valueAsDate = new Date();
+            function loadAndDisplayMenuForDate(dateStr) {
+                roDisplayCurrentDailyMenu.innerHTML = `<p class="text-gray-500">Loading menu for ${dateStr}...</p>`;
+                if (currentRestaurantDailyMenuUnsubscribe) currentRestaurantDailyMenuUnsubscribe();
+                const menuRefDB = ref(database, `restaurants/${restaurantId}/dailyMenu/${dateStr}`);
+                currentRestaurantDailyMenuUnsubscribe = onValue(menuRefDB, snapshot => {
+                    if (snapshot.exists()) {
+                        const menuItems = snapshot.val().items || [];
+                        if(roDailyMenuFormItems) roDailyMenuFormItems.value = menuItems.join('\n');
+                        roDisplayCurrentDailyMenu.innerHTML = menuItems.length > 0 ?
+                            `<p class="font-medium text-gray-700 mb-1">Menu for ${dateStr}:</p><ul class="list-disc list-inside text-gray-600">${menuItems.map(item => `<li>${item}</li>`).join('')}</ul>` :
+                            `<p class="text-gray-500">No menu items set for ${dateStr}.</p>`;
+                    } else {
+                        if(roDailyMenuFormItems) roDailyMenuFormItems.value = '';
+                        roDisplayCurrentDailyMenu.innerHTML = `<p class="text-gray-500">No menu set for ${dateStr}. Add items above.</p>`;
+                    }
+                }, error => {
+                    console.error("Error loading daily menu: ", error);
+                    roDisplayCurrentDailyMenu.innerHTML = `<p class="text-red-500">Could not load menu for ${dateStr}.</p>`;
+                });
+            }
+            roDailyMenuFormDate.addEventListener('change', (e) => loadAndDisplayMenuForDate(e.target.value));
+            loadAndDisplayMenuForDate(roDailyMenuFormDate.value);
+
+            roUpdateDailyMenuForm.addEventListener('submit', e => {
+                e.preventDefault();
+                const submitButton = roUpdateDailyMenuForm.querySelector('button[type="submit"]');
+                if (submitButton) submitButton.disabled = true;
+                showFeedback(roDailyMenuFeedback, 'Processing...', true, true); 
+
+                const date = roDailyMenuFormDate.value;
+                const items = roDailyMenuFormItems ? roDailyMenuFormItems.value.split('\n').map(item => item.trim()).filter(item => item) : [];
+                set(ref(database, `restaurants/${restaurantId}/dailyMenu/${date}`), { items })
+                    .then(() => {
+                        showFeedback(roDailyMenuFeedback, 'Daily menu updated!', true);
+                    })
+                    .catch(err => {
+                        showFeedback(roDailyMenuFeedback, 'Update failed: ' + err.message, false);
+                    })
+                    .finally(() => {
+                        if (submitButton) submitButton.disabled = false;
+                        if (roDailyMenuFeedback && roDailyMenuFeedback.textContent === 'Processing...') {
+                            roDailyMenuFeedback.textContent = '';
+                        }
+                    });
             });
         }
-        navLogout.addEventListener('click', handleLogout);
-        mobileNavLogout.addEventListener('click', handleLogout);
 
-        async function loadDailyMenuFavorites(userId) {
-            dailyMenuContainer.innerHTML = `
-                <div class="loading-placeholder w-72 flex-shrink-0">Loading favorite menus...</div>`; // Adjusted placeholder
-            noFavoritesMessage.classList.add('hidden');
-
-            try {
-                const userFavoritesRef = ref(database, `users/${userId}/favorites`);
-                const userFavoritesSnapshot = await get(userFavoritesRef);
-
-                let favoriteRestaurantIds = [];
-                if (userFavoritesSnapshot.exists() && Object.keys(userFavoritesSnapshot.val()).length > 0) {
-                    favoriteRestaurantIds = Object.keys(userFavoritesSnapshot.val()); 
-                }
-
-                if (favoriteRestaurantIds.length === 0) {
-                    dailyMenuContainer.innerHTML = ''; 
-                    noFavoritesMessage.classList.remove('hidden');
-                    return;
-                }
-                
-                dailyMenuContainer.innerHTML = ''; 
-                let displayedMenus = 0;
-
-                for (const restaurantId of favoriteRestaurantIds) {
-                    const restaurantRefNode = ref(database, `restaurants/${restaurantId}`);
-                    const restaurantSnapshot = await get(restaurantRefNode);
-
-                    if (restaurantSnapshot.exists()) {
-                        const restaurantData = restaurantSnapshot.val();
-                        const today = new Date().toISOString().split('T')[0];
-                        const menuRef = ref(database, `restaurants/${restaurantId}/dailyMenu/${today}`);
-                        const menuSnapshot = await get(menuRef);
-                        
-                        let menuItemsHtml = '<p class="text-gray-500 text-sm">No menu posted for today.</p>';
-                        if (menuSnapshot.exists() && menuSnapshot.val().items && menuSnapshot.val().items.length > 0) {
-                            menuItemsHtml = `<ul class="menu-item-list list-disc list-inside text-gray-600 text-sm space-y-1">
-                                ${menuSnapshot.val().items.map(item => `<li>${item}</li>`).join('')}
-                            </ul>`;
-                        }
-
-                        // Card width is fixed w-72, flex-shrink-0 for horizontal scrolling
-                        const menuCard = `
-                            <div class="card bg-white p-6 rounded-lg shadow-md flex flex-col justify-between w-72 flex-shrink-0">
-                                <div>
-                                    <h3 class="text-xl font-semibold mb-2 text-gray-800">${restaurantData.name || 'Unnamed Restaurant'}</h3>
-                                    ${menuItemsHtml}
-                                </div>
-                                <a href="restaurant-details.html?id=${restaurantId}" class="mt-4 self-start inline-block btn-orange hover:bg-orange-600 text-white text-sm font-semibold py-2 px-4 rounded transition duration-300">View Restaurant</a>
-                            </div>
-                        `;
-                        dailyMenuContainer.insertAdjacentHTML('beforeend', menuCard);
-                        displayedMenus++;
+        function renderRoFoodItems(foodsToRender) {
+            if(!roFoodsListContainer || !roFoodsListPlaceholder) {
+                 console.error("renderRoFoodItems: roFoodsListContainer or roFoodsListPlaceholder not found.");
+                 return;
+            }
+            console.log(`%c[DEBUG] LOG 4: renderRoFoodItems called with (count: ${foodsToRender ? foodsToRender.length : 0}):`, "color: purple; font-weight: bold;", foodsToRender ? JSON.parse(JSON.stringify(foodsToRender)) : "null/undefined"); 
+            roFoodsListContainer.innerHTML = '';
+            if (foodsToRender && foodsToRender.length > 0) {
+                roFoodsListPlaceholder.classList.add('hidden-important');
+                foodsToRender.forEach(foodEntry => {
+                    if (!foodEntry || !foodEntry.data) {
+                        console.warn('[DEBUG] Invalid foodEntry in renderRoFoodItems:', foodEntry);
+                        return; 
                     }
-                }
-                
-                if (displayedMenus === 0) {
-                    dailyMenuContainer.innerHTML = '<p class="text-gray-600 w-full text-center">None of your favorite restaurants have posted a menu today, or their details could not be loaded.</p>';
-                    noFavoritesMessage.classList.add('hidden'); 
-                }
-
-
-            } catch (error) {
-                console.error("Error loading favorite menus:", error);
-                dailyMenuContainer.innerHTML = '<p class="text-red-500 w-full text-center">Could not load favorite menus.</p>';
+                    const foodId = foodEntry.id;
+                    const food = foodEntry.data;
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="item-cell" data-label="Item"><img src="${food.imageBase64 || 'https://via.placeholder.com/50?text=Food'}" alt="${food.name || 'N/A'}"><div><div class="item-name">${food.name  || 'N/A'}</div><div class="item-description">${(food.description || '').substring(0,100)}...</div></div></td>
+                        <td data-label="Category">${food.category || 'N/A'}</td>
+                        <td data-label="Price">₹${typeof food.price === 'number' ? food.price.toFixed(2) : '0.00'}</td>
+                        <td data-label="Status"><span class="ro-status-badge ${food.status === 'Available' ? 'available' : 'unavailable'}">${food.status || 'N/A'}</span></td>
+                        <td data-label="Actions"><button class="edit-ro-food-item-btn ro-action-btn" data-id="${foodId}" title="Edit"><i class="fas fa-edit"></i></button><button class="delete-ro-food-item-btn ro-action-btn" data-id="${foodId}" title="Delete"><i class="fas fa-trash-alt"></i></button></td>
+                    `;
+                    roFoodsListContainer.appendChild(tr);
+                });
+            } else {
+                console.log('%c[DEBUG] LOG 5: No food items to render or foodsToRender is empty.', "color: purple; font-weight: bold;"); 
+                roFoodsListPlaceholder.classList.remove('hidden-important');
+                roFoodsListPlaceholder.textContent = (dashboardRoMenuItemsSearch && dashboardRoMenuItemsSearch.value.trim() !== '') ? "No food items match your search." : "No food items added yet. Click \"Add New Item\" to get started.";
             }
         }
 
-        function updateFavoriteHeartsVisuals() {
-            document.querySelectorAll('.favorite-heart-btn').forEach(button => {
-                const restaurantId = button.dataset.restaurantId;
-                const heartIcon = button.querySelector('i');
-                if (currentUserFavorites[restaurantId]) {
-                    heartIcon.classList.remove('far', 'fa-heart');
-                    heartIcon.classList.add('fas', 'fa-heart');
-                    // The parent button will handle color via classList if needed, or icon itself
-                    heartIcon.classList.add('text-red-500'); 
-                    heartIcon.classList.remove('text-gray-500');
-                    button.title = "Remove from favorites";
-                } else {
-                    heartIcon.classList.remove('fas', 'fa-heart');
-                    heartIcon.classList.add('far', 'fa-heart');
-                    heartIcon.classList.remove('text-red-500');
-                    heartIcon.classList.add('text-gray-500');
-                    button.title = "Add to favorites";
-                }
-            });
-        }
+        if(dashboardRoMenuItemsSearch) dashboardRoMenuItemsSearch.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            console.log('%c[DEBUG] LOG 6: Search term input:', "color: teal;", searchTerm); 
+            console.log('%c[DEBUG] LOG 7: All foods before filtering for search:', "color: teal;", JSON.parse(JSON.stringify(allRoFoods))); 
 
-
-        async function handleFavoriteClick(event) {
-            const button = event.target.closest('.favorite-heart-btn');
-            if (!button) return;
-
-            const user = auth.currentUser;
-            if (!user) {
-                alert('Please log in to add restaurants to your favorites.');
-                window.location.href = 'login.html';
+            if (searchTerm === "") {
+                console.log('%c[DEBUG] LOG 8: Search term is empty, rendering all foods.', "color: teal;"); 
+                renderRoFoodItems(allRoFoods);
                 return;
             }
 
-            const restaurantId = button.dataset.restaurantId;
-            const heartIcon = button.querySelector('i');
-            const favoriteRef = ref(database, `users/${user.uid}/favorites/${restaurantId}`);
-
-            try {
-                if (currentUserFavorites[restaurantId]) {
-                    await remove(favoriteRef);
-                    delete currentUserFavorites[restaurantId];
-                    // updateFavoriteHeartsVisuals will handle the visual change correctly
-                } else {
-                    await set(favoriteRef, true);
-                    currentUserFavorites[restaurantId] = true;
-                    // updateFavoriteHeartsVisuals will handle the visual change correctly
-                }
-                updateFavoriteHeartsVisuals(); // Call after DB op and local state update
-                if (user) { 
-                    loadDailyMenuFavorites(user.uid);
-                }
-            } catch (error) {
-                console.error("Error updating favorite:", error);
-                alert("Could not update favorite status. Please try again.");
-                updateFavoriteHeartsVisuals(); // Revert visual to match actual state on error
-            }
-        }
-        restaurantsPreviewContainer.addEventListener('click', handleFavoriteClick);
-
-        function loadRestaurantsPreview() {
-            restaurantsPreviewContainer.innerHTML = '<div class="loading-placeholder col-span-full">Loading restaurants...</div>';
-            const restaurantsRef = query(ref(database, 'restaurants'), limitToFirst(3));
-
-            onValue(restaurantsRef, (snapshot) => {
-                restaurantsPreviewContainer.innerHTML = '';
-                if (snapshot.exists()) {
-                    snapshot.forEach((childSnapshot) => {
-                        const restaurantId = childSnapshot.key;
-                        const restaurant = childSnapshot.val();
-                        // Visuals will be set by updateFavoriteHeartsVisuals
-                        const isFavorited = currentUserFavorites[restaurantId];
-                        const heartIconClass = isFavorited ? 'fas fa-heart text-red-500' : 'far fa-heart text-gray-500';
-                        const heartTitle = isFavorited ? 'Remove from favorites' : 'Add to favorites';
-
-
-                        const card = `
-                            <div class="card bg-white rounded-lg shadow-md overflow-hidden flex flex-col relative">
-                                <button class="favorite-heart-btn absolute top-3 right-3 bg-white bg-opacity-75 p-2 rounded-full hover:text-red-500 z-10 focus:outline-none"
-                                        data-restaurant-id="${restaurantId}"
-                                        title="${heartTitle}">
-                                    <i class="${heartIconClass} text-xl"></i>
-                                </button>
-                                <img src="${restaurant.imageBase64 || 'https://via.placeholder.com/300x150?text=Restaurant'}" alt="${restaurant.name}" class="item-image">
-                                <div class="p-6 flex flex-col flex-grow">
-                                    <h3 class="text-xl font-semibold mb-2 text-gray-800">${restaurant.name || 'Unnamed Restaurant'}</h3>
-                                    <p class="text-gray-600 text-sm mb-1">Cuisine: ${restaurant.cuisine || 'Not specified'}</p>
-                                    <p class="text-gray-600 text-sm mb-4 flex-grow">${(restaurant.description || 'No description available.').substring(0,100)}${(restaurant.description && restaurant.description.length > 100) ? '...' : ''}</p>
-                                    <a href="restaurant-details.html?id=${restaurantId}" class="self-start mt-auto btn-orange hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded text-sm transition duration-300">View Details</a>
-                                </div>
-                            </div>
-                        `;
-                        restaurantsPreviewContainer.insertAdjacentHTML('beforeend', card);
-                    });
-                    updateFavoriteHeartsVisuals(); 
-                } else {
-                    restaurantsPreviewContainer.innerHTML = '<p class="text-gray-600 col-span-full text-center">No restaurants featured at the moment.</p>';
-                }
-            }, (error) => {
-                console.error("Error loading restaurants preview:", error);
-                restaurantsPreviewContainer.innerHTML = '<p class="text-red-500 col-span-full text-center">Could not load featured restaurants.</p>';
+            const filteredFoods = allRoFoods.filter(foodEntry => {
+                if (!foodEntry || !foodEntry.data) return false; 
+                const nameMatch = foodEntry.data.name && foodEntry.data.name.toLowerCase().includes(searchTerm);
+                const categoryMatch = foodEntry.data.category && foodEntry.data.category.toLowerCase().includes(searchTerm);
+                const descriptionMatch = foodEntry.data.description && foodEntry.data.description.toLowerCase().includes(searchTerm);
+                return nameMatch || categoryMatch || descriptionMatch;
             });
-        }
+            console.log('%c[DEBUG] LOG 9: Filtered foods for search:', "color: teal;", JSON.parse(JSON.stringify(filteredFoods))); 
+            renderRoFoodItems(filteredFoods);
+        });
+        
+        function setupRoFoodItemManagement(restaurantId) {
+            if(!roFoodsListContainer) {
+                console.error("setupRoFoodItemManagement: roFoodsListContainer element not found.");
+                return;
+            }
+            if (!restaurantId) {
+                console.error('[DEBUG] CRITICAL: Restaurant ID is missing in setupRoFoodItemManagement. Cannot fetch food items.');
+                roFoodsListContainer.innerHTML = '<tr><td colspan="5" class="text-red-500 text-center py-4">Error: Restaurant ID not found.</td></tr>';
+                allRoFoods = [];
+                renderRoFoodItems(allRoFoods);
+                return;
+            }
+            if (currentRestaurantFoodsUnsubscribe) {
+                console.log('[DEBUG] Detaching existing food items listener before setting up new one.');
+                currentRestaurantFoodsUnsubscribe();
+                currentRestaurantFoodsUnsubscribe = null;
+            }
+            
+            const foodsRefDB = ref(database, `restaurants/${restaurantId}/foods`);
+            console.log(`%c[DEBUG] LOG 0: Setting up listener for foods at: restaurants/${restaurantId}/foods`, "color: blue; font-weight: bold;");
 
-        function loadFoodsPreview() {
-            foodsPreviewContainer.innerHTML = '<div class="loading-placeholder col-span-full">Loading popular dishes...</div>';
-            const foodsData = [];
-            let foodItemsLimit = 4;
+            currentRestaurantFoodsUnsubscribe = onValue(foodsRefDB, snapshot => {
+                const snapshotVal = snapshot.val(); 
+                console.log(`%c[DEBUG] LOG 1: Food items snapshot.exists(): ${snapshot.exists()}`, "color: green; font-weight: bold;");
+                try {
+                    console.log(`%c[DEBUG] LOG 1.1: Food items snapshot value:`, "color: green; font-weight: bold;", snapshotVal ? JSON.parse(JSON.stringify(snapshotVal)) : "null/undefined");
+                } catch (e) {
+                     console.error("[DEBUG] Error stringifying snapshotVal for LOG 1.1:", e, snapshotVal);
+                }
 
-            const restaurantsRef = ref(database, 'restaurants');
-            get(restaurantsRef).then(snapshot => {
-                if (snapshot.exists()) {
-                    snapshot.forEach(restaurantSnapshot => {
-                        if (foodsData.length >= foodItemsLimit) return;
-
-                        const restaurantId = restaurantSnapshot.key;
-                        const restaurantData = restaurantSnapshot.val();
-                        const foods = restaurantData.foods;
-
-                        if (foods) {
-                            for (const foodKey in foods) {
-                                if (foodsData.length >= foodItemsLimit) break;
-                                const food = foods[foodKey];
-                                foodsData.push({
-                                    ...food,
-                                    foodId: foodKey,
-                                    restaurantId: restaurantId,
-                                    restaurantName: restaurantData.name || "Unknown Restaurant"
-                                });
-                            }
+                allRoFoods = []; 
+                if (snapshot.exists() && snapshotVal) { 
+                    let itemCount = 0;
+                    snapshot.forEach(childSnapshot => { 
+                        itemCount++;
+                        const childKey = childSnapshot.key;
+                        const childData = childSnapshot.val();
+                        // console.log(`%c[DEBUG] LOG 2: Processing item ${itemCount} from snapshot - Key: ${childKey}`, "color: orange;", childData ? JSON.parse(JSON.stringify(childData)) : "null/undefined");
+                        
+                        if (childData && typeof childData === 'object' && childData.name) { 
+                           allRoFoods.push({ id: childKey, data: childData });
+                        } else {
+                           console.warn(`%c[DEBUG] LOG 2.1: SKIPPED invalid/incomplete food item data for key ${childKey}:`, "color: red;", childData ? JSON.parse(JSON.stringify(childData)): "null/undefined");
                         }
                     });
-
-                    foodsPreviewContainer.innerHTML = '';
-                    if (foodsData.length > 0) {
-                        foodsData.forEach(food => {
-                            const orderUrl = `order.html?restaurantId=${food.restaurantId}&foodId=${food.foodId}&foodName=${encodeURIComponent(food.name || 'Dish')}&foodPrice=${food.price || 0}`;
-                            const card = `
-                                <div class="card bg-white rounded-lg shadow-md overflow-hidden flex flex-col">
-                                    <img src="${food.imageBase64 || 'https://via.placeholder.com/300x150?text=Food'}" alt="${food.name}" class="item-image">
-                                    <div class="p-4 flex flex-col flex-grow">
-                                        <h4 class="text-lg font-semibold mb-1 text-gray-800">${food.name || 'Unnamed Dish'}</h4>
-                                        <p class="text-xs text-gray-500 mb-1">From: ${food.restaurantName}</p>
-                                        <p class="text-green-600 font-semibold text-sm mb-3">₹${food.price ? food.price.toFixed(2) : 'N/A'}</p>
-                                        <a href="${orderUrl}" class="mt-auto self-start btn-orange hover:bg-orange-600 text-white font-semibold py-2 px-3 rounded text-xs transition duration-300">Order Now</a>
-                                    </div>
-                                </div>
-                            `;
-                            foodsPreviewContainer.insertAdjacentHTML('beforeend', card);
-                        });
-                    } else {
-                        foodsPreviewContainer.innerHTML = '<p class="text-gray-600 col-span-full text-center">No popular dishes to show right now.</p>';
-                    }
+                    console.log(`%c[DEBUG] LOG 2.2: Finished processing snapshot. ${itemCount} children iterated.`, "color: orange;");
                 } else {
-                     foodsPreviewContainer.innerHTML = '<p class="text-gray-600 col-span-full text-center">No restaurants found to fetch dishes from.</p>';
+                    console.log('%c[DEBUG] LOG 1.2: Snapshot does not exist or value is null. No food items to process.', "color: green; font-weight: bold;");
                 }
-            }).catch(error => {
-                console.error("Error loading foods preview:", error);
-                foodsPreviewContainer.innerHTML = '<p class="text-red-500 col-span-full text-center">Could not load popular dishes.</p>';
+                
+                console.log(`%c[DEBUG] LOG 3: allRoFoods array populated (count: ${allRoFoods.length}):`, "color: blue; font-weight: bold;", JSON.parse(JSON.stringify(allRoFoods)));
+                
+                const currentSearchTerm = dashboardRoMenuItemsSearch ? dashboardRoMenuItemsSearch.value.toLowerCase().trim() : "";
+                if (currentSearchTerm && dashboardRoMenuItemsSearch) {
+                    dashboardRoMenuItemsSearch.dispatchEvent(new Event('input')); 
+                } else {
+                    renderRoFoodItems(allRoFoods); 
+                }
+                
+            }, error => {
+                console.error("[DEBUG] Firebase error loading RO food items: ", error);
+                if(roFoodsListContainer) roFoodsListContainer.innerHTML = '<tr><td colspan="5" class="text-red-500 text-center py-4">Could not load food items. Check console.</td></tr>';
+                allRoFoods = [];
+                renderRoFoodItems(allRoFoods);
+            });
+
+            if(roFoodItemForm) roFoodItemForm.addEventListener('submit', async e => {
+                e.preventDefault();
+                if(roFoodItemFormSubmitBtn) roFoodItemFormSubmitBtn.disabled = true;
+                showFeedback(roFoodItemFormFeedback, 'Processing...', true, true); 
+
+                const foodIdToEdit = roFoodItemFormId ? roFoodItemFormId.value : null;
+                let newImageBase64 = null; 
+
+                if (roFoodItemFormImage && roFoodItemFormImage.files[0]) {
+                    try {
+                        newImageBase64 = await compressAndEncodeImage(roFoodItemFormImage.files[0]);
+                    } catch (imgErr) {
+                        showFeedback(roFoodItemFormFeedback, imgErr.message, false);
+                        if(roFoodItemFormSubmitBtn) roFoodItemFormSubmitBtn.disabled = false;
+                        return;
+                    }
+                }
+
+                const foodData = {
+                    name: roFoodItemFormName ? roFoodItemFormName.value.trim() : "Unnamed",
+                    description: roFoodItemFormDescription ? roFoodItemFormDescription.value.trim() : "",
+                    category: roFoodItemFormCategory ? roFoodItemFormCategory.value.trim() : "Uncategorized",
+                    price: roFoodItemFormPrice ? parseFloat(roFoodItemFormPrice.value) : 0,
+                    status: roFoodItemFormStatus ? roFoodItemFormStatus.value : "Available"
+                };
+
+                try {
+                    if (foodIdToEdit && currentUser) { 
+                        if (newImageBase64 !== null) { 
+                            foodData.imageBase64 = newImageBase64;
+                        } else { 
+                            const existingFoodSnap = await get(ref(database, `restaurants/${currentUser.uid}/foods/${foodIdToEdit}`));
+                            if (existingFoodSnap.exists() && existingFoodSnap.val().imageBase64) {
+                                foodData.imageBase64 = existingFoodSnap.val().imageBase64;
+                            } else {
+                                foodData.imageBase64 = ''; 
+                            }
+                        }
+                        await update(ref(database, `restaurants/${currentUser.uid}/foods/${foodIdToEdit}`), foodData);
+                        showFeedback(roFoodItemFormFeedback, 'Food item updated!', true);
+                    } else if(currentUser) { 
+                        foodData.imageBase64 = newImageBase64 !== null ? newImageBase64 : '';
+                        await push(ref(database, `restaurants/${currentUser.uid}/foods`), foodData);
+                        showFeedback(roFoodItemFormFeedback, 'Food item added!', true);
+                    } else {
+                        throw new Error("User not authenticated for food item operation.");
+                    }
+
+                    roFoodItemForm.reset();
+                    if(roFoodItemFormImage) roFoodItemFormImage.value = ''; 
+                    if(roFoodItemFormId) roFoodItemFormId.value = '';
+                    if(roFoodItemFormTitle) roFoodItemFormTitle.textContent = 'Add New Food Item';
+                    if(roFoodItemFormSubmitBtn) roFoodItemFormSubmitBtn.textContent = 'Add Food Item';
+                    if(roAddEditFoodFormContainer) roAddEditFoodFormContainer.classList.add('hidden-important');
+                    if(dashboardHeaderActionBtn) dashboardHeaderActionBtn.innerHTML = '<i class="fas fa-plus"></i>Add New Item';
+
+                } catch (err) {
+                    console.error('[DEBUG] Error in roFoodItemForm submit:', err);
+                    showFeedback(roFoodItemFormFeedback, 'Operation failed: ' + err.message, false);
+                } finally {
+                    if(roFoodItemFormSubmitBtn) roFoodItemFormSubmitBtn.disabled = false;
+                    if (roFoodItemFormFeedback && roFoodItemFormFeedback.textContent === 'Processing...') {
+                        roFoodItemFormFeedback.textContent = '';
+                    }
+                }
             });
         }
 
-        document.getElementById('current-year').textContent = new Date().getFullYear();
+        if(roFoodsListContainer) roFoodsListContainer.addEventListener('click', async e => {
+            const editBtn = e.target.closest('.edit-ro-food-item-btn');
+            const deleteBtn = e.target.closest('.delete-ro-food-item-btn');
+            if (editBtn && currentUser) {
+                const foodId = editBtn.dataset.id;
+                const foodSnap = await get(ref(database, `restaurants/${currentUser.uid}/foods/${foodId}`));
+                if (foodSnap.exists()) {
+                    const food = foodSnap.val();
+                    if(roFoodItemFormId) roFoodItemFormId.value = foodId;
+                    if(roFoodItemFormName) roFoodItemFormName.value = food.name || '';
+                    if(roFoodItemFormDescription) roFoodItemFormDescription.value = food.description || '';
+                    if(roFoodItemFormCategory) roFoodItemFormCategory.value = food.category || '';
+                    if(roFoodItemFormPrice) roFoodItemFormPrice.value = food.price || '';
+                    if(roFoodItemFormStatus) roFoodItemFormStatus.value = food.status || 'Available';
+                    if(roFoodItemFormImage) roFoodItemFormImage.value = ''; 
+                    if(roFoodItemFormTitle) roFoodItemFormTitle.textContent = 'Edit Food Item';
+                    if(roFoodItemFormSubmitBtn) roFoodItemFormSubmitBtn.textContent = 'Update Food Item';
+                    if(roFoodItemFormFeedback) roFoodItemFormFeedback.textContent = ''; 
+                    if(roAddEditFoodFormContainer) {
+                        roAddEditFoodFormContainer.classList.remove('hidden-important');
+                        roAddEditFoodFormContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                    if(dashboardHeaderActionBtn) dashboardHeaderActionBtn.innerHTML = '<i class="fas fa-times"></i>Cancel Editing';
+                }
+            } else if (deleteBtn && currentUser) {
+                const foodId = deleteBtn.dataset.id;
+                openConfirmationModal('Delete Food Item', 'Are you sure you want to delete this food item?', async () => {
+                    try {
+                        await remove(ref(database, `restaurants/${currentUser.uid}/foods/${foodId}`));
+                        showFeedback(roFoodItemFormFeedback, 'Food item deleted!', true); 
+                    } catch (err) {
+                        showFeedback(roFoodItemFormFeedback, 'Delete failed: ' + err.message, false);
+                    }
+                });
+            }
+        });
 
-        loadRestaurantsPreview();
-        loadFoodsPreview();
+        if(dashboardHeaderActionBtn) dashboardHeaderActionBtn.addEventListener('click', () => {
+            if(!roAddEditFoodFormContainer || !roFoodItemForm) return;
+            const isFormVisible = !roAddEditFoodFormContainer.classList.contains('hidden-important');
+            if (isFormVisible) {
+                roAddEditFoodFormContainer.classList.add('hidden-important');
+                dashboardHeaderActionBtn.innerHTML = '<i class="fas fa-plus"></i>Add New Item';
+                roFoodItemForm.reset();
+                if(roFoodItemFormImage) roFoodItemFormImage.value = '';
+                if(roFoodItemFormId) roFoodItemFormId.value = '';
+                if(roFoodItemFormFeedback) roFoodItemFormFeedback.textContent = '';
+            } else {
+                roFoodItemForm.reset(); 
+                if(roFoodItemFormId) roFoodItemFormId.value = '';
+                if(roFoodItemFormImage) roFoodItemFormImage.value = '';
+                if(roFoodItemFormTitle) roFoodItemFormTitle.textContent = 'Add New Food Item';
+                if(roFoodItemFormSubmitBtn) roFoodItemFormSubmitBtn.textContent = 'Add Food Item';
+                if(roFoodItemFormFeedback) roFoodItemFormFeedback.textContent = '';
+                roAddEditFoodFormContainer.classList.remove('hidden-important');
+                dashboardHeaderActionBtn.innerHTML = '<i class="fas fa-times"></i>Cancel Adding';
+                roAddEditFoodFormContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+
+        if(editUserProfileToggleBtn) editUserProfileToggleBtn.addEventListener('click', () => {
+            if(!editUserProfileFormContainer) return;
+            editUserProfileFormContainer.classList.toggle('hidden-important');
+            if (!editUserProfileFormContainer.classList.contains('hidden-important')) {
+                if(editUserFormName && currentUserDbData) editUserFormName.value = currentUserDbData.name || '';
+                if(editUserFormImage) editUserFormImage.value = ''; 
+                if(editUserProfileFeedback) editUserProfileFeedback.textContent = '';
+            }
+        });
+
+        if(updateUserProfileDetailsForm) updateUserProfileDetailsForm.addEventListener('submit', async e => {
+            e.preventDefault();
+            const submitButton = updateUserProfileDetailsForm.querySelector('button[type="submit"]');
+            if (submitButton) submitButton.disabled = true;
+            showFeedback(editUserProfileFeedback, 'Processing...', true, true);
+
+            if (!currentUser) {
+                showFeedback(editUserProfileFeedback, 'You must be logged in to update your profile.', false);
+                if (submitButton) submitButton.disabled = false;
+                return;
+            }
+
+            const newName = editUserFormName ? editUserFormName.value.trim() : "";
+            const imageFile = editUserFormImage ? editUserFormImage.files[0] : null;
+
+            if (!newName) {
+                showFeedback(editUserProfileFeedback, 'Full name is required.', false);
+                if (submitButton) submitButton.disabled = false;
+                return;
+            }
+
+            try {
+                const userRefPath = ref(database, `users/${currentUser.uid}`);
+                const userSnapshot = await get(userRefPath); 
+
+                const updatesToMake = { name: newName };
+                let imageBase64 = null; 
+
+                if (imageFile) {
+                    imageBase64 = await compressAndEncodeImage(imageFile);
+                    updatesToMake.imageBase64 = imageBase64;
+                } else if (userSnapshot.exists() && userSnapshot.val().imageBase64) {
+                    updatesToMake.imageBase64 = userSnapshot.val().imageBase64; 
+                } else {
+                    updatesToMake.imageBase64 = ''; 
+                }
+                
+                if (!userSnapshot.exists() || !userSnapshot.val().role || !userSnapshot.val().email) {
+                    updatesToMake.email = currentUser.email; 
+                    updatesToMake.role = 'user';        
+                    updatesToMake.favorites = currentUserDbData?.favorites || {};        
+                }
+
+                await update(userRefPath, updatesToMake);
+                showFeedback(editUserProfileFeedback, 'Profile updated successfully!', true);
+                if(editUserProfileFormContainer) editUserProfileFormContainer.classList.add('hidden-important');
+                if(editUserFormImage) editUserFormImage.value = ''; 
+            } catch (err) {
+                showFeedback(editUserProfileFeedback, `Update failed: ${err.message}`, false);
+            } finally {
+                if (submitButton) submitButton.disabled = false;
+                if (editUserProfileFeedback && editUserProfileFeedback.textContent === 'Processing...') {
+                    editUserProfileFeedback.textContent = '';
+                }
+            }
+        });
+
+
+        if(editRoRestaurantToggleBtn) editRoRestaurantToggleBtn.addEventListener('click', () => {
+            if(!editRoRestaurantFormContainer) return;
+            editRoRestaurantFormContainer.classList.toggle('hidden-important');
+            if(!editRoRestaurantFormContainer.classList.contains('hidden-important')) {
+                if(editRoRestaurantFeedback) editRoRestaurantFeedback.textContent = '';
+                if(currentUserDbData) {
+                    if(editRoFormRestaurantName) editRoFormRestaurantName.value = currentUserDbData.name || '';
+                    if(editRoFormRestaurantAddress) editRoFormRestaurantAddress.value = currentUserDbData.address || '';
+                    if(editRoFormRestaurantContact) editRoFormRestaurantContact.value = currentUserDbData.contact || currentUserDbData.email || '';
+                    if(editRoFormRestaurantCuisine) editRoFormRestaurantCuisine.value = currentUserDbData.cuisine || '';
+                    if(editRoFormRestaurantLogo) editRoFormRestaurantLogo.value = ''; 
+                }
+            }
+        });
+
+        if(updateRoRestaurantDetailsForm) updateRoRestaurantDetailsForm.addEventListener('submit', async e => {
+            e.preventDefault();
+            const submitButton = updateRoRestaurantDetailsForm.querySelector('button[type="submit"]');
+            if (submitButton) submitButton.disabled = true;
+            showFeedback(editRoRestaurantFeedback, 'Processing...', true, true);
+
+            const imageFile = editRoFormRestaurantLogo ? editRoFormRestaurantLogo.files[0] : null;
+            
+            const updates = {
+                name: editRoFormRestaurantName ? editRoFormRestaurantName.value.trim() : "",
+                address: editRoFormRestaurantAddress ? editRoFormRestaurantAddress.value.trim() : "",
+                contact: editRoFormRestaurantContact ? editRoFormRestaurantContact.value.trim() : "",
+                cuisine: editRoFormRestaurantCuisine ? editRoFormRestaurantCuisine.value.trim() : "",
+            };
+
+            let newImageBase64 = null; 
+            if(imageFile) {
+                try { 
+                    newImageBase64 = await compressAndEncodeImage(imageFile); 
+                    updates.imageBase64 = newImageBase64;
+                }
+                catch(err) { 
+                    showFeedback(editRoRestaurantFeedback, err.message, false); 
+                    if (submitButton) submitButton.disabled = false;
+                    return; 
+                }
+            } else if (currentUserDbData && currentUserDbData.imageBase64) {
+                 updates.imageBase64 = currentUserDbData.imageBase64; 
+            } else {
+                 updates.imageBase64 = ''; 
+            }
+            
+            try {
+                if (!currentUser) throw new Error("User not authenticated for restaurant update.");
+                await update(ref(database, `restaurants/${currentUser.uid}`), updates);
+                showFeedback(editRoRestaurantFeedback, 'Restaurant details updated!', true);
+                if(editRoRestaurantFormContainer) editRoRestaurantFormContainer.classList.add('hidden-important');
+                if(editRoFormRestaurantLogo) editRoFormRestaurantLogo.value = ''; 
+            } catch (err) {
+                showFeedback(editRoRestaurantFeedback, 'Update failed: ' + err.message, false);
+            } finally {
+                if (submitButton) submitButton.disabled = false;
+                if (editRoRestaurantFeedback && editRoRestaurantFeedback.textContent === 'Processing...') {
+                     editRoRestaurantFeedback.textContent = '';
+                }
+            }
+        });
+
+        if(commonChangePasswordForm) commonChangePasswordForm.addEventListener('submit', async e => {
+            e.preventDefault();
+            const submitButton = commonChangePasswordForm.querySelector('button[type="submit"]');
+            if (submitButton) submitButton.disabled = true;
+            showFeedback(commonChangePasswordFeedback, 'Processing...', true, true);
+
+            const oldPass = commonCurrentPasswordInput ? commonCurrentPasswordInput.value : "";
+            const newPass = commonNewPasswordInput ? commonNewPasswordInput.value : "";
+            const confirmPass = commonConfirmNewPasswordInput ? commonConfirmNewPasswordInput.value : "";
+
+            if (newPass !== confirmPass) { 
+                showFeedback(commonChangePasswordFeedback, 'New passwords do not match.', false); 
+                if (submitButton) submitButton.disabled = false;
+                return; 
+            }
+            if (newPass.length < 6) { 
+                showFeedback(commonChangePasswordFeedback, 'New password must be at least 6 characters.', false); 
+                if (submitButton) submitButton.disabled = false;
+                return; 
+            }
+            try {
+                if (!currentUser || !currentUser.email) throw new Error("User not properly authenticated for password change.");
+                const credential = EmailAuthProvider.credential(currentUser.email, oldPass);
+                await reauthenticateWithCredential(currentUser, credential);
+                await updatePassword(currentUser, newPass);
+                showFeedback(commonChangePasswordFeedback, 'Password updated successfully!', true);
+                commonChangePasswordForm.reset();
+            } catch (err) {
+                let msg = 'Password update failed. ';
+                if (err.code === 'auth/wrong-password') msg += 'Incorrect current password.';
+                else if (err.code === 'auth/too-many-requests') msg += 'Too many attempts. Try again later.';
+                else if (err.code === 'auth/weak-password') msg += 'New password is too weak.';
+                else msg += 'An error occurred: ' + err.message; 
+                console.error("Password update error:", err);
+                showFeedback(commonChangePasswordFeedback, msg, false);
+            } finally {
+                if (submitButton) submitButton.disabled = false;
+                if (commonChangePasswordFeedback && commonChangePasswordFeedback.textContent === 'Processing...') {
+                     commonChangePasswordFeedback.textContent = '';
+                }
+            }
+        });
+
+        if(commonForgotPasswordLink) commonForgotPasswordLink.addEventListener('click', async e => {
+            e.preventDefault();
+            if (!currentUser?.email) {
+                showFeedback(commonForgotPasswordFeedback, 'No user logged in or email not available.', false);
+                return;
+            }
+            showFeedback(commonForgotPasswordFeedback, 'Sending reset email...', true, true);
+            try {
+                await sendPasswordResetEmail(auth, currentUser.email);
+                showFeedback(commonForgotPasswordFeedback, 'Password reset email sent! Check your inbox.', true);
+            } catch (err) {
+                showFeedback(commonForgotPasswordFeedback, 'Failed to send reset email: ' + err.message, false);
+            }
+        });
+
+        onAuthStateChanged(auth, async (user) => {
+            console.log("[AUTH STATE] Auth state changed. User:", user ? user.uid : "None");
+            currentUser = user;
+
+            if (currentDbListener) {
+                console.log("[AUTH STATE] Detaching previous general DB listener.");
+                currentDbListener(); 
+                currentDbListener = null;
+            }
+            if (currentRestaurantFoodsUnsubscribe) {
+                console.log("[AUTH STATE] Detaching previous restaurant foods listener.");
+                currentRestaurantFoodsUnsubscribe();
+                currentRestaurantFoodsUnsubscribe = null;
+            }
+            if (currentRestaurantDailyMenuUnsubscribe) {
+                console.log("[AUTH STATE] Detaching previous daily menu listener.");
+                currentRestaurantDailyMenuUnsubscribe();
+                currentRestaurantDailyMenuUnsubscribe = null;
+            }
+
+            // Reset UI elements
+            if(initialLoadingState) initialLoadingState.classList.remove('hidden-important'); // Show loading
+            if(authRequiredPrompt) authRequiredPrompt.classList.add('hidden-important');
+            if(unifiedDashboardContainer) unifiedDashboardContainer.classList.add('hidden-important');
+            if(allDashboardPanels) allDashboardPanels.forEach(panel => panel.classList.add('hidden-important'));
+            if(dashboardSidebarNavList) dashboardSidebarNavList.innerHTML = ''; 
+            allRoFoods = []; 
+            currentUserDbData = null;
+
+            if (user) {
+                console.log("[AUTH STATE] User IS authenticated:", user.uid, user.email);
+                
+                const restaurantRef = ref(database, `restaurants/${user.uid}`);
+                currentDbListener = onValue(restaurantRef, (restoSnapshot) => {
+                    console.log("[AUTH STATE] Restaurant data snapshot for /restaurants/", user.uid, ":", restoSnapshot.val() ? "Exists" : "Does NOT exist");
+                    if (restoSnapshot.exists()) { 
+                        currentUserDbData = { uid: user.uid, role: 'restaurant', ...restoSnapshot.val() };
+                        if(sidebarUsernameRestaurantName) sidebarUsernameRestaurantName.textContent = currentUserDbData.name || 'Restaurant Owner';
+                        populateSidebar('restaurant');
+                        displayRoProfileInfo(currentUserDbData);
+                        setupRoDailyMenuManagement(user.uid);
+                        setupRoFoodItemManagement(user.uid);
+                        if (dashboardSidebarNavList && dashboardSidebarNavList.firstChild && dashboardSidebarNavList.firstChild.querySelector('a')) {
+                            dashboardSidebarNavList.firstChild.querySelector('a').click(); 
+                        }
+                        if(initialLoadingState) initialLoadingState.classList.add('hidden-important');
+                        if(unifiedDashboardContainer) unifiedDashboardContainer.classList.remove('hidden-important');
+                    } else {
+                        if (currentDbListener) { currentDbListener(); currentDbListener = null; }
+                        
+                        console.log("[AUTH STATE] No restaurant data. Checking /users/", user.uid);
+                        const userRefNode = ref(database, `users/${user.uid}`);
+                        currentDbListener = onValue(userRefNode, (userSnapshot) => {
+                            console.log("[AUTH STATE] User data snapshot for /users/", user.uid, ":", userSnapshot.val() ? "Exists" : "Does NOT exist");
+                            if (userSnapshot.exists() && userSnapshot.val().role === 'user') {
+                                currentUserDbData = { uid: user.uid, ...userSnapshot.val() };
+                                if(sidebarUsernameRestaurantName) sidebarUsernameRestaurantName.textContent = currentUserDbData.name || 'Customer';
+                                populateSidebar('user');
+                                displayUserProfileInfo(currentUserDbData);
+                                
+                                let favoriteRestaurantIds = [];
+                                if (currentUserDbData.favorites && typeof currentUserDbData.favorites === 'object' && !Array.isArray(currentUserDbData.favorites)) {
+                                    favoriteRestaurantIds = Object.keys(currentUserDbData.favorites);
+                                } else if (Array.isArray(currentUserDbData.favorites)) { 
+                                    favoriteRestaurantIds = currentUserDbData.favorites;
+                                }
+                                displayUserFavorites(favoriteRestaurantIds);
+
+                                if (dashboardSidebarNavList && dashboardSidebarNavList.firstChild && dashboardSidebarNavList.firstChild.querySelector('a')) {
+                                   dashboardSidebarNavList.firstChild.querySelector('a').click(); 
+                                }
+                                if(initialLoadingState) initialLoadingState.classList.add('hidden-important');
+                                if(unifiedDashboardContainer) unifiedDashboardContainer.classList.remove('hidden-important');
+                            } else {
+                                console.warn("[AUTH STATE] User authenticated, but no specific role found. Signing out. UID:", user.uid);
+                                console.warn("Data at users/", user.uid, ":", userSnapshot.val());
+                                signOut(auth).then(() => {
+                                    console.log("[AUTH STATE] Signed out due to indeterminate role/data.");
+                                }).catch(e => console.error("Error signing out during indeterminate state:", e));
+                                // UI handled by the 'else' block of onAuthStateChanged after signout
+                            }
+                        }, (userError) => {
+                            console.error("[AUTH STATE] Error listening to /users/", user.uid, ":", userError);
+                            signOut(auth);
+                            if(initialLoadingState) initialLoadingState.innerHTML = `<p style="color: red;">Error loading user data. Please try again.</p>`;
+                        });
+                    }
+                }, (restoError) => {
+                     console.error("[AUTH STATE] Error listening to /restaurants/", user.uid, ":", restoError);
+                     signOut(auth);
+                     if(initialLoadingState) initialLoadingState.innerHTML = `<p style="color: red;">Error loading restaurant data. Please try again.</p>`;
+                });
+
+            } else { 
+                console.log("[AUTH STATE] No user authenticated. Preparing to redirect or show auth prompt.");
+                if(initialLoadingState) initialLoadingState.classList.add('hidden-important'); 
+                
+                // IMPORTANT: Ensure 'index.html' is your login page or a public landing page.
+                // If this 'profile.html' is part of a Single Page Application (SPA) flow
+                // that handles routing, a hard redirect might not be what you want.
+                // You might want to show 'authRequiredPrompt' instead.
+                console.log("[AUTH STATE] Redirecting to index.html (or showing auth prompt if index.html is not the login page).");
+                window.location.href = 'index.html'; 
+                // OR, if this page should show a prompt to log in:
+                // if(authRequiredPrompt) authRequiredPrompt.classList.remove('hidden-important');
+            }
+        });
+
+        // Final check for any missing critical DOM elements after script load
+        if (!unifiedDashboardContainer || !authRequiredPrompt || !initialLoadingState) {
+            console.error("CRITICAL DOM SETUP ERROR: One or more essential container elements (unifiedDashboardContainer, authRequiredPrompt, initialLoadingState) are missing from the HTML. The page will not function correctly.");
+        }
 
     </script>
 </body>
