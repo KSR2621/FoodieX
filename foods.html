@@ -85,14 +85,14 @@
 
 <nav class="navbar p-4 text-white fixed w-full top-0 z-50">
     <div class="container mx-auto flex justify-between items-center">
-        <a href="/index.html" class="text-2xl font-bold">FoodieX</a>
+        <a href="index.html" class="text-2xl font-bold">FoodieX</a>
         <div class="hidden md:flex space-x-6 items-center desktop-menu">
             <span id="welcome-message" class="welcome-message hidden"></span>
-            <a href="/index.html" class="hover:text-gray-300">Home</a>
-            <a href="/restaurants.html" class="hover:text-gray-300">Restaurants</a>
-            <a href="/foods.html" class="hover:text-gray-300 font-semibold">Foods</a>
-            <a href="/login.html" id="nav-login" class="hover:text-gray-300">Login / Signup</a>
-            <a href="/profile.html" id="nav-profile" class="hover:text-gray-300 hidden">Profile</a>
+            <a href="index.html" class="hover:text-gray-300">Home</a>
+            <a href="restaurants.html" class="hover:text-gray-300">Restaurants</a>
+            <a href="foods.html" class="hover:text-gray-300 font-semibold">Foods</a>
+            <a href="login.html" id="nav-login" class="hover:text-gray-300">Login / Signup</a>
+            <a href="profile.html" id="nav-profile" class="hover:text-gray-300 hidden">Profile</a>
             <a href="#" id="nav-logout" class="hover:text-gray-300 hidden">Logout</a>
         </div>
         <div class="md:hidden">
@@ -103,11 +103,11 @@
     </div>
     <div id="mobile-menu-items" class="mobile-menu md:hidden mt-3">
         <span id="mobile-welcome-message" class="block px-2 py-1 text-sm welcome-message hidden"></span>
-        <a href="/index.html" class="block px-2 py-1 text-sm hover:bg-gray-700">Home</a>
-        <a href="/restaurants.html" class="block px-2 py-1 text-sm hover:bg-gray-700">Restaurants</a>
-        <a href="/foods.html" class="block px-2 py-1 text-sm hover:bg-gray-700 font-semibold">Foods</a>
-        <a href="/login.html" id="mobile-nav-login" class="block px-2 py-1 text-sm hover:bg-gray-700">Login / Signup</a>
-        <a href="/profile.html" id="mobile-nav-profile" class="block px-2 py-1 text-sm hover:bg-gray-700 hidden">Profile</a>
+        <a href="index.html" class="block px-2 py-1 text-sm hover:bg-gray-700">Home</a>
+        <a href="restaurants.html" class="block px-2 py-1 text-sm hover:bg-gray-700">Restaurants</a>
+        <a href="foods.html" class="block px-2 py-1 text-sm hover:bg-gray-700 font-semibold">Foods</a>
+        <a href="login.html" id="mobile-nav-login" class="block px-2 py-1 text-sm hover:bg-gray-700">Login / Signup</a>
+        <a href="profile.html" id="mobile-nav-profile" class="block px-2 py-1 text-sm hover:bg-gray-700 hidden">Profile</a>
         <a href="#" id="mobile-nav-logout" class="block px-2 py-1 text-sm hover:bg-gray-700 hidden">Logout</a>
     </div>
 </nav>
@@ -284,7 +284,7 @@
 
             const foodName = food.name || 'Unnamed Food';
             const foodPrice = typeof food.price === 'number' ? food.price.toFixed(2) : 'N/A';
-            const orderUrl = `/order.html?restaurantId=${food.restaurantId}&foodId=${food.foodId}&foodName=${encodeURIComponent(foodName)}&foodPrice=${food.price || 0}`;
+            const orderUrl = `order.html?restaurantId=${food.restaurantId}&foodId=${food.foodId}&foodName=${encodeURIComponent(foodName)}&foodPrice=${food.price || 0}`;
 
             // Corrected card.innerHTML with comments removed
             card.innerHTML = `
