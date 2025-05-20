@@ -3,244 +3,233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FoodieX - Join Our Community</title>
+    <title>Foodie - Find Your Favorite Meal</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
             font-family: 'Arial', sans-serif;
+            scroll-behavior: smooth;
         }
         .navbar {
-            background-color: #1f2937; 
+            background-color: #1f2937; /* Dark gray-blue */
         }
-        .btn-primary, .btn-orange { 
-            background-color: #ea580c; 
-            color: white;
-        }
-        .btn-primary:hover, .btn-orange:hover {
-            background-color: #c2410c; 
+        .hero-section {
+            background-image: url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80');
+            background-size: cover;
+            background-position: center;
+            height: 60vh;
         }
         .card {
-            transition: transform 0.3s ease;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
         }
         .card:hover {
             transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
-        .form-input { 
+        .item-image {
             width: 100%;
-            padding: 0.75rem; 
-            border: 1px solid #fed7aa; 
-            border-radius: 0.5rem; 
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 0.5rem 0.5rem 0 0;
         }
-        .form-input:focus {
-            outline: none;
-            border-color: #fb923c; 
-            box-shadow: 0 0 0 2px rgba(251, 146, 60, 0.5); 
+        .menu-item-list li {
+            padding: 0.25rem 0;
         }
-        .form-label {
-            display: block;
-            color: #7c2d12; 
-            margin-bottom: 0.5rem; 
-            font-weight: 500;
+        .loading-placeholder {
+            min-height: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #9ca3af;
+            background-color: #f9fafb;
+            border-radius: 0.5rem;
+            padding: 1rem;
         }
-        .text-main-title { color: #7c2d12; } 
-        .text-subtitle { color: #9a3412; } 
-        .text-link { color: #c2410c; } 
-        .text-link:hover { text-decoration: underline; }
-        .mobile-menu { display: none; } 
-        .mobile-menu.open { display: block; }
-
+        /* Hamburger Menu */
+        .mobile-menu {
+            display: none;
+        }
+        @media (max-width: 768px) {
+            .desktop-menu {
+                display: none;
+            }
+            .mobile-menu.open {
+                display: block;
+            }
+        }
+        .welcome-message {
+            color: #d1d5db;
+            margin-right: 1rem;
+        }
+        .favorite-heart-btn i.fas.fa-heart {
+            color: #ef4444;
+        }
+        .favorite-heart-btn:hover i.far.fa-heart {
+             color: #ef4444;
+        }
+        /* Orange buttons */
+        .btn-orange {
+            background-color: #F97316;
+            color: white;
+        }
+        .btn-orange:hover {
+            background-color: #EA580C;
+        }
+        .btn-orange-outline {
+            background-color: transparent;
+            border: 2px solid #F97316;
+            color: #F97316;
+        }
+        .btn-orange-outline:hover {
+            background-color: #F97316;
+            color: white;
+        }
+        /* Custom scrollbar for Webkit browsers */
+        #daily-menu-container::-webkit-scrollbar {
+            height: 8px;
+        }
+        #daily-menu-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        #daily-menu-container::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 10px;
+        }
+        #daily-menu-container::-webkit-scrollbar-thumb:hover {
+            background: #bbb;
+        }
+        /* For Firefox */
+        #daily-menu-container {
+            scrollbar-width: thin;
+            scrollbar-color: #ccc #f1f1f1;
+        }
     </style>
 </head>
-<body class="bg-orange-50">
+<body class="bg-gray-100">
+
     <!-- Navigation Bar -->
-    <nav class="navbar p-4 text-white shadow-md fixed w-full top-0 z-50">
+    <nav class="navbar p-4 text-white fixed w-full top-0 z-50">
         <div class="container mx-auto flex justify-between items-center">
-            <a href="/index.html" class="text-2xl font-bold">FoodieX</a>
-            <div class="hidden md:flex space-x-6 items-center">
-                <a href="/index.html" class="hover:text-gray-300">Home</a>
-                <a href="/restaurants.html" class="hover:text-gray-300">Restaurants</a>
-                <a href="/foods.html" class="hover:text-gray-300">Foods</a>
-                <a href="/login.html" class="hover:text-gray-300 font-semibold">Join Us</a>
-                <a href="/profile.html" id="nav-profile-link" class="hover:text-gray-300 hidden">Profile</a>
+            <a href="index.html" class="text-2xl font-bold">FoodieX</a>
+            
+            <div class="hidden md:flex space-x-6 items-center desktop-menu">
+                <span id="welcome-message" class="welcome-message hidden"></span>
+                <a href="index.html" class="hover:text-gray-300">Home</a>
+                <a href="restaurants.html" class="hover:text-gray-300">Restaurants</a>
+                <a href="foods.html" class="hover:text-gray-300">Foods</a>
+                <a href="login.html" id="nav-login" class="hover:text-gray-300">Login / Signup</a>
+                <a href="profile.html" id="nav-profile" class="hover:text-gray-300 hidden">Profile</a>
+                <a href="#" id="nav-logout" class="hover:text-gray-300 hidden">Logout</a>
             </div>
+
             <div class="md:hidden">
-                <button id="mobile-menu-button-login" class="text-white focus:outline-none">
+                <button id="mobile-menu-button" class="text-white focus:outline-none">
                     <i class="fas fa-bars fa-lg"></i>
                 </button>
             </div>
         </div>
-        <div id="mobile-menu-items-login" class="mobile-menu md:hidden mt-3 bg-gray-700 bg-opacity-90 rounded-md">
-            <a href="/index.html" class="block px-4 py-2 text-sm hover:bg-gray-600 rounded-t-md">Home</a>
-            <a href="/restaurants.html" class="block px-4 py-2 text-sm hover:bg-gray-600">Restaurants</a>
-            <a href="/foods.html" class="block px-4 py-2 text-sm hover:bg-gray-600">Foods</a>
-            <a href="/login.html" class="block px-4 py-2 text-sm hover:bg-gray-600 font-semibold">Join Us</a>
-            <a href="/profile.html" id="mobile-nav-profile-link" class="block px-4 py-2 text-sm hover:bg-gray-600 rounded-b-md hidden">Profile</a>
+        <div id="mobile-menu-items" class="mobile-menu md:hidden mt-3">
+            <span id="mobile-welcome-message" class="block px-2 py-1 text-sm welcome-message hidden"></span>
+            <a href="index.html" class="block px-2 py-1 text-sm hover:bg-gray-700">Home</a>
+            <a href="restaurants.html" class="block px-2 py-1 text-sm hover:bg-gray-700">Restaurants</a>
+            <a href="foods.html" class="block px-2 py-1 text-sm hover:bg-gray-700">Foods</a>
+            <a href="login.html" id="mobile-nav-login" class="block px-2 py-1 text-sm hover:bg-gray-700">Login / Signup</a>
+            <a href="profile.html" id="mobile-nav-profile" class="block px-2 py-1 text-sm hover:bg-gray-700 hidden">Profile</a>
+            <a href="#" id="mobile-nav-logout" class="block px-2 py-1 text-sm hover:bg-gray-700 hidden">Logout</a>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <section class="container mx-auto py-12 px-4 pt-24">
-        <div class="text-center mb-12">
-            <h1 class="text-4xl font-bold text-main-title mb-4">Welcome to FoodieX!</h1>
-            <p class="text-xl text-subtitle max-w-2xl mx-auto">
-                Join our community of food lovers and restaurant owners to discover and share amazing culinary experiences.
-            </p>
-        </div>
-
-        <!-- Cards Section -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <!-- Food Lover Card -->
-            <div class="card bg-white p-8 rounded-lg shadow-lg text-center">
-                <div class="text-orange-500 mb-4">
-                     <i class="fas fa-utensils fa-3x mx-auto"></i>
-                </div>
-                <h2 class="text-2xl font-bold text-main-title mb-4">Food Explorer</h2>
-                <p class="text-gray-600 mb-6">
-                    Discover amazing restaurants, save your favorites, and get personalized recommendations based on your taste.
-                </p>
-                <button onclick="showForm('user-signup')" class="btn-orange text-white py-2 px-6 rounded-lg font-medium">
-                    Join as Food Lover
-                </button>
-            </div>
-
-            <!-- Restaurant Owner Card -->
-            <div class="card bg-white p-8 rounded-lg shadow-lg text-center">
-                <div class="text-orange-500 mb-4">
-                    <i class="fas fa-store-alt fa-3x mx-auto"></i>
-                </div>
-                <h2 class="text-2xl font-bold text-main-title mb-4">Restaurant Partner</h2>
-                <p class="text-gray-600 mb-6">
-                    Showcase your restaurant, manage your menu, and connect with food lovers in your community.
-                </p>
-                <button onclick="showForm('restaurant-signup')" class="btn-orange text-white py-2 px-6 rounded-lg font-medium">
-                    Join as Restaurant
-                </button>
+    <section class="hero-section flex items-center justify-center text-white pt-16">
+        <div class="text-center bg-black bg-opacity-50 p-8 rounded-lg">
+            <h1 class="text-5xl font-bold mb-4">Find Your Favorite Meal Today!</h1>
+            <p class="text-xl mb-8">Discover the best local restaurants and dishes.</p>
+            <div class="flex flex-col space-y-4 items-center md:flex-row md:space-y-0 md:space-x-4 md:justify-center">
+                <a href="/restaurants.html" class="btn-orange hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300 w-full md:w-auto text-center">Explore Restaurants</a>
+                <a href="/login.html#user-signup" id="hero-signup-btn" class="btn-orange-outline hover:bg-orange-500 hover:text-white text-orange-500 font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300 w-full md:w-auto text-center">Sign Up Now</a>
             </div>
         </div>
     </section>
 
-    <!-- Forms Section (Hidden by default) -->
-    <section id="forms-section" class="container mx-auto py-8 px-4 hidden">
-        <div class="max-w-lg mx-auto bg-white p-8 rounded-lg shadow-xl">
-            <div class="flex justify-end mb-4">
-                <button onclick="hideForms()" class="text-orange-600 hover:text-orange-800">
-                    <i class="fas fa-times fa-lg"></i>
-                </button>
-            </div>
+    <!-- Daily Menu of Favorite Restaurants -->
+    <section id="daily-menu-favorites-section" class="container mx-auto py-12 px-4 hidden">
+        <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">Today's Specials from Your Favorites</h2>
+        <div id="daily-menu-container" class="flex overflow-x-auto gap-4 pb-4">
+            <!-- Content dynamically loaded by JS -->
+        </div>
+        <p id="no-favorites-message" class="text-center text-gray-600 mt-6 hidden">
+            Add restaurants to your favorites to see their daily specials here!
+        </p>
+    </section>
 
-            <div id="user-signup" class="form hidden">
-                <h2 class="text-2xl font-bold text-main-title mb-6 text-center">Join as Food Lover</h2>
-                <form id="user-signup-form">
-                    <div class="mb-4">
-                        <label for="user-name" class="form-label">Full Name</label>
-                        <input type="text" id="user-name" class="form-input" required>
-                    </div>
-                    <div class="mb-4">
-                        <label for="user-email" class="form-label">Email Address</label>
-                        <input type="email" id="user-email" class="form-input" required>
-                    </div>
-                    <div class="mb-6">
-                        <label for="user-password" class="form-label">Password</label>
-                        <input type="password" id="user-password" class="form-input" required minlength="6">
-                    </div>
-                    <button type="submit" class="w-full btn-orange text-white p-3 rounded-lg font-medium">
-                        Create Account
-                    </button>
-                </form>
-                <p class="text-center mt-4 text-gray-600">
-                    Already have an account? <a href="#" onclick="showForm('login')" class="text-link">Login</a>
-                </p>
-                <p id="user-signup-error" class="text-red-500 mt-4 text-sm text-center hidden"></p>
+    <!-- Restaurants Preview Section -->
+    <section class="bg-gray-50 py-12 px-4">
+        <div class="container mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">Featured Restaurants</h2>
+            <div id="restaurants-preview-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="loading-placeholder col-span-full">Loading restaurants...</div>
             </div>
-
-            <div id="restaurant-signup" class="form hidden">
-                <h2 class="text-2xl font-bold text-main-title mb-6 text-center">Register Your Restaurant</h2>
-                <form id="restaurant-signup-form">
-                    <div class="mb-4">
-                        <label for="restaurant-name" class="form-label">Restaurant Name</label>
-                        <input type="text" id="restaurant-name" class="form-input" required>
-                    </div>
-                    <div class="mb-4">
-                        <label for="restaurant-email" class="form-label">Business Email</label>
-                        <input type="email" id="restaurant-email" class="form-input" required>
-                    </div>
-                    <div class="mb-4">
-                        <label for="restaurant-password" class="form-label">Password</label>
-                        <input type="password" id="restaurant-password" class="form-input" required minlength="6">
-                    </div>
-                    <div class="mb-4">
-                        <label for="restaurant-address" class="form-label">Full Address</label>
-                        <input type="text" id="restaurant-address" class="form-input" required>
-                    </div>
-                    <div class="mb-4">
-                        <label for="restaurant-contact" class="form-label">Contact Number</label>
-                        <input type="tel" id="restaurant-contact" class="form-input" placeholder="e.g., +911234567890" required>
-                    </div>
-                    <div class="mb-4">
-                        <label for="restaurant-cuisine" class="form-label">Cuisine Type(s)</label>
-                        <input type="text" id="restaurant-cuisine" class="form-input" placeholder="e.g., Italian, North Indian, Chinese" required>
-                    </div>
-                    <div class="mb-4">
-                        <label for="restaurant-hours" class="form-label">Operating Hours</label>
-                        <textarea id="restaurant-hours" class="form-input" rows="3" placeholder="e.g., Mon-Fri: 9 AM - 10 PM, Sat-Sun: 11 AM - 11 PM" required></textarea>
-                    </div>
-                     <div class="mb-4">
-                        <label for="restaurant-description" class="form-label">Short Description (Max 200 chars)</label>
-                        <textarea id="restaurant-description" class="form-input" rows="3" maxlength="200" placeholder="Tell us a bit about your restaurant..." required></textarea>
-                    </div>
-                    <div class="mb-6">
-                        <label for="restaurant-image" class="form-label">Restaurant Display Image (Logo/Facade, max 500KB)</label>
-                        <input type="file" id="restaurant-image" accept="image/jpeg, image/png" class="form-input">
-                        <p class="text-xs text-gray-500 mt-1">Optional. Recommended for better visibility.</p>
-                    </div>
-                    <button type="submit" class="w-full btn-orange text-white p-3 rounded-lg font-medium">
-                        Register Restaurant
-                    </button>
-                </form>
-                <p class="text-center mt-4 text-gray-600">
-                    Already registered? <a href="#" onclick="showForm('login')" class="text-link">Login</a>
-                </p>
-                <p id="restaurant-signup-error" class="text-red-500 mt-4 text-sm text-center hidden"></p>
-            </div>
-
-            <div id="login" class="form hidden">
-                <h2 class="text-2xl font-bold text-main-title mb-6 text-center">Welcome Back!</h2>
-                <form id="login-form">
-                    <div class="mb-4">
-                        <label for="login-email" class="form-label">Email</label>
-                        <input type="email" id="login-email" class="form-input" required>
-                    </div>
-                    <div class="mb-6">
-                        <label for="login-password" class="form-label">Password</label>
-                        <input type="password" id="login-password" class="form-input" required>
-                    </div>
-                    <button type="submit" class="w-full btn-orange text-white p-3 rounded-lg font-medium">
-                        Login
-                    </button>
-                </form>
-                <p class="text-center mt-4 text-gray-600">
-                    Don't have an account? 
-                    <a href="#" onclick="showForm('user-signup')" class="text-link">Sign up as Food Lover</a> or 
-                    <a href="#" onclick="showForm('restaurant-signup')" class="text-link">Restaurant Owner</a>
-                </p>
-                <p id="login-error" class="text-red-500 mt-4 text-sm text-center hidden"></p>
+            <div class="text-center mt-8">
+                <a href="/restaurants.html" class="btn-orange hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300">View All Restaurants</a>
             </div>
         </div>
     </section>
-    
-    <footer class="bg-orange-100 py-8 mt-12">
-        <div class="container mx-auto text-center text-orange-700">
-            <p>© <span id="current-year"></span> FoodieX. All rights reserved.</p>
+
+    <!-- Foods Preview Section -->
+    <section class="py-12 px-4">
+        <div class="container mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">Popular Dishes</h2>
+            <div id="foods-preview-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="loading-placeholder col-span-full">Loading popular dishes...</div>
+            </div>
+             <div class="text-center mt-8">
+                <a href="/foods.html" class="btn-orange hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300">Explore All Foods</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-gray-300 py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-xl font-semibold text-white mb-4">FoodieX</h3>
+                    <p class="text-sm">Your go-to platform for discovering delicious meals and supporting local restaurants.</p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold text-white mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="/index.html" class="hover:text-white">Home</a></li>
+                        <li><a href="/restaurants.html" class="hover:text-white">Restaurants</a></li>
+                        <li><a href="/foods.html" class="hover:text-white">Foods</a></li>
+                        <li><a href="https://wa.me/918789548725" target="_blank" rel="noopener noreferrer" class="hover:text-white">Contact Us (WhatsApp)</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold text-white mb-4">Connect With Us</h3>
+                    <div class="flex flex-col space-y-2">
+                        <a href="https://wa.me/918789548725" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white flex items-center">
+                            <i class="fab fa-whatsapp fa-lg mr-2"></i> WhatsApp 1
+                        </a>
+                        <a href="https://wa.me/917987693299" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white flex items-center">
+                            <i class="fab fa-whatsapp fa-lg mr-2"></i> WhatsApp 2
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 border-t border-gray-700 pt-8 text-center text-sm">
+                <p>© <span id="current-year"></span> FoodieX. All rights reserved.</p>
+            </div>
         </div>
     </footer>
 
+    <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
-        // Updated import to include 'get'
-        import { getDatabase, ref, set, get } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
+        import { getDatabase, ref, get, onValue, query, limitToFirst, set, remove } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyABlpJruz0pZN7K6bQgRuqDxPVAG1bi9q8",
@@ -257,194 +246,326 @@
         const auth = getAuth(app);
         const database = getDatabase(app);
 
-        const navProfileLink = document.getElementById('nav-profile-link');
-        const mobileNavProfileLink = document.getElementById('mobile-nav-profile-link');
-        const mobileMenuButton = document.getElementById('mobile-menu-button-login');
-        const mobileMenuItems = document.getElementById('mobile-menu-items-login');
+        const navLogin = document.getElementById('nav-login');
+        const navProfile = document.getElementById('nav-profile');
+        const navLogout = document.getElementById('nav-logout');
+        const mobileNavLogin = document.getElementById('mobile-nav-login');
+        const mobileNavProfile = document.getElementById('mobile-nav-profile');
+        const mobileNavLogout = document.getElementById('mobile-nav-logout');
+        const welcomeMessage = document.getElementById('welcome-message');
+        const mobileWelcomeMessage = document.getElementById('mobile-welcome-message');
+        const heroSignupBtn = document.getElementById('hero-signup-btn');
+        const dailyMenuFavoritesSection = document.getElementById('daily-menu-favorites-section');
+        const dailyMenuContainer = document.getElementById('daily-menu-container');
+        const noFavoritesMessage = document.getElementById('no-favorites-message');
+        const restaurantsPreviewContainer = document.getElementById('restaurants-preview-container');
+        const foodsPreviewContainer = document.getElementById('foods-preview-container');
 
-        if(mobileMenuButton) {
-            mobileMenuButton.addEventListener('click', () => {
-                mobileMenuItems.classList.toggle('open'); 
-            });
-        }
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenuItems = document.getElementById('mobile-menu-items');
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenuItems.classList.toggle('open');
+        });
 
-        onAuthStateChanged(auth, (user) => {
+        let currentUserFavorites = {};
+
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
-                if(navProfileLink) navProfileLink.classList.remove('hidden');
-                if(mobileNavProfileLink) mobileNavProfileLink.classList.remove('hidden');
+                navLogin.classList.add('hidden');
+                mobileNavLogin.classList.add('hidden');
+                navProfile.classList.remove('hidden');
+                mobileNavProfile.classList.remove('hidden');
+                navLogout.classList.remove('hidden');
+                mobileNavLogout.classList.remove('hidden');
+                heroSignupBtn.classList.add('hidden');
+
+                const userRef = ref(database, `users/${user.uid}`);
+                const userSnapshot = await get(userRef);
+                let userName = "User";
+                if (userSnapshot.exists() && userSnapshot.val().name) {
+                    userName = userSnapshot.val().name.split(" ")[0];
+                } else {
+                    const restaurantRef = ref(database, `restaurants/${user.uid}`);
+                    const restaurantSnapshot = await get(restaurantRef);
+                    if (restaurantSnapshot.exists() && restaurantSnapshot.val().name) {
+                         userName = restaurantSnapshot.val().name;
+                    }
+                }
+                welcomeMessage.textContent = `Hello, ${userName}!`;
+                welcomeMessage.classList.remove('hidden');
+                mobileWelcomeMessage.textContent = `Hello, ${userName}!`;
+                mobileWelcomeMessage.classList.remove('hidden');
+
+                const userFavoritesRef = ref(database, `users/${user.uid}/favorites`);
+                const favSnapshot = await get(userFavoritesRef);
+                currentUserFavorites = favSnapshot.exists() ? favSnapshot.val() : {};
+                
+                loadDailyMenuFavorites(user.uid);
+                dailyMenuFavoritesSection.classList.remove('hidden');
+                updateFavoriteHeartsVisuals();
+
             } else {
-                if(navProfileLink) navProfileLink.classList.add('hidden');
-                if(mobileNavProfileLink) mobileNavProfileLink.classList.add('hidden');
+                navLogin.classList.remove('hidden');
+                mobileNavLogin.classList.remove('hidden');
+                navProfile.classList.add('hidden');
+                mobileNavProfile.classList.add('hidden');
+                navLogout.classList.add('hidden');
+                mobileNavLogout.classList.add('hidden');
+                welcomeMessage.classList.add('hidden');
+                mobileWelcomeMessage.classList.add('hidden');
+                heroSignupBtn.classList.remove('hidden');
+
+                dailyMenuFavoritesSection.classList.add('hidden');
+                currentUserFavorites = {};
+                updateFavoriteHeartsVisuals();
             }
         });
 
-        async function compressAndConvertToBase64(file) {
-            return new Promise((resolve, reject) => {
-                if (!file) return resolve('');
-                if (file.size > 500 * 1024) {
-                    reject(new Error('Image size exceeds 500KB. Please upload a smaller image.'));
+        function handleLogout(e) {
+            e.preventDefault();
+            signOut(auth).then(() => {
+                window.location.href = '/login.html';
+            }).catch((error) => {
+                console.error('Logout error:', error);
+                alert('Failed to logout.');
+            });
+        }
+        navLogout.addEventListener('click', handleLogout);
+        mobileNavLogout.addEventListener('click', handleLogout);
+
+        async function loadDailyMenuFavorites(userId) {
+            dailyMenuContainer.innerHTML = `
+                <div class="loading-placeholder w-72 flex-shrink-0">Loading favorite menus...</div>`; // Adjusted placeholder
+            noFavoritesMessage.classList.add('hidden');
+
+            try {
+                const userFavoritesRef = ref(database, `users/${userId}/favorites`);
+                const userFavoritesSnapshot = await get(userFavoritesRef);
+
+                let favoriteRestaurantIds = [];
+                if (userFavoritesSnapshot.exists() && Object.keys(userFavoritesSnapshot.val()).length > 0) {
+                    favoriteRestaurantIds = Object.keys(userFavoritesSnapshot.val()); 
+                }
+
+                if (favoriteRestaurantIds.length === 0) {
+                    dailyMenuContainer.innerHTML = ''; 
+                    noFavoritesMessage.classList.remove('hidden');
                     return;
                 }
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.src = e.target.result;
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        const ctx = canvas.getContext('2d');
-                        const maxWidth = 400; 
-                        let width = img.width;
-                        let height = img.height;
-
-                        if (width > maxWidth) {
-                            height = (maxWidth / width) * height;
-                            width = maxWidth;
-                        }
-                        canvas.width = width;
-                        canvas.height = height;
-                        ctx.drawImage(img, 0, 0, width, height);
-                        const base64 = canvas.toDataURL('image/jpeg', 0.75); 
-                        resolve(base64);
-                    };
-                    img.onerror = () => reject(new Error('Failed to process image.'));
-                };
-                reader.onerror = () => reject(new Error('Failed to read image file.'));
-                reader.readAsDataURL(file);
-            });
-        }
-
-        window.showForm = function(formId) {
-            document.getElementById('forms-section').classList.remove('hidden');
-            document.querySelectorAll('.form').forEach(form => form.classList.add('hidden'));
-            document.getElementById(formId).classList.remove('hidden');
-            
-            const errorPIds = ['user-signup-error', 'restaurant-signup-error', 'login-error'];
-            errorPIds.forEach(id => {
-                const errorEl = document.getElementById(id);
-                if (errorEl) { 
-                    errorEl.textContent = '';
-                    errorEl.classList.add('hidden');
-                }
-            });
-            document.getElementById('forms-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        };
-
-        window.hideForms = function() {
-            document.getElementById('forms-section').classList.add('hidden');
-        };
-
-        function displayError(elementId, message) {
-            const errorEl = document.getElementById(elementId);
-            if (errorEl) { 
-                errorEl.textContent = message;
-                errorEl.classList.remove('hidden');
-            } else {
-                console.warn(`Error element with ID '${elementId}' not found.`);
-            }
-        }
-        
-        if (window.location.hash === '#user-signup') {
-            showForm('user-signup');
-        } else if (window.location.hash === '#restaurant-signup') {
-            showForm('restaurant-signup');
-        }
-
-        const userSignupForm = document.getElementById('user-signup-form');
-        if(userSignupForm) {
-            userSignupForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const name = document.getElementById('user-name').value;
-                const email = document.getElementById('user-email').value;
-                const password = document.getElementById('user-password').value;
-                try {
-                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    const user = userCredential.user;
-                    await set(ref(database, 'users/' + user.uid), {
-                        name: name,
-                        email: email,
-                        type: 'user',
-                        favorites: {} 
-                    });
-                    window.location.href = '/index.html';
-                } catch (err) {
-                    displayError('user-signup-error', err.message);
-                }
-            });
-        }
-
-        const restaurantSignupForm = document.getElementById('restaurant-signup-form');
-        if(restaurantSignupForm){
-            restaurantSignupForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const name = document.getElementById('restaurant-name').value;
-                const email = document.getElementById('restaurant-email').value;
-                const password = document.getElementById('restaurant-password').value;
-                const address = document.getElementById('restaurant-address').value;
-                const contact = document.getElementById('restaurant-contact').value;
-                const cuisine = document.getElementById('restaurant-cuisine').value;
-                const hours = document.getElementById('restaurant-hours').value;
-                const description = document.getElementById('restaurant-description').value;
-                const imageFile = document.getElementById('restaurant-image').files[0];
                 
-                try {
-                    const imageBase64 = await compressAndConvertToBase64(imageFile);
-                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    const user = userCredential.user;
+                dailyMenuContainer.innerHTML = ''; 
+                let displayedMenus = 0;
 
-                    await set(ref(database, 'restaurants/' + user.uid), {
-                        name: name,
-                        email: email,
-                        address: address,
-                        contact: contact,
-                        cuisine: cuisine,
-                        operatingHours: hours,
-                        description: description,
-                        type: 'restaurant',
-                        imageBase64: imageBase64 || '', 
-                        foods: {}, 
-                        dailyMenu: {} 
-                    });
-                    // After restaurant signup, redirect to their dashboard.
-                    window.location.href = '/Restaurants/index.html';
-                } catch (err) {
-                     displayError('restaurant-signup-error', err.message);
-                }
-            });
-        }
-
-        const loginForm = document.getElementById('login-form');
-        if(loginForm) {
-            loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const email = document.getElementById('login-email').value;
-                const password = document.getElementById('login-password').value;
-                try {
-                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                    const user = userCredential.user;
-
-                    // Check if the logged-in user is a restaurant owner
-                    const restaurantDbRef = ref(database, 'restaurants/' + user.uid);
-                    const restaurantSnapshot = await get(restaurantDbRef);
+                for (const restaurantId of favoriteRestaurantIds) {
+                    const restaurantRefNode = ref(database, `restaurants/${restaurantId}`);
+                    const restaurantSnapshot = await get(restaurantRefNode);
 
                     if (restaurantSnapshot.exists()) {
                         const restaurantData = restaurantSnapshot.val();
-                        // Ensure the type is 'restaurant' (as set during signup)
-                        if (restaurantData && restaurantData.type === 'restaurant') {
-                            window.location.href = '/Restaurants/index.html'; // Redirect restaurant to their specific page
-                            return; // Important: stop further execution to prevent fallback redirect
+                        const today = new Date().toISOString().split('T')[0];
+                        const menuRef = ref(database, `restaurants/${restaurantId}/dailyMenu/${today}`);
+                        const menuSnapshot = await get(menuRef);
+                        
+                        let menuItemsHtml = '<p class="text-gray-500 text-sm">No menu posted for today.</p>';
+                        if (menuSnapshot.exists() && menuSnapshot.val().items && menuSnapshot.val().items.length > 0) {
+                            menuItemsHtml = `<ul class="menu-item-list list-disc list-inside text-gray-600 text-sm space-y-1">
+                                ${menuSnapshot.val().items.map(item => `<li>${item}</li>`).join('')}
+                            </ul>`;
                         }
-                    }
-                    
-                    // Fallback: if not a restaurant or data is missing/malformed, redirect to general index page
-                    // This will also handle regular users (food lovers)
-                    window.location.href = '/index.html';
 
-                } catch (err) {
-                    displayError('login-error', err.message);
+                        // Card width is fixed w-72, flex-shrink-0 for horizontal scrolling
+                        const menuCard = `
+                            <div class="card bg-white p-6 rounded-lg shadow-md flex flex-col justify-between w-72 flex-shrink-0">
+                                <div>
+                                    <h3 class="text-xl font-semibold mb-2 text-gray-800">${restaurantData.name || 'Unnamed Restaurant'}</h3>
+                                    ${menuItemsHtml}
+                                </div>
+                                <a href="/restaurant-details.html?id=${restaurantId}" class="mt-4 self-start inline-block btn-orange hover:bg-orange-600 text-white text-sm font-semibold py-2 px-4 rounded transition duration-300">View Restaurant</a>
+                            </div>
+                        `;
+                        dailyMenuContainer.insertAdjacentHTML('beforeend', menuCard);
+                        displayedMenus++;
+                    }
+                }
+                
+                if (displayedMenus === 0) {
+                    dailyMenuContainer.innerHTML = '<p class="text-gray-600 w-full text-center">None of your favorite restaurants have posted a menu today, or their details could not be loaded.</p>';
+                    noFavoritesMessage.classList.add('hidden'); 
+                }
+
+
+            } catch (error) {
+                console.error("Error loading favorite menus:", error);
+                dailyMenuContainer.innerHTML = '<p class="text-red-500 w-full text-center">Could not load favorite menus.</p>';
+            }
+        }
+
+        function updateFavoriteHeartsVisuals() {
+            document.querySelectorAll('.favorite-heart-btn').forEach(button => {
+                const restaurantId = button.dataset.restaurantId;
+                const heartIcon = button.querySelector('i');
+                if (currentUserFavorites[restaurantId]) {
+                    heartIcon.classList.remove('far', 'fa-heart');
+                    heartIcon.classList.add('fas', 'fa-heart');
+                    // The parent button will handle color via classList if needed, or icon itself
+                    heartIcon.classList.add('text-red-500'); 
+                    heartIcon.classList.remove('text-gray-500');
+                    button.title = "Remove from favorites";
+                } else {
+                    heartIcon.classList.remove('fas', 'fa-heart');
+                    heartIcon.classList.add('far', 'fa-heart');
+                    heartIcon.classList.remove('text-red-500');
+                    heartIcon.classList.add('text-gray-500');
+                    button.title = "Add to favorites";
                 }
             });
         }
+
+
+        async function handleFavoriteClick(event) {
+            const button = event.target.closest('.favorite-heart-btn');
+            if (!button) return;
+
+            const user = auth.currentUser;
+            if (!user) {
+                alert('Please log in to add restaurants to your favorites.');
+                window.location.href = '/login.html';
+                return;
+            }
+
+            const restaurantId = button.dataset.restaurantId;
+            const heartIcon = button.querySelector('i');
+            const favoriteRef = ref(database, `users/${user.uid}/favorites/${restaurantId}`);
+
+            try {
+                if (currentUserFavorites[restaurantId]) {
+                    await remove(favoriteRef);
+                    delete currentUserFavorites[restaurantId];
+                    // updateFavoriteHeartsVisuals will handle the visual change correctly
+                } else {
+                    await set(favoriteRef, true);
+                    currentUserFavorites[restaurantId] = true;
+                    // updateFavoriteHeartsVisuals will handle the visual change correctly
+                }
+                updateFavoriteHeartsVisuals(); // Call after DB op and local state update
+                if (user) { 
+                    loadDailyMenuFavorites(user.uid);
+                }
+            } catch (error) {
+                console.error("Error updating favorite:", error);
+                alert("Could not update favorite status. Please try again.");
+                updateFavoriteHeartsVisuals(); // Revert visual to match actual state on error
+            }
+        }
+        restaurantsPreviewContainer.addEventListener('click', handleFavoriteClick);
+
+        function loadRestaurantsPreview() {
+            restaurantsPreviewContainer.innerHTML = '<div class="loading-placeholder col-span-full">Loading restaurants...</div>';
+            const restaurantsRef = query(ref(database, 'restaurants'), limitToFirst(3));
+
+            onValue(restaurantsRef, (snapshot) => {
+                restaurantsPreviewContainer.innerHTML = '';
+                if (snapshot.exists()) {
+                    snapshot.forEach((childSnapshot) => {
+                        const restaurantId = childSnapshot.key;
+                        const restaurant = childSnapshot.val();
+                        // Visuals will be set by updateFavoriteHeartsVisuals
+                        const isFavorited = currentUserFavorites[restaurantId];
+                        const heartIconClass = isFavorited ? 'fas fa-heart text-red-500' : 'far fa-heart text-gray-500';
+                        const heartTitle = isFavorited ? 'Remove from favorites' : 'Add to favorites';
+
+
+                        const card = `
+                            <div class="card bg-white rounded-lg shadow-md overflow-hidden flex flex-col relative">
+                                <button class="favorite-heart-btn absolute top-3 right-3 bg-white bg-opacity-75 p-2 rounded-full hover:text-red-500 z-10 focus:outline-none"
+                                        data-restaurant-id="${restaurantId}"
+                                        title="${heartTitle}">
+                                    <i class="${heartIconClass} text-xl"></i>
+                                </button>
+                                <img src="${restaurant.imageBase64 || 'https://via.placeholder.com/300x150?text=Restaurant'}" alt="${restaurant.name}" class="item-image">
+                                <div class="p-6 flex flex-col flex-grow">
+                                    <h3 class="text-xl font-semibold mb-2 text-gray-800">${restaurant.name || 'Unnamed Restaurant'}</h3>
+                                    <p class="text-gray-600 text-sm mb-1">Cuisine: ${restaurant.cuisine || 'Not specified'}</p>
+                                    <p class="text-gray-600 text-sm mb-4 flex-grow">${(restaurant.description || 'No description available.').substring(0,100)}${(restaurant.description && restaurant.description.length > 100) ? '...' : ''}</p>
+                                    <a href="/restaurant-details.html?id=${restaurantId}" class="self-start mt-auto btn-orange hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded text-sm transition duration-300">View Details</a>
+                                </div>
+                            </div>
+                        `;
+                        restaurantsPreviewContainer.insertAdjacentHTML('beforeend', card);
+                    });
+                    updateFavoriteHeartsVisuals(); 
+                } else {
+                    restaurantsPreviewContainer.innerHTML = '<p class="text-gray-600 col-span-full text-center">No restaurants featured at the moment.</p>';
+                }
+            }, (error) => {
+                console.error("Error loading restaurants preview:", error);
+                restaurantsPreviewContainer.innerHTML = '<p class="text-red-500 col-span-full text-center">Could not load featured restaurants.</p>';
+            });
+        }
+
+        function loadFoodsPreview() {
+            foodsPreviewContainer.innerHTML = '<div class="loading-placeholder col-span-full">Loading popular dishes...</div>';
+            const foodsData = [];
+            let foodItemsLimit = 4;
+
+            const restaurantsRef = ref(database, 'restaurants');
+            get(restaurantsRef).then(snapshot => {
+                if (snapshot.exists()) {
+                    snapshot.forEach(restaurantSnapshot => {
+                        if (foodsData.length >= foodItemsLimit) return;
+
+                        const restaurantId = restaurantSnapshot.key;
+                        const restaurantData = restaurantSnapshot.val();
+                        const foods = restaurantData.foods;
+
+                        if (foods) {
+                            for (const foodKey in foods) {
+                                if (foodsData.length >= foodItemsLimit) break;
+                                const food = foods[foodKey];
+                                foodsData.push({
+                                    ...food,
+                                    foodId: foodKey,
+                                    restaurantId: restaurantId,
+                                    restaurantName: restaurantData.name || "Unknown Restaurant"
+                                });
+                            }
+                        }
+                    });
+
+                    foodsPreviewContainer.innerHTML = '';
+                    if (foodsData.length > 0) {
+                        foodsData.forEach(food => {
+                            const orderUrl = `/order.html?restaurantId=${food.restaurantId}&foodId=${food.foodId}&foodName=${encodeURIComponent(food.name || 'Dish')}&foodPrice=${food.price || 0}`;
+                            const card = `
+                                <div class="card bg-white rounded-lg shadow-md overflow-hidden flex flex-col">
+                                    <img src="${food.imageBase64 || 'https://via.placeholder.com/300x150?text=Food'}" alt="${food.name}" class="item-image">
+                                    <div class="p-4 flex flex-col flex-grow">
+                                        <h4 class="text-lg font-semibold mb-1 text-gray-800">${food.name || 'Unnamed Dish'}</h4>
+                                        <p class="text-xs text-gray-500 mb-1">From: ${food.restaurantName}</p>
+                                        <p class="text-green-600 font-semibold text-sm mb-3">₹${food.price ? food.price.toFixed(2) : 'N/A'}</p>
+                                        <a href="${orderUrl}" class="mt-auto self-start btn-orange hover:bg-orange-600 text-white font-semibold py-2 px-3 rounded text-xs transition duration-300">Order Now</a>
+                                    </div>
+                                </div>
+                            `;
+                            foodsPreviewContainer.insertAdjacentHTML('beforeend', card);
+                        });
+                    } else {
+                        foodsPreviewContainer.innerHTML = '<p class="text-gray-600 col-span-full text-center">No popular dishes to show right now.</p>';
+                    }
+                } else {
+                     foodsPreviewContainer.innerHTML = '<p class="text-gray-600 col-span-full text-center">No restaurants found to fetch dishes from.</p>';
+                }
+            }).catch(error => {
+                console.error("Error loading foods preview:", error);
+                foodsPreviewContainer.innerHTML = '<p class="text-red-500 col-span-full text-center">Could not load popular dishes.</p>';
+            });
+        }
+
         document.getElementById('current-year').textContent = new Date().getFullYear();
+
+        loadRestaurantsPreview();
+        loadFoodsPreview();
+
     </script>
 </body>
 </html>
