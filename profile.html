@@ -453,7 +453,7 @@
         import { getDatabase, ref, get, set, update, onValue, push, remove } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js';
 
         const firebaseConfig = {
-            apiKey: "AIzaSyABlpJruz0pZN7K6bQgRuqDxPVAG1bi9q8",
+            apiKey: "AIzaSyABlpJruz0pZN7K6bQgRuqDxPVAG1bi9q8", // Replace with your actual API key if this is a placeholder
             authDomain: "daily-menu-bc700.firebaseapp.com",
             databaseURL: "https://daily-menu-bc700-default-rtdb.firebaseio.com",
             projectId: "daily-menu-bc700",
@@ -543,7 +543,6 @@
         let currentDbListener = null;
         let currentRestaurantFoodsUnsubscribe = null;
         let currentRestaurantDailyMenuUnsubscribe = null;
-        // let currentFavoritesUnsubscribe = null; // Not used with current structure, favorites are part of user data
         let allRoFoods = [];
 
         async function compressAndEncodeImage(file, maxWidth = 300, quality = 0.7) {
@@ -686,7 +685,7 @@
         }
 
         function displayUserFavorites(favoriteRestaurantIds = []) {
-            if (!Array.isArray(favoriteRestaurantIds)) { // Safety check
+            if (!Array.isArray(favoriteRestaurantIds)) { 
                 console.error("displayUserFavorites expects an array, got:", favoriteRestaurantIds);
                 favoriteRestaurantIds = [];
             }
@@ -700,12 +699,12 @@
             const favoritePromises = favoriteRestaurantIds.map(id => get(ref(database, `restaurants/${id}`)));
             
             Promise.all(favoritePromises).then(snapshots => {
-                userFavoritesListContainer.innerHTML = ''; // Clear loading/previous
+                userFavoritesListContainer.innerHTML = ''; 
                 let favoritesDisplayed = 0;
                 snapshots.forEach((snapshot, index) => {
                     if (snapshot.exists()) {
                         const restaurant = snapshot.val();
-                        const restaurantId = favoriteRestaurantIds[index]; // Get ID from the input array
+                        const restaurantId = favoriteRestaurantIds[index]; 
                         const card = document.createElement('div');
                         card.className = 'card p-4 flex flex-col';
                         card.innerHTML = `
@@ -721,9 +720,9 @@
                         favoritesDisplayed++;
                     }
                 });
-                if(favoritesDisplayed === 0 && favoriteRestaurantIds.length > 0) { // Had IDs but none could be loaded
+                if(favoritesDisplayed === 0 && favoriteRestaurantIds.length > 0) { 
                     userFavoritesListContainer.innerHTML = '<p class="text-gray-600 col-span-full text-center py-4">Could not load details for your favorite restaurants. They may no longer exist.</p>';
-                } else if (favoritesDisplayed === 0 && favoriteRestaurantIds.length === 0) { // Should be caught by earlier check but good to have
+                } else if (favoritesDisplayed === 0 && favoriteRestaurantIds.length === 0) { 
                      userFavoritesListContainer.innerHTML = '<p class="text-gray-600 col-span-full text-center py-4">You haven\'t added any favorites yet.</p>';
                 }
             }).catch(error => {
@@ -737,12 +736,10 @@
             if (removeButton) {
                 const restaurantIdToRemove = removeButton.dataset.id;
                 openConfirmationModal('Remove Favorite', `Are you sure you want to remove this restaurant from your favorites?`, () => {
-                    // ** MODIFIED ** Correct path for object-based favorites
                     const favoriteRef = ref(database, `users/${currentUser.uid}/favorites/${restaurantIdToRemove}`);
                     remove(favoriteRef)
                         .then(() => {
                             showFeedback(editUserProfileFeedback, 'Favorite removed successfully.', true);
-                            // The onValue listener on `users/${currentUser.uid}` will automatically refresh the list.
                         })
                         .catch(err => {
                             console.error("Failed to remove favorite:", err);
@@ -800,6 +797,7 @@
             });
         }
 
+        // =============== MODIFIED FUNCTION ===============
         function renderRoFoodItems(foodsToRender) {
             roFoodsListContainer.innerHTML = '';
             if (foodsToRender.length > 0) {
@@ -807,11 +805,25 @@
                 foodsToRender.forEach(foodEntry => {
                     const foodId = foodEntry.id;
                     const food = foodEntry.data;
+
+                    let priceDisplay = '0.00'; // Default value
+                    if (food.price !== null && typeof food.price !== 'undefined') {
+                        const numericPrice = Number(food.price); // Attempt to convert to number
+                        if (!isNaN(numericPrice)) { // Check if conversion was successful
+                            priceDisplay = numericPrice.toFixed(2);
+                        } else {
+                            console.warn(`Item "${food.name || 'Unknown'}" (ID: ${foodId}) has an invalid price:`, food.price);
+                            priceDisplay = 'N/A'; // Or 'Invalid' or keep '0.00' or any placeholder
+                        }
+                    } else {
+                         priceDisplay = '0.00'; // If price is null or undefined
+                    }
+
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td class="item-cell" data-label="Item"><img src="${food.imageBase64 || 'https://via.placeholder.com/50?text=Food'}" alt="${food.name}"><div><div class="item-name">${food.name}</div><div class="item-description">${(food.description || '').substring(0,100)}...</div></div></td>
+                        <td class="item-cell" data-label="Item"><img src="${food.imageBase64 || 'https://via.placeholder.com/50?text=Food'}" alt="${food.name || 'N/A'}"><div><div class="item-name">${food.name || 'N/A'}</div><div class="item-description">${(food.description || '').substring(0,100)}...</div></div></td>
                         <td data-label="Category">${food.category || 'N/A'}</td>
-                        <td data-label="Price">₹${food.price?.toFixed(2) || '0.00'}</td>
+                        <td data-label="Price">₹${priceDisplay}</td>
                         <td data-label="Status"><span class="ro-status-badge ${food.status === 'Available' ? 'available' : 'unavailable'}">${food.status || 'N/A'}</span></td>
                         <td data-label="Actions"><button class="edit-ro-food-item-btn ro-action-btn" data-id="${foodId}" title="Edit"><i class="fas fa-edit"></i></button><button class="delete-ro-food-item-btn ro-action-btn" data-id="${foodId}" title="Delete"><i class="fas fa-trash-alt"></i></button></td>
                     `;
@@ -822,11 +834,12 @@
                 roFoodsListPlaceholder.textContent = dashboardRoMenuItemsSearch.value.trim() !== '' ? "No food items match your search." : "No food items added yet.";
             }
         }
+        // ===============================================
 
         dashboardRoMenuItemsSearch.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase().trim();
             const filteredFoods = allRoFoods.filter(foodEntry =>
-                foodEntry.data.name.toLowerCase().includes(searchTerm) ||
+                (foodEntry.data.name && foodEntry.data.name.toLowerCase().includes(searchTerm)) ||
                 (foodEntry.data.category && foodEntry.data.category.toLowerCase().includes(searchTerm)) ||
                 (foodEntry.data.description && foodEntry.data.description.toLowerCase().includes(searchTerm))
             );
@@ -863,29 +876,23 @@
                     category: roFoodItemFormCategory.value, price: parseFloat(roFoodItemFormPrice.value),
                     status: roFoodItemFormStatus.value
                 };
-                // Only add imageBase64 to foodData if a new image was actually processed
                 if (imageBase64) {
                      foodData.imageBase64 = imageBase64;
                 }
 
-
                 try {
                     if (foodIdToEdit) {
-                         // If editing and no new image is provided, we want to keep the existing image.
-                        // So, only add imageBase64 to foodData if a new one was processed.
-                        // If imageBase64 is not in foodData, Firebase update will not touch that field.
                         if (!imageBase64 && roFoodItemFormImage.files.length === 0) {
                             const existingFoodSnap = await get(ref(database, `restaurants/${currentUser.uid}/foods/${foodIdToEdit}`));
                             if(existingFoodSnap.exists() && existingFoodSnap.val().imageBase64) {
-                                // No new image, keep existing. foodData won't have imageBase64, so it's fine.
+                                // Keep existing image implicitly by not setting foodData.imageBase64
                             } else {
-                                foodData.imageBase64 = ''; // Explicitly set to empty if no old and no new
+                                foodData.imageBase64 = ''; 
                             }
                         }
                         await update(ref(database, `restaurants/${currentUser.uid}/foods/${foodIdToEdit}`), foodData);
                         showFeedback(roFoodItemFormFeedback, 'Food item updated!', true);
                     } else {
-                        // If adding new and no image, ensure imageBase64 is at least an empty string
                         if (!foodData.imageBase64) foodData.imageBase64 = '';
                         await push(ref(database, `restaurants/${currentUser.uid}/foods`), foodData);
                         showFeedback(roFoodItemFormFeedback, 'Food item added!', true);
@@ -915,7 +922,7 @@
                     roFoodItemFormCategory.value = food.category || '';
                     roFoodItemFormPrice.value = food.price || '';
                     roFoodItemFormStatus.value = food.status || 'Available';
-                    roFoodItemFormImage.value = ''; // Clear file input
+                    roFoodItemFormImage.value = ''; 
                     roFoodItemFormTitle.textContent = 'Edit Food Item';
                     roFoodItemFormSubmitBtn.textContent = 'Update Food Item';
                     roAddEditFoodFormContainer.classList.remove('hidden-important');
@@ -954,7 +961,7 @@
             editUserProfileFormContainer.classList.toggle('hidden-important');
             if (!editUserProfileFormContainer.classList.contains('hidden-important')) {
                 editUserFormName.value = currentUserDbData?.name || '';
-                editUserFormImage.value = ''; // Reset file input
+                editUserFormImage.value = ''; 
             }
         });
 
@@ -975,48 +982,37 @@
 
             try {
                 const userRefPath = ref(database, `users/${currentUser.uid}`);
-                const userSnapshot = await get(userRefPath); // get current data for safety
+                const userSnapshot = await get(userRefPath); 
 
                 const updatesToMake = { name: newName };
-                let imageBase64; // Declare here to check if it was processed
+                let imageBase64; 
 
                 if (imageFile) {
                     imageBase64 = await compressAndEncodeImage(imageFile);
                     updatesToMake.imageBase64 = imageBase64;
-                } else if (userSnapshot.exists() && typeof userSnapshot.val().imageBase64 !== 'undefined' && !imageFile) {
-                    // No new image file selected, preserve existing if it exists.
-                    // This is implicitly handled by `update()` if imageBase64 is not in updatesToMake.
-                    // However, if you want to explicitly set it to empty if no file and no previous, then:
-                    // updatesToMake.imageBase64 = userSnapshot.val().imageBase64;
-                }
-
-
-                // If this is the first time this user's record is being created/completed in 'users' node
+                } 
+                
                 if (!userSnapshot.exists() || !userSnapshot.val().role) {
-                    updatesToMake.email = currentUser.email; // Ensure email is set
-                    updatesToMake.role = 'user';         // Ensure role is set
-                    updatesToMake.favorites = {};        // Initialize favorites for a new user
+                    updatesToMake.email = currentUser.email; 
+                    updatesToMake.role = 'user';         
+                    updatesToMake.favorites = {};        
                 }
 
                 await update(userRefPath, updatesToMake);
 
-                // Update local state carefully after successful DB update
-                // currentUserDbData should be updated by the onValue listener, but for immediate UI:
-                if(currentUserDbData) { // Ensure currentUserDbData exists
+                if(currentUserDbData) { 
                     currentUserDbData.name = newName;
-                    if (imageBase64) { // Only update local image if new one was set
+                    if (imageBase64) { 
                         currentUserDbData.imageBase64 = imageBase64;
                     }
-                } else { // Should not happen if user is logged in and onValue listener worked
+                } else { 
                     currentUserDbData = { ...updatesToMake, uid: currentUser.uid, email: currentUser.email };
                 }
 
-                displayUserProfileInfo(currentUserDbData); // Re-display with updated info
-
+                displayUserProfileInfo(currentUserDbData); 
                 showFeedback(editUserProfileFeedback, 'Profile updated successfully!', true);
                 editUserProfileFormContainer.classList.add('hidden-important');
-                // updateUserProfileDetailsForm.reset(); // Removed to keep name field populated
-                editUserFormImage.value = ''; // Only reset file input
+                editUserFormImage.value = ''; 
             } catch (err) {
                 showFeedback(editUserProfileFeedback, `Update failed: ${err.message}`, false);
             }
@@ -1036,7 +1032,7 @@
                 cuisine: editRoFormRestaurantCuisine.value,
             };
 
-            let imageBase64; // To check if new image was processed
+            let imageBase64; 
             if(imageFile) {
                 try { 
                     imageBase64 = await compressAndEncodeImage(imageFile); 
@@ -1049,7 +1045,6 @@
                 .then(() => {
                     showFeedback(editRoRestaurantFeedback, 'Restaurant details updated!', true);
                     editRoRestaurantFormContainer.classList.add('hidden-important');
-                    // Local currentUserDbData will be updated by its onValue listener
                 })
                 .catch(err => showFeedback(editRoRestaurantFeedback, 'Update failed: ' + err.message, false));
         });
@@ -1093,7 +1088,7 @@
         onAuthStateChanged(auth, async (user) => {
             currentUser = user;
 
-            if (currentDbListener) currentDbListener(); // Detach old listener
+            if (currentDbListener) currentDbListener(); 
             if (currentRestaurantFoodsUnsubscribe) currentRestaurantFoodsUnsubscribe();
             if (currentRestaurantDailyMenuUnsubscribe) currentRestaurantDailyMenuUnsubscribe();
 
@@ -1102,37 +1097,39 @@
 
             if (user) {
                 unifiedDashboardContainer.classList.remove('hidden-important');
-                const userRef = ref(database, `users/${user.uid}`);
-                currentDbListener = onValue(userRef, (userSnapshot) => {
+                const userRefPath = ref(database, `users/${user.uid}`); // Changed from userRef to userRefPath for clarity
+                currentDbListener = onValue(userRefPath, (userSnapshot) => {
                     if (userSnapshot.exists() && userSnapshot.val().role === 'user') {
                         currentUserDbData = { uid: user.uid, ...userSnapshot.val() };
                         sidebarUsernameRestaurantName.textContent = currentUserDbData.name || 'Customer';
                         populateSidebar('user');
                         displayUserProfileInfo(currentUserDbData);
                         
-                        // ** MODIFIED ** Correctly get favorite IDs from object
                         let favoriteRestaurantIds = [];
                         if (currentUserDbData.favorites && typeof currentUserDbData.favorites === 'object' && !Array.isArray(currentUserDbData.favorites)) {
                             favoriteRestaurantIds = Object.keys(currentUserDbData.favorites);
-                        } else if (Array.isArray(currentUserDbData.favorites)) { // Less likely, but handle
+                        } else if (Array.isArray(currentUserDbData.favorites)) { 
                             favoriteRestaurantIds = currentUserDbData.favorites;
                         }
                         displayUserFavorites(favoriteRestaurantIds);
-                        // END MODIFICATION
 
                         if (dashboardSidebarNavList.firstChild && dashboardSidebarNavList.firstChild.querySelector('a')) {
-                             // Check if already on a panel, if not, click first.
                             const currentActivePanel = Array.from(allDashboardPanels).find(p => !p.classList.contains('hidden-important'));
-                            if(!currentActivePanel) { // Only click if no panel is active (e.g. initial load)
+                            if(!currentActivePanel) { 
                                 dashboardSidebarNavList.firstChild.querySelector('a').click();
                             }
                         }
 
-                    } else { // Could be restaurant or new/undefined user profile in DB
-                        const restaurantRef = ref(database, `restaurants/${user.uid}`);
-                        if (currentDbListener) currentDbListener(); // Detach user listener before attaching restaurant one
-                        currentDbListener = onValue(restaurantRef, (restoSnapshot) => {
-                            if (restoSnapshot.exists()) { // It's a restaurant
+                    } else { 
+                        const restaurantRefPath = ref(database, `restaurants/${user.uid}`); // Changed for clarity
+                        if (currentDbListener && userRefPath.toString() === restaurantRefPath.toString()) { 
+                            // Avoid re-attaching if it's the same path, though unlikely here.
+                        } else {
+                            if (currentDbListener) currentDbListener(); 
+                        }
+                        
+                        currentDbListener = onValue(restaurantRefPath, (restoSnapshot) => {
+                            if (restoSnapshot.exists()) { 
                                 currentUserDbData = { uid: user.uid, role: 'restaurant', ...restoSnapshot.val() };
                                 sidebarUsernameRestaurantName.textContent = currentUserDbData.name || 'Restaurant Owner';
                                 populateSidebar('restaurant');
@@ -1145,31 +1142,29 @@
                                         dashboardSidebarNavList.firstChild.querySelector('a').click();
                                     }
                                 }
-                            } else { // Not a user with 'user' role, not a restaurant - could be new signup needing role
-                                console.warn("User exists but no 'user' role or 'restaurant' data found. Defaulting to user view.");
-                                // Default to a basic user view or prompt for role selection
+                            } else { 
+                                console.warn("User authenticated but no 'user' role profile or 'restaurant' data found. Defaulting to user view or prompting for role.");
                                 currentUserDbData = { uid: user.uid, role: 'user', email: user.email, name: user.displayName || "FoodieX User", favorites: {} };
                                 sidebarUsernameRestaurantName.textContent = currentUserDbData.name;
                                 populateSidebar('user');
                                 displayUserProfileInfo(currentUserDbData);
-                                displayUserFavorites([]); // No favorites for this assumed new/undefined user
+                                displayUserFavorites([]); 
                                 if (dashboardSidebarNavList.firstChild && dashboardSidebarNavList.firstChild.querySelector('a')) {
                                      const currentActivePanel = Array.from(allDashboardPanels).find(p => !p.classList.contains('hidden-important'));
                                     if(!currentActivePanel) {
                                         dashboardSidebarNavList.firstChild.querySelector('a').click();
                                     }
                                 }
+                                // Consider adding logic here to prompt the user to complete their profile / choose a role.
                             }
                         }, (error) => {
                              console.error("Error listening to restaurant data:", error);
-                             // Handle error, e.g. default to user view
                         });
                     }
                 }, (error) => {
                     console.error("Error listening to user data:", error);
-                    // Handle error, possibly show auth prompt or error message
                 });
-            } else { // No user logged in
+            } else { 
                 currentUserDbData = null;
                 authRequiredPrompt.classList.remove('hidden-important');
             }
