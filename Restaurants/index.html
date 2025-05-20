@@ -912,7 +912,7 @@
                  console.error("renderRoFoodItems: roFoodsListContainer or roFoodsListPlaceholder not found.");
                  return;
             }
-            console.log(`%c[DEBUG] LOG 4: renderRoFoodItems called with (count: ${foodsToRender ? foodsToRender.length : 0}):`, "color: purple; font-weight: bold;", foodsToRender ? JSON.parse(JSON.stringify(foodsToRender)) : "null/undefined"); 
+            // console.log(`%c[DEBUG] LOG 4: renderRoFoodItems called with (count: ${foodsToRender ? foodsToRender.length : 0}):`, "color: purple; font-weight: bold;", foodsToRender ? JSON.parse(JSON.stringify(foodsToRender)) : "null/undefined"); 
             roFoodsListContainer.innerHTML = '';
             if (foodsToRender && foodsToRender.length > 0) {
                 roFoodsListPlaceholder.classList.add('hidden-important');
@@ -934,7 +934,7 @@
                     roFoodsListContainer.appendChild(tr);
                 });
             } else {
-                console.log('%c[DEBUG] LOG 5: No food items to render or foodsToRender is empty.', "color: purple; font-weight: bold;"); 
+                // console.log('%c[DEBUG] LOG 5: No food items to render or foodsToRender is empty.', "color: purple; font-weight: bold;"); 
                 roFoodsListPlaceholder.classList.remove('hidden-important');
                 roFoodsListPlaceholder.textContent = (dashboardRoMenuItemsSearch && dashboardRoMenuItemsSearch.value.trim() !== '') ? "No food items match your search." : "No food items added yet. Click \"Add New Item\" to get started.";
             }
@@ -942,11 +942,11 @@
 
         if(dashboardRoMenuItemsSearch) dashboardRoMenuItemsSearch.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase().trim();
-            console.log('%c[DEBUG] LOG 6: Search term input:', "color: teal;", searchTerm); 
-            console.log('%c[DEBUG] LOG 7: All foods before filtering for search:', "color: teal;", JSON.parse(JSON.stringify(allRoFoods))); 
+            // console.log('%c[DEBUG] LOG 6: Search term input:', "color: teal;", searchTerm); 
+            // console.log('%c[DEBUG] LOG 7: All foods before filtering for search:', "color: teal;", JSON.parse(JSON.stringify(allRoFoods))); 
 
             if (searchTerm === "") {
-                console.log('%c[DEBUG] LOG 8: Search term is empty, rendering all foods.', "color: teal;"); 
+                // console.log('%c[DEBUG] LOG 8: Search term is empty, rendering all foods.', "color: teal;"); 
                 renderRoFoodItems(allRoFoods);
                 return;
             }
@@ -958,7 +958,7 @@
                 const descriptionMatch = foodEntry.data.description && foodEntry.data.description.toLowerCase().includes(searchTerm);
                 return nameMatch || categoryMatch || descriptionMatch;
             });
-            console.log('%c[DEBUG] LOG 9: Filtered foods for search:', "color: teal;", JSON.parse(JSON.stringify(filteredFoods))); 
+            // console.log('%c[DEBUG] LOG 9: Filtered foods for search:', "color: teal;", JSON.parse(JSON.stringify(filteredFoods))); 
             renderRoFoodItems(filteredFoods);
         });
         
@@ -981,16 +981,16 @@
             }
             
             const foodsRefDB = ref(database, `restaurants/${restaurantId}/foods`);
-            console.log(`%c[DEBUG] LOG 0: Setting up listener for foods at: restaurants/${restaurantId}/foods`, "color: blue; font-weight: bold;");
+            // console.log(`%c[DEBUG] LOG 0: Setting up listener for foods at: restaurants/${restaurantId}/foods`, "color: blue; font-weight: bold;");
 
             currentRestaurantFoodsUnsubscribe = onValue(foodsRefDB, snapshot => {
                 const snapshotVal = snapshot.val(); 
-                console.log(`%c[DEBUG] LOG 1: Food items snapshot.exists(): ${snapshot.exists()}`, "color: green; font-weight: bold;");
-                try {
-                    console.log(`%c[DEBUG] LOG 1.1: Food items snapshot value:`, "color: green; font-weight: bold;", snapshotVal ? JSON.parse(JSON.stringify(snapshotVal)) : "null/undefined");
-                } catch (e) {
-                     console.error("[DEBUG] Error stringifying snapshotVal for LOG 1.1:", e, snapshotVal);
-                }
+                // console.log(`%c[DEBUG] LOG 1: Food items snapshot.exists(): ${snapshot.exists()}`, "color: green; font-weight: bold;");
+                // try {
+                //     console.log(`%c[DEBUG] LOG 1.1: Food items snapshot value:`, "color: green; font-weight: bold;", snapshotVal ? JSON.parse(JSON.stringify(snapshotVal)) : "null/undefined");
+                // } catch (e) {
+                //      console.error("[DEBUG] Error stringifying snapshotVal for LOG 1.1:", e, snapshotVal);
+                // }
 
                 allRoFoods = []; 
                 if (snapshot.exists() && snapshotVal) { 
@@ -999,7 +999,6 @@
                         itemCount++;
                         const childKey = childSnapshot.key;
                         const childData = childSnapshot.val();
-                        // console.log(`%c[DEBUG] LOG 2: Processing item ${itemCount} from snapshot - Key: ${childKey}`, "color: orange;", childData ? JSON.parse(JSON.stringify(childData)) : "null/undefined");
                         
                         if (childData && typeof childData === 'object' && childData.name) { 
                            allRoFoods.push({ id: childKey, data: childData });
@@ -1007,12 +1006,12 @@
                            console.warn(`%c[DEBUG] LOG 2.1: SKIPPED invalid/incomplete food item data for key ${childKey}:`, "color: red;", childData ? JSON.parse(JSON.stringify(childData)): "null/undefined");
                         }
                     });
-                    console.log(`%c[DEBUG] LOG 2.2: Finished processing snapshot. ${itemCount} children iterated.`, "color: orange;");
+                    // console.log(`%c[DEBUG] LOG 2.2: Finished processing snapshot. ${itemCount} children iterated.`, "color: orange;");
                 } else {
-                    console.log('%c[DEBUG] LOG 1.2: Snapshot does not exist or value is null. No food items to process.', "color: green; font-weight: bold;");
+                    // console.log('%c[DEBUG] LOG 1.2: Snapshot does not exist or value is null. No food items to process.', "color: green; font-weight: bold;");
                 }
                 
-                console.log(`%c[DEBUG] LOG 3: allRoFoods array populated (count: ${allRoFoods.length}):`, "color: blue; font-weight: bold;", JSON.parse(JSON.stringify(allRoFoods)));
+                // console.log(`%c[DEBUG] LOG 3: allRoFoods array populated (count: ${allRoFoods.length}):`, "color: blue; font-weight: bold;", JSON.parse(JSON.stringify(allRoFoods)));
                 
                 const currentSearchTerm = dashboardRoMenuItemsSearch ? dashboardRoMenuItemsSearch.value.toLowerCase().trim() : "";
                 if (currentSearchTerm && dashboardRoMenuItemsSearch) {
@@ -1365,8 +1364,7 @@
                 currentRestaurantDailyMenuUnsubscribe = null;
             }
 
-            // Reset UI elements
-            if(initialLoadingState) initialLoadingState.classList.remove('hidden-important'); // Show loading
+            if(initialLoadingState) initialLoadingState.classList.remove('hidden-important'); 
             if(authRequiredPrompt) authRequiredPrompt.classList.add('hidden-important');
             if(unifiedDashboardContainer) unifiedDashboardContainer.classList.add('hidden-important');
             if(allDashboardPanels) allDashboardPanels.forEach(panel => panel.classList.add('hidden-important'));
@@ -1424,7 +1422,6 @@
                                 signOut(auth).then(() => {
                                     console.log("[AUTH STATE] Signed out due to indeterminate role/data.");
                                 }).catch(e => console.error("Error signing out during indeterminate state:", e));
-                                // UI handled by the 'else' block of onAuthStateChanged after signout
                             }
                         }, (userError) => {
                             console.error("[AUTH STATE] Error listening to /users/", user.uid, ":", userError);
@@ -1442,14 +1439,15 @@
                 console.log("[AUTH STATE] No user authenticated. Preparing to redirect or show auth prompt.");
                 if(initialLoadingState) initialLoadingState.classList.add('hidden-important'); 
                 
-                // IMPORTANT: Ensure 'index.html' is your login page or a public landing page.
-                // If this 'profile.html' is part of a Single Page Application (SPA) flow
-                // that handles routing, a hard redirect might not be what you want.
-                // You might want to show 'authRequiredPrompt' instead.
-                console.log("[AUTH STATE] Redirecting to index.html (or showing auth prompt if index.html is not the login page).");
+                // **IMPORTANT**: Ensure 'index.html' is your login page. 
+                // If 'index.html' is THIS page, you will have a redirect loop.
+                // If you want to show the auth prompt on this page instead of redirecting,
+                // comment out the line below and uncomment the 'authRequiredPrompt' line.
+                console.log("[AUTH STATE] Redirecting to index.html.");
                 window.location.href = 'index.html'; 
-                // OR, if this page should show a prompt to log in:
+                // OR:
                 // if(authRequiredPrompt) authRequiredPrompt.classList.remove('hidden-important');
+                // console.log("[AUTH STATE] Showing auth prompt.");
             }
         });
 
