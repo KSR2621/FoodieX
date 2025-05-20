@@ -446,7 +446,7 @@
         </div>
     </div>
 
-    <footer class="bg GROW-gray-800 text-gray-300 py-10 mt-12">
+    <footer class="bg-gray-800 text-gray-300 py-10 mt-12"> <!-- Typo corrected: GROW-gray-800 to bg-gray-800 -->
         <div class="container mx-auto px-4 text-center text-sm">
             <p>© <span id="current-year"></span> FoodieX. All rights reserved.</p>
         </div>
@@ -457,16 +457,25 @@
         import { getAuth, onAuthStateChanged, updatePassword, signOut, sendPasswordResetEmail, reauthenticateWithCredential, EmailAuthProvider } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
         import { getDatabase, ref, get, set, update, onValue, push, remove } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js';
 
-        // IMPORTANT: Replace these with your actual Firebase configuration values
+        // =====================================================================================
+        // IMPORTANT: Firebase Configuration
+        // REPLACE THE PLACEHOLDER VALUES BELOW WITH YOUR ACTUAL FIREBASE PROJECT CONFIGURATION.
+        // You can find these details in your Firebase project settings:
+        // Project Overview -> Project settings (gear icon) -> General tab -> Your apps -> SDK setup and configuration
+        // =====================================================================================
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            databaseURL: "YOUR_DATABASE_URL",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID",
+            apiKey: "YOUR_API_KEY", // <-- REPLACE THIS
+            authDomain: "YOUR_AUTH_DOMAIN", // <-- REPLACE THIS
+            databaseURL: "YOUR_DATABASE_URL", // <-- REPLACE THIS (usually for Realtime Database)
+            projectId: "YOUR_PROJECT_ID", // <-- REPLACE THIS
+            storageBucket: "YOUR_STORAGE_BUCKET", // <-- REPLACE THIS (if using Firebase Storage)
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID", // <-- REPLACE THIS (if using Firebase Cloud Messaging)
+            appId: "YOUR_APP_ID", // <-- REPLACE THIS (especially if using Analytics or other specific services)
         };
+        // =====================================================================================
+        // END OF Firebase Configuration
+        // =====================================================================================
+
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const database = getDatabase(app);
@@ -763,6 +772,8 @@
                     remove(favoriteRef)
                         .then(() => {
                             showFeedback(editUserProfileFeedback, 'Favorite removed successfully.', true);
+                             // Re-render favorites by fetching user data again or manipulating current list
+                             // For simplicity, let's assume onValue for user data will trigger re-render
                         })
                         .catch(err => {
                             console.error("Failed to remove favorite:", err);
@@ -835,7 +846,7 @@
         }
 
         function renderRoFoodItems(foodsToRender) {
-            console.log(`%c[DEBUG] LOG 4: renderRoFoodItems called with (count: ${foodsToRender ? foodsToRender.length : 0}):`, "color: purple; font-weight: bold;", JSON.parse(JSON.stringify(foodsToRender))); 
+            console.log(`%c[DEBUG] LOG 4: renderRoFoodItems called with (count: ${foodsToRender ? foodsToRender.length : 0}):`, "color: purple; font-weight: bold;", foodsToRender ? JSON.parse(JSON.stringify(foodsToRender)) : "null/undefined"); 
             roFoodsListContainer.innerHTML = '';
             if (foodsToRender && foodsToRender.length > 0) {
                 roFoodsListPlaceholder.classList.add('hidden-important');
@@ -903,29 +914,27 @@
             console.log(`%c[DEBUG] LOG 0: Setting up listener for foods at: restaurants/${restaurantId}/foods`, "color: blue; font-weight: bold;");
 
             currentRestaurantFoodsUnsubscribe = onValue(foodsRefDB, snapshot => {
-                const snapshotVal = snapshot.val(); // Get value once
+                const snapshotVal = snapshot.val(); 
                 console.log(`%c[DEBUG] LOG 1: Food items snapshot.exists(): ${snapshot.exists()}`, "color: green; font-weight: bold;");
-                // Deep clone for logging to prevent modifications by subsequent code before console output
                 try {
-                    console.log(`%c[DEBUG] LOG 1.1: Food items snapshot value:`, "color: green; font-weight: bold;", JSON.parse(JSON.stringify(snapshotVal)));
+                    console.log(`%c[DEBUG] LOG 1.1: Food items snapshot value:`, "color: green; font-weight: bold;", snapshotVal ? JSON.parse(JSON.stringify(snapshotVal)) : "null/undefined");
                 } catch (e) {
                      console.error("[DEBUG] Error stringifying snapshotVal for LOG 1.1:", e, snapshotVal);
                 }
 
-
                 allRoFoods = []; 
                 if (snapshot.exists() && snapshotVal) { 
                     let itemCount = 0;
-                    snapshot.forEach(childSnapshot => { // Use snapshot.forEach to iterate
+                    snapshot.forEach(childSnapshot => { 
                         itemCount++;
                         const childKey = childSnapshot.key;
                         const childData = childSnapshot.val();
-                        console.log(`%c[DEBUG] LOG 2: Processing item ${itemCount} from snapshot - Key: ${childKey}`, "color: orange;", JSON.parse(JSON.stringify(childData)));
+                        console.log(`%c[DEBUG] LOG 2: Processing item ${itemCount} from snapshot - Key: ${childKey}`, "color: orange;", childData ? JSON.parse(JSON.stringify(childData)) : "null/undefined");
                         
                         if (childData && typeof childData === 'object' && childData.name) { 
                            allRoFoods.push({ id: childKey, data: childData });
                         } else {
-                           console.warn(`%c[DEBUG] LOG 2.1: SKIPPED invalid/incomplete food item data for key ${childKey}:`, "color: red;", JSON.parse(JSON.stringify(childData)));
+                           console.warn(`%c[DEBUG] LOG 2.1: SKIPPED invalid/incomplete food item data for key ${childKey}:`, "color: red;", childData ? JSON.parse(JSON.stringify(childData)): "null/undefined");
                         }
                     });
                     console.log(`%c[DEBUG] LOG 2.2: Finished processing snapshot. ${itemCount} children iterated.`, "color: orange;");
@@ -935,7 +944,13 @@
                 
                 console.log(`%c[DEBUG] LOG 3: allRoFoods array populated (count: ${allRoFoods.length}):`, "color: blue; font-weight: bold;", JSON.parse(JSON.stringify(allRoFoods)));
                 
-                renderRoFoodItems(allRoFoods); 
+                // Render based on current search term, or all if no search term
+                const currentSearchTerm = dashboardRoMenuItemsSearch.value.toLowerCase().trim();
+                if (currentSearchTerm) {
+                    dashboardRoMenuItemsSearch.dispatchEvent(new Event('input')); // Trigger search re-filter
+                } else {
+                    renderRoFoodItems(allRoFoods); 
+                }
                 
             }, error => {
                 console.error("[DEBUG] Firebase error loading RO food items: ", error);
@@ -1117,12 +1132,14 @@
                     updatesToMake.imageBase64 = ''; 
                 }
 
-
-                if (!userSnapshot.exists() || !userSnapshot.val().role) {
+                // This ensures that if a user record was somehow incomplete, it gets standard fields.
+                // For an existing user, their role and email should already be set.
+                if (!userSnapshot.exists() || !userSnapshot.val().role || !userSnapshot.val().email) {
                     updatesToMake.email = currentUser.email; 
-                    updatesToMake.role = 'user';         
+                    updatesToMake.role = 'user'; // Assuming this form is only for 'user' role         
                     updatesToMake.favorites = currentUserDbData?.favorites || {};        
                 }
+
 
                 await update(userRefPath, updatesToMake);
                 showFeedback(editUserProfileFeedback, 'Profile updated successfully!', true);
@@ -1143,6 +1160,14 @@
             editRoRestaurantFormContainer.classList.toggle('hidden-important');
             if(!editRoRestaurantFormContainer.classList.contains('hidden-important')) {
                 editRoRestaurantFeedback.textContent = '';
+                // Populate form with current data if not already
+                if(currentUserDbData) {
+                    editRoFormRestaurantName.value = currentUserDbData.name || '';
+                    editRoFormRestaurantAddress.value = currentUserDbData.address || '';
+                    editRoFormRestaurantContact.value = currentUserDbData.contact || currentUserDbData.email || '';
+                    editRoFormRestaurantCuisine.value = currentUserDbData.cuisine || '';
+                    editRoFormRestaurantLogo.value = ''; // Clear file input
+                }
             }
         });
 
@@ -1224,7 +1249,7 @@
                 if (err.code === 'auth/wrong-password') msg += 'Incorrect current password.';
                 else if (err.code === 'auth/too-many-requests') msg += 'Too many attempts. Try again later.';
                 else if (err.code === 'auth/weak-password') msg += 'New password is too weak.';
-                else msg += 'An error occurred.'; 
+                else msg += 'An error occurred: ' + err.message; 
                 console.error("Password update error:", err);
                 showFeedback(commonChangePasswordFeedback, msg, false);
             } finally {
@@ -1253,6 +1278,7 @@
         onAuthStateChanged(auth, async (user) => {
             currentUser = user;
 
+            // Detach all existing listeners from previous auth state
             if (currentDbListener) {
                 console.log("[DEBUG] Detaching previous general DB listener.");
                 currentDbListener(); 
@@ -1269,39 +1295,44 @@
                 currentRestaurantDailyMenuUnsubscribe = null;
             }
 
+            // Reset UI state
             authRequiredPrompt.classList.add('hidden-important');
             unifiedDashboardContainer.classList.add('hidden-important');
             allDashboardPanels.forEach(panel => panel.classList.add('hidden-important'));
             dashboardSidebarNavList.innerHTML = ''; 
-            allRoFoods = []; 
+            allRoFoods = []; // Clear food items cache
+            currentUserDbData = null; // Clear current user data
 
             if (user) {
                 console.log("[DEBUG] User authenticated:", user.uid, user.email);
                 unifiedDashboardContainer.classList.remove('hidden-important');
                 
-                // Attempt to determine role: Check /restaurants first for RO, then /users for regular user
                 const restaurantRef = ref(database, `restaurants/${user.uid}`);
+                // This listener will determine if user is a restaurant owner
                 currentDbListener = onValue(restaurantRef, (restoSnapshot) => {
-                    console.log("[DEBUG] Restaurant data snapshot received for /restaurants/", user.uid, ":", JSON.parse(JSON.stringify(restoSnapshot.val())));
+                    console.log("[DEBUG] Restaurant data snapshot received for /restaurants/", user.uid, ":", restoSnapshot.val() ? JSON.parse(JSON.stringify(restoSnapshot.val())) : "null/undefined");
                     if (restoSnapshot.exists()) { 
-                        // If restaurant data exists, assume restaurant owner role
                         currentUserDbData = { uid: user.uid, role: 'restaurant', ...restoSnapshot.val() };
                         sidebarUsernameRestaurantName.textContent = currentUserDbData.name || 'Restaurant Owner';
                         populateSidebar('restaurant');
                         displayRoProfileInfo(currentUserDbData);
                         setupRoDailyMenuManagement(user.uid);
-                        setupRoFoodItemManagement(user.uid); // This will fetch and display food items
+                        setupRoFoodItemManagement(user.uid);
                         if (dashboardSidebarNavList.firstChild && dashboardSidebarNavList.firstChild.querySelector('a')) {
-                            dashboardSidebarNavList.firstChild.querySelector('a').click();
+                            dashboardSidebarNavList.firstChild.querySelector('a').click(); // Open first panel
                         }
                     } else {
-                        // No restaurant data, check if it's a regular user
+                        // Not a restaurant, detach this listener and check if regular user
+                        if (currentDbListener) { // currentDbListener here refers to the restaurantRef listener
+                           currentDbListener(); // Detach restaurant listener as it's not needed
+                           currentDbListener = null; // Nullify it
+                        }
+                        
                         console.log("[DEBUG] No restaurant data. Checking /users/", user.uid);
                         const userRefNode = ref(database, `users/${user.uid}`);
-                        // Detach restaurant listener if it was set
-                        if (currentDbListener) currentDbListener(); 
+                        // This listener determines if user is a regular user
                         currentDbListener = onValue(userRefNode, (userSnapshot) => {
-                            console.log("[DEBUG] User data snapshot received for /users/", user.uid, ":", JSON.parse(JSON.stringify(userSnapshot.val())));
+                            console.log("[DEBUG] User data snapshot received for /users/", user.uid, ":", userSnapshot.val() ? JSON.parse(JSON.stringify(userSnapshot.val())) : "null/undefined");
                             if (userSnapshot.exists() && userSnapshot.val().role === 'user') {
                                 currentUserDbData = { uid: user.uid, ...userSnapshot.val() };
                                 sidebarUsernameRestaurantName.textContent = currentUserDbData.name || 'Customer';
@@ -1317,28 +1348,32 @@
                                 displayUserFavorites(favoriteRestaurantIds);
 
                                 if (dashboardSidebarNavList.firstChild && dashboardSidebarNavList.firstChild.querySelector('a')) {
-                                   dashboardSidebarNavList.firstChild.querySelector('a').click();
+                                   dashboardSidebarNavList.firstChild.querySelector('a').click(); // Open first panel
                                 }
                             } else {
-                                console.warn("[DEBUG] User authenticated, but no specific role found (not in /restaurants/uid and not 'user' in /users/uid). Critical state.", user.uid);
+                                console.warn("[DEBUG] User authenticated, but no specific role found (not in /restaurants/uid and not 'user' in /users/uid). Critical state. Signing out.", user.uid);
                                 signOut(auth).then(() => {
                                     console.log("[DEBUG] Signed out due to indeterminate role/data.");
+                                    // window.location.href = 'index.html'; // Optionally redirect
                                 }).catch(e => console.error("Error signing out during indeterminate state:", e));
                             }
                         }, (userError) => {
                             console.error("[DEBUG] Error listening to /users/", user.uid, ":", userError);
-                            signOut(auth);
+                            signOut(auth); // Sign out on error
                         });
                     }
                 }, (restoError) => {
                      console.error("[DEBUG] Error listening to /restaurants/", user.uid, ":", restoError);
-                     signOut(auth);
+                     signOut(auth); // Sign out on error
                 });
 
             } else { 
                 console.log("[DEBUG] No user authenticated. Redirecting or showing auth prompt.");
-                currentUserDbData = null;
+                // If this page is only for authenticated users, redirect.
+                // If index.html is the login page, this is correct.
+                // Otherwise, you might want to show `authRequiredPrompt` instead.
                 window.location.href = 'index.html'; 
+                // authRequiredPrompt.classList.remove('hidden-important'); // Alternative to redirect
             }
         });
     </script>
