@@ -149,11 +149,11 @@
         </div>
         <div id="mobile-menu-items" class="mobile-menu md:hidden mt-3">
             <span id="mobile-welcome-message" class="block px-2 py-1 text-sm welcome-message hidden"></span>
-            <a href="/index.html" class="block px-2 py-1 text-sm hover:bg-gray-700">Home</a>
-            <a href="/restaurants.html" class="block px-2 py-1 text-sm hover:bg-gray-700">Restaurants</a>
-            <a href="/foods.html" class="block px-2 py-1 text-sm hover:bg-gray-700">Foods</a>
-            <a href="/login.html" id="mobile-nav-login" class="block px-2 py-1 text-sm hover:bg-gray-700">Login / Signup</a>
-            <a href="/profile.html" id="mobile-nav-profile" class="block px-2 py-1 text-sm hover:bg-gray-700 hidden">Profile</a>
+            <a href="index.html" class="block px-2 py-1 text-sm hover:bg-gray-700">Home</a>
+            <a href="restaurants.html" class="block px-2 py-1 text-sm hover:bg-gray-700">Restaurants</a>
+            <a href="foods.html" class="block px-2 py-1 text-sm hover:bg-gray-700">Foods</a>
+            <a href="login.html" id="mobile-nav-login" class="block px-2 py-1 text-sm hover:bg-gray-700">Login / Signup</a>
+            <a href="profile.html" id="mobile-nav-profile" class="block px-2 py-1 text-sm hover:bg-gray-700 hidden">Profile</a>
         </div>
     </nav>
 
@@ -198,7 +198,7 @@
                 </div>
 
                 <div class="text-center mt-12">
-                    <a href="/restaurants.html" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition duration-300"><i class="fas fa-arrow-left mr-2"></i>Back to Restaurants</a>
+                    <a href="restaurants.html" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition duration-300"><i class="fas fa-arrow-left mr-2"></i>Back to Restaurants</a>
                 </div>
             </div>
         </div>
@@ -336,7 +336,7 @@
                         
                         const foodName = food.name || 'Unnamed Food';
                         const foodPrice = food.price || 0;
-                        const orderUrl = `/order.html?restaurantId=${restaurantId}&foodId=${foodId}&foodName=${encodeURIComponent(foodName)}&foodPrice=${foodPrice}`;
+                        const orderUrl = `order.html?restaurantId=${restaurantId}&foodId=${foodId}&foodName=${encodeURIComponent(foodName)}&foodPrice=${foodPrice}`;
 
                         card.innerHTML = `
                             <img class="food-image" src="${food.imageBase64 || 'https://via.placeholder.com/300x150?text=Food'}" alt="${foodName}">
