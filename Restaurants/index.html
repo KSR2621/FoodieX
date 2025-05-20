@@ -64,20 +64,26 @@
             padding: 0.75rem 1.5rem; border-radius: 0.375rem; font-weight: 600;
             transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease; text-align: center;
         }
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
         .btn-orange {
             background-color: var(--theme-orange); color: white; border: 1px solid var(--theme-orange);
         }
-        .btn-orange:hover {
+        .btn-orange:hover:not(:disabled) {
             background-color: var(--theme-orange-dark); border-color: var(--theme-orange-dark);
         }
         .btn-orange-outline {
             background-color: white; color: var(--theme-orange); border: 1px solid var(--theme-orange);
         }
-        .btn-orange-outline:hover {
+        .btn-orange-outline:hover:not(:disabled) {
             background-color: #FFF7ED; color: var(--theme-orange-dark); border-color: var(--theme-orange-dark);
         }
         .error-feedback { color: #dc2626; font-size: 0.875rem; margin-top: 0.25rem; }
         .success-feedback { color: #16a34a; font-size: 0.875rem; margin-top: 0.25rem; }
+        .neutral-feedback { color: #4b5563; font-size: 0.875rem; margin-top: 0.25rem; } /* For 'Processing...' */
+
         .auth-prompt {
             text-align: center; padding: 3rem 1rem; border: 2px dashed #d1d5db;
             border-radius: 0.5rem; background-color: white;
@@ -331,7 +337,6 @@
             <div id="panel-user-my-favorites" class="dashboard-panel dashboard-panel-content hidden-important">
                 <h2 class="panel-main-title">My Favorite Restaurants</h2>
                 <div id="user-favorites-list-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Initial placeholder, will be replaced by JS -->
                     <p class="text-gray-600 col-span-full text-center py-4">Loading favorites...</p> 
                 </div>
             </div>
@@ -452,14 +457,15 @@
         import { getAuth, onAuthStateChanged, updatePassword, signOut, sendPasswordResetEmail, reauthenticateWithCredential, EmailAuthProvider } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
         import { getDatabase, ref, get, set, update, onValue, push, remove } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js';
 
+        // IMPORTANT: Replace these with your actual Firebase configuration values
         const firebaseConfig = {
-            apiKey: "AIzaSyABlpJruz0pZN7K6bQgRuqDxPVAG1bi9q8", // Replace with your actual API key
-            authDomain: "daily-menu-bc700.firebaseapp.com", // Replace with your actual authDomain
-            databaseURL: "https://daily-menu-bc700-default-rtdb.firebaseio.com", // Replace with your actual databaseURL
-            projectId: "daily-menu-bc700", // Replace with your actual projectId
-            storageBucket: "daily-menu-bc700.firebasestorage.app", // Replace with your actual storageBucket
-            messagingSenderId: "87059586917", // Replace with your actual messagingSenderId
-            appId: "1:87059586917:web:d2787e9d4d12dc47decb8c", // Replace with your actual appId
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            databaseURL: "YOUR_DATABASE_URL",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID",
         };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -572,11 +578,17 @@
             });
         }
 
-        function showFeedback(element, message, isSuccess = true) {
+        function showFeedback(element, message, isSuccess = true, isNeutral = false) {
             if (!element) return;
             element.textContent = message;
-            element.className = `text-center text-sm ${isSuccess ? 'success-feedback' : 'error-feedback'}`;
-            setTimeout(() => { if(element) element.textContent = '';}, 4000);
+            if (isNeutral) {
+                element.className = 'text-center text-sm neutral-feedback';
+            } else {
+                element.className = `text-center text-sm ${isSuccess ? 'success-feedback' : 'error-feedback'}`;
+            }
+            if (!isNeutral) { // Don't auto-clear neutral "Processing..." messages
+                setTimeout(() => { if(element) element.textContent = '';}, 4000);
+            }
         }
 
         let confirmActionCallback = null;
@@ -740,6 +752,7 @@
                     remove(favoriteRef)
                         .then(() => {
                             showFeedback(editUserProfileFeedback, 'Favorite removed successfully.', true);
+                            // The onValue listener for user data should automatically refresh the list.
                         })
                         .catch(err => {
                             console.error("Failed to remove favorite:", err);
@@ -789,11 +802,25 @@
 
             roUpdateDailyMenuForm.addEventListener('submit', e => {
                 e.preventDefault();
+                const submitButton = roUpdateDailyMenuForm.querySelector('button[type="submit"]');
+                if (submitButton) submitButton.disabled = true;
+                showFeedback(roDailyMenuFeedback, 'Processing...', true, true); // Neutral feedback
+
                 const date = roDailyMenuFormDate.value;
                 const items = roDailyMenuFormItems.value.split('\n').map(item => item.trim()).filter(item => item);
                 set(ref(database, `restaurants/${restaurantId}/dailyMenu/${date}`), { items })
-                    .then(() => showFeedback(roDailyMenuFeedback, 'Daily menu updated!', true))
-                    .catch(err => showFeedback(roDailyMenuFeedback, 'Update failed: ' + err.message, false));
+                    .then(() => {
+                        showFeedback(roDailyMenuFeedback, 'Daily menu updated!', true);
+                    })
+                    .catch(err => {
+                        showFeedback(roDailyMenuFeedback, 'Update failed: ' + err.message, false);
+                    })
+                    .finally(() => {
+                        if (submitButton) submitButton.disabled = false;
+                        if (roDailyMenuFeedback.textContent === 'Processing...') {
+                            roDailyMenuFeedback.textContent = '';
+                        }
+                    });
             });
         }
 
@@ -839,7 +866,7 @@
                     snapshot.forEach(childSnapshot => allRoFoods.push({ id: childSnapshot.key, data: childSnapshot.val() }));
                 }
                 renderRoFoodItems(allRoFoods);
-                dashboardRoMenuItemsSearch.value = '';
+                // dashboardRoMenuItemsSearch.value = ''; // Let search term persist if user is typing
             }, error => {
                 console.error("Error loading RO food items: ", error);
                 roFoodsListContainer.innerHTML = '<tr><td colspan="5" class="text-red-500 text-center py-4">Could not load food items.</td></tr>';
@@ -848,47 +875,65 @@
 
             roFoodItemForm.addEventListener('submit', async e => {
                 e.preventDefault();
+                roFoodItemFormSubmitBtn.disabled = true;
+                showFeedback(roFoodItemFormFeedback, 'Processing...', true, true); // Neutral feedback
+
                 const foodIdToEdit = roFoodItemFormId.value;
-                let imageBase64 = '';
+                let newImageBase64 = null; 
+
                 if (roFoodItemFormImage.files[0]) {
-                    try { imageBase64 = await compressAndEncodeImage(roFoodItemFormImage.files[0]); }
-                    catch (imgErr) { showFeedback(roFoodItemFormFeedback, imgErr.message, false); return; }
+                    try {
+                        newImageBase64 = await compressAndEncodeImage(roFoodItemFormImage.files[0]);
+                    } catch (imgErr) {
+                        showFeedback(roFoodItemFormFeedback, imgErr.message, false);
+                        roFoodItemFormSubmitBtn.disabled = false;
+                        return;
+                    }
                 }
 
                 const foodData = {
-                    name: roFoodItemFormName.value, description: roFoodItemFormDescription.value,
-                    category: roFoodItemFormCategory.value, price: parseFloat(roFoodItemFormPrice.value),
+                    name: roFoodItemFormName.value.trim(),
+                    description: roFoodItemFormDescription.value.trim(),
+                    category: roFoodItemFormCategory.value.trim(),
+                    price: parseFloat(roFoodItemFormPrice.value),
                     status: roFoodItemFormStatus.value
                 };
-                if (imageBase64) {
-                     foodData.imageBase64 = imageBase64;
-                }
-
 
                 try {
-                    if (foodIdToEdit) {
-                        if (!imageBase64 && roFoodItemFormImage.files.length === 0) {
+                    if (foodIdToEdit) { // Editing existing item
+                        if (newImageBase64 !== null) { // New image was uploaded
+                            foodData.imageBase64 = newImageBase64;
+                        } else { // No new image, retain old one if it exists
                             const existingFoodSnap = await get(ref(database, `restaurants/${currentUser.uid}/foods/${foodIdToEdit}`));
-                            if(existingFoodSnap.exists() && existingFoodSnap.val().imageBase64) {
-                                // No new image, keep existing
+                            if (existingFoodSnap.exists() && existingFoodSnap.val().imageBase64) {
+                                foodData.imageBase64 = existingFoodSnap.val().imageBase64;
                             } else {
-                                foodData.imageBase64 = ''; 
+                                foodData.imageBase64 = ''; // No new and no existing image
                             }
                         }
                         await update(ref(database, `restaurants/${currentUser.uid}/foods/${foodIdToEdit}`), foodData);
                         showFeedback(roFoodItemFormFeedback, 'Food item updated!', true);
-                    } else {
-                        if (!foodData.imageBase64) foodData.imageBase64 = '';
+                    } else { // Adding new item
+                        foodData.imageBase64 = newImageBase64 !== null ? newImageBase64 : '';
                         await push(ref(database, `restaurants/${currentUser.uid}/foods`), foodData);
                         showFeedback(roFoodItemFormFeedback, 'Food item added!', true);
                     }
-                    roFoodItemForm.reset(); roFoodItemFormId.value = '';
+
+                    roFoodItemForm.reset();
+                    roFoodItemFormImage.value = ''; // Explicitly clear file input
+                    roFoodItemFormId.value = '';
                     roFoodItemFormTitle.textContent = 'Add New Food Item';
                     roFoodItemFormSubmitBtn.textContent = 'Add Food Item';
                     roAddEditFoodFormContainer.classList.add('hidden-important');
                     dashboardHeaderActionBtn.innerHTML = '<i class="fas fa-plus"></i>Add New Item';
+
                 } catch (err) {
                     showFeedback(roFoodItemFormFeedback, 'Operation failed: ' + err.message, false);
+                } finally {
+                    roFoodItemFormSubmitBtn.disabled = false;
+                    if (roFoodItemFormFeedback.textContent === 'Processing...') {
+                        roFoodItemFormFeedback.textContent = '';
+                    }
                 }
             });
         }
@@ -910,6 +955,7 @@
                     roFoodItemFormImage.value = ''; 
                     roFoodItemFormTitle.textContent = 'Edit Food Item';
                     roFoodItemFormSubmitBtn.textContent = 'Update Food Item';
+                    roFoodItemFormFeedback.textContent = ''; // Clear previous feedback
                     roAddEditFoodFormContainer.classList.remove('hidden-important');
                     dashboardHeaderActionBtn.innerHTML = '<i class="fas fa-times"></i>Cancel Editing';
                     roAddEditFoodFormContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -919,7 +965,7 @@
                 openConfirmationModal('Delete Food Item', 'Are you sure you want to delete this food item?', async () => {
                     try {
                         await remove(ref(database, `restaurants/${currentUser.uid}/foods/${foodId}`));
-                        showFeedback(roFoodItemFormFeedback, 'Food item deleted!', true);
+                        showFeedback(roFoodItemFormFeedback, 'Food item deleted!', true); // Show feedback near form
                     } catch (err) {
                         showFeedback(roFoodItemFormFeedback, 'Delete failed: ' + err.message, false);
                     }
@@ -932,10 +978,16 @@
             if (isFormVisible) {
                 roAddEditFoodFormContainer.classList.add('hidden-important');
                 dashboardHeaderActionBtn.innerHTML = '<i class="fas fa-plus"></i>Add New Item';
+                roFoodItemForm.reset();
+                roFoodItemFormImage.value = '';
+                roFoodItemFormId.value = '';
+                roFoodItemFormFeedback.textContent = '';
             } else {
                 roFoodItemForm.reset(); roFoodItemFormId.value = '';
+                roFoodItemFormImage.value = '';
                 roFoodItemFormTitle.textContent = 'Add New Food Item';
                 roFoodItemFormSubmitBtn.textContent = 'Add Food Item';
+                roFoodItemFormFeedback.textContent = '';
                 roAddEditFoodFormContainer.classList.remove('hidden-important');
                 dashboardHeaderActionBtn.innerHTML = '<i class="fas fa-times"></i>Cancel Adding';
                 roAddEditFoodFormContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -947,13 +999,19 @@
             if (!editUserProfileFormContainer.classList.contains('hidden-important')) {
                 editUserFormName.value = currentUserDbData?.name || '';
                 editUserFormImage.value = ''; 
+                editUserProfileFeedback.textContent = '';
             }
         });
 
         updateUserProfileDetailsForm.addEventListener('submit', async e => {
             e.preventDefault();
+            const submitButton = updateUserProfileDetailsForm.querySelector('button[type="submit"]');
+            if (submitButton) submitButton.disabled = true;
+            showFeedback(editUserProfileFeedback, 'Processing...', true, true);
+
             if (!currentUser) {
                 showFeedback(editUserProfileFeedback, 'You must be logged in to update your profile.', false);
+                if (submitButton) submitButton.disabled = false;
                 return;
             }
 
@@ -962,6 +1020,7 @@
 
             if (!newName) {
                 showFeedback(editUserProfileFeedback, 'Full name is required.', false);
+                if (submitButton) submitButton.disabled = false;
                 return;
             }
 
@@ -970,102 +1029,146 @@
                 const userSnapshot = await get(userRefPath); 
 
                 const updatesToMake = { name: newName };
-                let imageBase64; 
+                let imageBase64 = null; 
 
                 if (imageFile) {
                     imageBase64 = await compressAndEncodeImage(imageFile);
                     updatesToMake.imageBase64 = imageBase64;
+                } else if (userSnapshot.exists() && userSnapshot.val().imageBase64) {
+                    updatesToMake.imageBase64 = userSnapshot.val().imageBase64; // Retain existing if no new one
+                } else {
+                    updatesToMake.imageBase64 = ''; // Ensure property exists
                 }
+
 
                 if (!userSnapshot.exists() || !userSnapshot.val().role) {
                     updatesToMake.email = currentUser.email; 
                     updatesToMake.role = 'user';         
-                    updatesToMake.favorites = {};        
+                    updatesToMake.favorites = currentUserDbData?.favorites || {};        
                 }
 
                 await update(userRefPath, updatesToMake);
-
-                if(currentUserDbData) { 
-                    currentUserDbData.name = newName;
-                    if (imageBase64) { 
-                        currentUserDbData.imageBase64 = imageBase64;
-                    }
-                } else { 
-                    currentUserDbData = { ...updatesToMake, uid: currentUser.uid, email: currentUser.email };
-                }
-
-                displayUserProfileInfo(currentUserDbData); 
-
                 showFeedback(editUserProfileFeedback, 'Profile updated successfully!', true);
                 editUserProfileFormContainer.classList.add('hidden-important');
                 editUserFormImage.value = ''; 
             } catch (err) {
                 showFeedback(editUserProfileFeedback, `Update failed: ${err.message}`, false);
+            } finally {
+                if (submitButton) submitButton.disabled = false;
+                if (editUserProfileFeedback.textContent === 'Processing...') {
+                    editUserProfileFeedback.textContent = '';
+                }
             }
         });
 
 
-        editRoRestaurantToggleBtn.addEventListener('click', () => editRoRestaurantFormContainer.classList.toggle('hidden-important'));
+        editRoRestaurantToggleBtn.addEventListener('click', () => {
+            editRoRestaurantFormContainer.classList.toggle('hidden-important');
+            if(!editRoRestaurantFormContainer.classList.contains('hidden-important')) {
+                editRoRestaurantFeedback.textContent = '';
+                // Values are already set from displayRoProfileInfo which is called by onValue
+            }
+        });
 
         updateRoRestaurantDetailsForm.addEventListener('submit', async e => {
             e.preventDefault();
+            const submitButton = updateRoRestaurantDetailsForm.querySelector('button[type="submit"]');
+            if (submitButton) submitButton.disabled = true;
+            showFeedback(editRoRestaurantFeedback, 'Processing...', true, true);
+
             const imageFile = editRoFormRestaurantLogo.files[0];
             
             const updates = {
-                name: editRoFormRestaurantName.value,
-                address: editRoFormRestaurantAddress.value,
-                contact: editRoFormRestaurantContact.value,
-                cuisine: editRoFormRestaurantCuisine.value,
+                name: editRoFormRestaurantName.value.trim(),
+                address: editRoFormRestaurantAddress.value.trim(),
+                contact: editRoFormRestaurantContact.value.trim(),
+                cuisine: editRoFormRestaurantCuisine.value.trim(),
             };
 
-            let imageBase64; 
+            let newImageBase64 = null; 
             if(imageFile) {
                 try { 
-                    imageBase64 = await compressAndEncodeImage(imageFile); 
-                    updates.imageBase64 = imageBase64;
+                    newImageBase64 = await compressAndEncodeImage(imageFile); 
+                    updates.imageBase64 = newImageBase64;
                 }
-                catch(err) { showFeedback(editRoRestaurantFeedback, err.message, false); return; }
+                catch(err) { 
+                    showFeedback(editRoRestaurantFeedback, err.message, false); 
+                    if (submitButton) submitButton.disabled = false;
+                    return; 
+                }
+            } else if (currentUserDbData && currentUserDbData.imageBase64) {
+                 updates.imageBase64 = currentUserDbData.imageBase64; // Retain existing if no new file
+            } else {
+                 updates.imageBase64 = ''; // Ensure property exists
             }
             
-            update(ref(database, `restaurants/${currentUser.uid}`), updates)
-                .then(() => {
-                    showFeedback(editRoRestaurantFeedback, 'Restaurant details updated!', true);
-                    editRoRestaurantFormContainer.classList.add('hidden-important');
-                })
-                .catch(err => showFeedback(editRoRestaurantFeedback, 'Update failed: ' + err.message, false));
+            try {
+                await update(ref(database, `restaurants/${currentUser.uid}`), updates);
+                showFeedback(editRoRestaurantFeedback, 'Restaurant details updated!', true);
+                editRoRestaurantFormContainer.classList.add('hidden-important');
+                editRoFormRestaurantLogo.value = ''; // Clear file input
+            } catch (err) {
+                showFeedback(editRoRestaurantFeedback, 'Update failed: ' + err.message, false);
+            } finally {
+                if (submitButton) submitButton.disabled = false;
+                if (editRoRestaurantFeedback.textContent === 'Processing...') {
+                     editRoRestaurantFeedback.textContent = '';
+                }
+            }
         });
 
         commonChangePasswordForm.addEventListener('submit', async e => {
             e.preventDefault();
+            const submitButton = commonChangePasswordForm.querySelector('button[type="submit"]');
+            if (submitButton) submitButton.disabled = true;
+            showFeedback(commonChangePasswordFeedback, 'Processing...', true, true);
+
             const oldPass = commonCurrentPasswordInput.value;
             const newPass = commonNewPasswordInput.value;
             const confirmPass = commonConfirmNewPasswordInput.value;
-            if (newPass !== confirmPass) { showFeedback(commonChangePasswordFeedback, 'New passwords do not match.', false); return; }
-            if (newPass.length < 6) { showFeedback(commonChangePasswordFeedback, 'New password (min 6 chars).', false); return; }
+
+            if (newPass !== confirmPass) { 
+                showFeedback(commonChangePasswordFeedback, 'New passwords do not match.', false); 
+                if (submitButton) submitButton.disabled = false;
+                return; 
+            }
+            if (newPass.length < 6) { 
+                showFeedback(commonChangePasswordFeedback, 'New password must be at least 6 characters.', false); 
+                if (submitButton) submitButton.disabled = false;
+                return; 
+            }
             try {
                 const credential = EmailAuthProvider.credential(currentUser.email, oldPass);
                 await reauthenticateWithCredential(currentUser, credential);
                 await updatePassword(currentUser, newPass);
-                showFeedback(commonChangePasswordFeedback, 'Password updated!', true);
+                showFeedback(commonChangePasswordFeedback, 'Password updated successfully!', true);
                 commonChangePasswordForm.reset();
             } catch (err) {
-                let msg = 'Update failed. ';
+                let msg = 'Password update failed. ';
                 if (err.code === 'auth/wrong-password') msg += 'Incorrect current password.';
                 else if (err.code === 'auth/too-many-requests') msg += 'Too many attempts. Try again later.';
-                else msg += err.message.split('/').pop().replace(/-/g, ' ') + '.';
+                else if (err.code === 'auth/weak-password') msg += 'New password is too weak.';
+                else msg += 'An error occurred.'; // Generic for other Firebase errors
+                console.error("Password update error:", err);
                 showFeedback(commonChangePasswordFeedback, msg, false);
+            } finally {
+                if (submitButton) submitButton.disabled = false;
+                if (commonChangePasswordFeedback.textContent === 'Processing...') {
+                     commonChangePasswordFeedback.textContent = '';
+                }
             }
         });
 
         commonForgotPasswordLink.addEventListener('click', async e => {
             e.preventDefault();
             if (!currentUser?.email) {
-                showFeedback(commonForgotPasswordFeedback, 'No user logged in.', false);
+                showFeedback(commonForgotPasswordFeedback, 'No user logged in or email not available.', false);
                 return;
             }
+            showFeedback(commonForgotPasswordFeedback, 'Sending reset email...', true, true);
             try {
                 await sendPasswordResetEmail(auth, currentUser.email);
-                showFeedback(commonForgotPasswordFeedback, 'Password reset email sent!', true);
+                showFeedback(commonForgotPasswordFeedback, 'Password reset email sent! Check your inbox.', true);
             } catch (err) {
                 showFeedback(commonForgotPasswordFeedback, 'Failed to send reset email: ' + err.message, false);
             }
@@ -1080,6 +1183,9 @@
 
             authRequiredPrompt.classList.add('hidden-important');
             unifiedDashboardContainer.classList.add('hidden-important');
+            // Clear any previous state from dashboard panels
+            allDashboardPanels.forEach(panel => panel.classList.add('hidden-important'));
+            dashboardSidebarNavList.innerHTML = ''; // Clear sidebar nav
 
             if (user) {
                 unifiedDashboardContainer.classList.remove('hidden-important');
@@ -1100,10 +1206,7 @@
                         displayUserFavorites(favoriteRestaurantIds);
 
                         if (dashboardSidebarNavList.firstChild && dashboardSidebarNavList.firstChild.querySelector('a')) {
-                            const currentActivePanel = Array.from(allDashboardPanels).find(p => !p.classList.contains('hidden-important'));
-                            if(!currentActivePanel) { 
-                                dashboardSidebarNavList.firstChild.querySelector('a').click();
-                            }
+                           dashboardSidebarNavList.firstChild.querySelector('a').click();
                         }
 
                     } else { 
@@ -1118,36 +1221,32 @@
                                 setupRoDailyMenuManagement(user.uid);
                                 setupRoFoodItemManagement(user.uid);
                                 if (dashboardSidebarNavList.firstChild && dashboardSidebarNavList.firstChild.querySelector('a')) {
-                                    const currentActivePanel = Array.from(allDashboardPanels).find(p => !p.classList.contains('hidden-important'));
-                                    if(!currentActivePanel) {
-                                        dashboardSidebarNavList.firstChild.querySelector('a').click();
-                                    }
+                                    dashboardSidebarNavList.firstChild.querySelector('a').click();
                                 }
                             } else { 
-                                console.warn("User exists but no 'user' role or 'restaurant' data found. Defaulting to user view.");
-                                currentUserDbData = { uid: user.uid, role: 'user', email: user.email, name: user.displayName || "FoodieX User", favorites: {} };
-                                sidebarUsernameRestaurantName.textContent = currentUserDbData.name;
-                                populateSidebar('user');
-                                displayUserProfileInfo(currentUserDbData);
-                                displayUserFavorites([]); 
-                                if (dashboardSidebarNavList.firstChild && dashboardSidebarNavList.firstChild.querySelector('a')) {
-                                     const currentActivePanel = Array.from(allDashboardPanels).find(p => !p.classList.contains('hidden-important'));
-                                    if(!currentActivePanel) {
-                                        dashboardSidebarNavList.firstChild.querySelector('a').click();
-                                    }
-                                }
+                                console.warn("User authenticated, but no 'user' role in /users/uid or no data in /restaurants/uid. Prompting for role or redirecting.");
+                                // This case might require a page to select role if it's a new signup not yet classified
+                                // For now, showing auth prompt or redirecting might be an option
+                                signOut(auth); // Force logout as state is indeterminate
+                                // Or: authRequiredPrompt.classList.remove('hidden-important');
+                                // Or redirect to a role selection page
                             }
                         }, (error) => {
                              console.error("Error listening to restaurant data:", error);
+                             signOut(auth); // Error fetching critical data, log out
                         });
                     }
                 }, (error) => {
                     console.error("Error listening to user data:", error);
+                    signOut(auth); // Error fetching critical data, log out
                 });
-            } else { // No user logged in (this block is triggered after signOut)
+            } else { 
                 currentUserDbData = null;
-                // Redirect to index.html
-                window.location.href = 'index.html'; 
+                // If you want to show a login prompt on this page:
+                // authRequiredPrompt.classList.remove('hidden-important');
+                // unifiedDashboardContainer.classList.add('hidden-important');
+                // If you want to redirect to a login page:
+                window.location.href = 'index.html'; // Or your login page e.g., /login.html
             }
         });
     </script>
