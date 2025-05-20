@@ -324,7 +324,7 @@
         function handleLogout(e) {
             e.preventDefault();
             signOut(auth).then(() => {
-                window.location.href = '/login.html';
+                window.location.href = 'login.html';
             }).catch((error) => {
                 console.error('Logout error:', error);
                 alert('Failed to logout.');
@@ -380,7 +380,7 @@
                                     <h3 class="text-xl font-semibold mb-2 text-gray-800">${restaurantData.name || 'Unnamed Restaurant'}</h3>
                                     ${menuItemsHtml}
                                 </div>
-                                <a href="/restaurant-details.html?id=${restaurantId}" class="mt-4 self-start inline-block btn-orange hover:bg-orange-600 text-white text-sm font-semibold py-2 px-4 rounded transition duration-300">View Restaurant</a>
+                                <a href="restaurant-details.html?id=${restaurantId}" class="mt-4 self-start inline-block btn-orange hover:bg-orange-600 text-white text-sm font-semibold py-2 px-4 rounded transition duration-300">View Restaurant</a>
                             </div>
                         `;
                         dailyMenuContainer.insertAdjacentHTML('beforeend', menuCard);
@@ -487,7 +487,7 @@
                                     <h3 class="text-xl font-semibold mb-2 text-gray-800">${restaurant.name || 'Unnamed Restaurant'}</h3>
                                     <p class="text-gray-600 text-sm mb-1">Cuisine: ${restaurant.cuisine || 'Not specified'}</p>
                                     <p class="text-gray-600 text-sm mb-4 flex-grow">${(restaurant.description || 'No description available.').substring(0,100)}${(restaurant.description && restaurant.description.length > 100) ? '...' : ''}</p>
-                                    <a href="/restaurant-details.html?id=${restaurantId}" class="self-start mt-auto btn-orange hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded text-sm transition duration-300">View Details</a>
+                                    <a href="restaurant-details.html?id=${restaurantId}" class="self-start mt-auto btn-orange hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded text-sm transition duration-300">View Details</a>
                                 </div>
                             </div>
                         `;
