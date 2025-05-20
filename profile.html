@@ -453,7 +453,7 @@
         import { getDatabase, ref, get, set, update, onValue, push, remove } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js';
 
         const firebaseConfig = {
-            apiKey: "AIzaSyABlpJruz0pZN7K6bQgRuqDxPVAG1bi9q8", // Replace with your actual API key if this is a placeholder
+            apiKey: "AIzaSyABlpJruz0pZN7K6bQgRuqDxPVAG1bi9q8", // Replace with your actual Firebase config
             authDomain: "daily-menu-bc700.firebaseapp.com",
             databaseURL: "https://daily-menu-bc700-default-rtdb.firebaseio.com",
             projectId: "daily-menu-bc700",
@@ -797,7 +797,6 @@
             });
         }
 
-        // =============== MODIFIED FUNCTION ===============
         function renderRoFoodItems(foodsToRender) {
             roFoodsListContainer.innerHTML = '';
             if (foodsToRender.length > 0) {
@@ -805,25 +804,11 @@
                 foodsToRender.forEach(foodEntry => {
                     const foodId = foodEntry.id;
                     const food = foodEntry.data;
-
-                    let priceDisplay = '0.00'; // Default value
-                    if (food.price !== null && typeof food.price !== 'undefined') {
-                        const numericPrice = Number(food.price); // Attempt to convert to number
-                        if (!isNaN(numericPrice)) { // Check if conversion was successful
-                            priceDisplay = numericPrice.toFixed(2);
-                        } else {
-                            console.warn(`Item "${food.name || 'Unknown'}" (ID: ${foodId}) has an invalid price:`, food.price);
-                            priceDisplay = 'N/A'; // Or 'Invalid' or keep '0.00' or any placeholder
-                        }
-                    } else {
-                         priceDisplay = '0.00'; // If price is null or undefined
-                    }
-
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td class="item-cell" data-label="Item"><img src="${food.imageBase64 || 'https://via.placeholder.com/50?text=Food'}" alt="${food.name || 'N/A'}"><div><div class="item-name">${food.name || 'N/A'}</div><div class="item-description">${(food.description || '').substring(0,100)}...</div></div></td>
+                        <td class="item-cell" data-label="Item"><img src="${food.imageBase64 || 'https://via.placeholder.com/50?text=Food'}" alt="${food.name || 'Food item'}"><div><div class="item-name">${food.name || 'N/A'}</div><div class="item-description">${(food.description || '').substring(0,100)}...</div></div></td>
                         <td data-label="Category">${food.category || 'N/A'}</td>
-                        <td data-label="Price">₹${priceDisplay}</td>
+                        <td data-label="Price">₹${typeof food.price === 'number' ? food.price.toFixed(2) : '0.00'}</td>
                         <td data-label="Status"><span class="ro-status-badge ${food.status === 'Available' ? 'available' : 'unavailable'}">${food.status || 'N/A'}</span></td>
                         <td data-label="Actions"><button class="edit-ro-food-item-btn ro-action-btn" data-id="${foodId}" title="Edit"><i class="fas fa-edit"></i></button><button class="delete-ro-food-item-btn ro-action-btn" data-id="${foodId}" title="Delete"><i class="fas fa-trash-alt"></i></button></td>
                     `;
@@ -831,10 +816,9 @@
                 });
             } else {
                 roFoodsListPlaceholder.classList.remove('hidden-important');
-                roFoodsListPlaceholder.textContent = dashboardRoMenuItemsSearch.value.trim() !== '' ? "No food items match your search." : "No food items added yet.";
+                roFoodsListPlaceholder.textContent = dashboardRoMenuItemsSearch.value.trim() !== '' ? "No food items match your search." : "No food items added yet. Click \"Add New Item\" to get started.";
             }
         }
-        // ===============================================
 
         dashboardRoMenuItemsSearch.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase().trim();
@@ -852,10 +836,18 @@
             currentRestaurantFoodsUnsubscribe = onValue(foodsRefDB, snapshot => {
                 allRoFoods = [];
                 if (snapshot.exists()) {
-                    snapshot.forEach(childSnapshot => allRoFoods.push({ id: childSnapshot.key, data: childSnapshot.val() }));
+                    snapshot.forEach(childSnapshot => {
+                        // Ensure basic structure for robustness, though Firebase usually returns objects
+                        const data = childSnapshot.val();
+                        if (typeof data === 'object' && data !== null) {
+                             allRoFoods.push({ id: childSnapshot.key, data: data });
+                        } else {
+                            console.warn("Invalid food item data structure from Firebase:", childSnapshot.key, data);
+                        }
+                    });
                 }
                 renderRoFoodItems(allRoFoods);
-                dashboardRoMenuItemsSearch.value = '';
+                dashboardRoMenuItemsSearch.value = ''; // Reset search on new data load
             }, error => {
                 console.error("Error loading RO food items: ", error);
                 roFoodsListContainer.innerHTML = '<tr><td colspan="5" class="text-red-500 text-center py-4">Could not load food items.</td></tr>';
@@ -864,6 +856,7 @@
 
             roFoodItemForm.addEventListener('submit', async e => {
                 e.preventDefault();
+                roFoodItemFormFeedback.textContent = ''; // Clear previous feedback
                 const foodIdToEdit = roFoodItemFormId.value;
                 let imageBase64 = '';
                 if (roFoodItemFormImage.files[0]) {
@@ -872,10 +865,22 @@
                 }
 
                 const foodData = {
-                    name: roFoodItemFormName.value, description: roFoodItemFormDescription.value,
-                    category: roFoodItemFormCategory.value, price: parseFloat(roFoodItemFormPrice.value),
+                    name: roFoodItemFormName.value.trim(), 
+                    description: roFoodItemFormDescription.value.trim(),
+                    category: roFoodItemFormCategory.value.trim(), 
+                    price: parseFloat(roFoodItemFormPrice.value),
                     status: roFoodItemFormStatus.value
                 };
+                
+                if (isNaN(foodData.price) || foodData.price < 0) {
+                    showFeedback(roFoodItemFormFeedback, 'Please enter a valid non-negative price.', false);
+                    return;
+                }
+                if (!foodData.name) {
+                    showFeedback(roFoodItemFormFeedback, 'Food name is required.', false);
+                    return;
+                }
+
                 if (imageBase64) {
                      foodData.imageBase64 = imageBase64;
                 }
@@ -885,7 +890,7 @@
                         if (!imageBase64 && roFoodItemFormImage.files.length === 0) {
                             const existingFoodSnap = await get(ref(database, `restaurants/${currentUser.uid}/foods/${foodIdToEdit}`));
                             if(existingFoodSnap.exists() && existingFoodSnap.val().imageBase64) {
-                                // Keep existing image implicitly by not setting foodData.imageBase64
+                                foodData.imageBase64 = existingFoodSnap.val().imageBase64; // Keep existing image
                             } else {
                                 foodData.imageBase64 = ''; 
                             }
@@ -893,11 +898,12 @@
                         await update(ref(database, `restaurants/${currentUser.uid}/foods/${foodIdToEdit}`), foodData);
                         showFeedback(roFoodItemFormFeedback, 'Food item updated!', true);
                     } else {
-                        if (!foodData.imageBase64) foodData.imageBase64 = '';
+                        if (!foodData.imageBase64) foodData.imageBase64 = ''; // Ensure property exists
                         await push(ref(database, `restaurants/${currentUser.uid}/foods`), foodData);
                         showFeedback(roFoodItemFormFeedback, 'Food item added!', true);
                     }
                     roFoodItemForm.reset(); roFoodItemFormId.value = '';
+                    roFoodItemFormImage.value = ''; // Explicitly clear file input
                     roFoodItemFormTitle.textContent = 'Add New Food Item';
                     roFoodItemFormSubmitBtn.textContent = 'Add Food Item';
                     roAddEditFoodFormContainer.classList.add('hidden-important');
@@ -913,28 +919,35 @@
             const deleteBtn = e.target.closest('.delete-ro-food-item-btn');
             if (editBtn) {
                 const foodId = editBtn.dataset.id;
-                const foodSnap = await get(ref(database, `restaurants/${currentUser.uid}/foods/${foodId}`));
-                if (foodSnap.exists()) {
-                    const food = foodSnap.val();
-                    roFoodItemFormId.value = foodId;
-                    roFoodItemFormName.value = food.name || '';
-                    roFoodItemFormDescription.value = food.description || '';
-                    roFoodItemFormCategory.value = food.category || '';
-                    roFoodItemFormPrice.value = food.price || '';
-                    roFoodItemFormStatus.value = food.status || 'Available';
-                    roFoodItemFormImage.value = ''; 
-                    roFoodItemFormTitle.textContent = 'Edit Food Item';
-                    roFoodItemFormSubmitBtn.textContent = 'Update Food Item';
-                    roAddEditFoodFormContainer.classList.remove('hidden-important');
-                    dashboardHeaderActionBtn.innerHTML = '<i class="fas fa-times"></i>Cancel Editing';
-                    roAddEditFoodFormContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                try {
+                    const foodSnap = await get(ref(database, `restaurants/${currentUser.uid}/foods/${foodId}`));
+                    if (foodSnap.exists()) {
+                        const food = foodSnap.val();
+                        roFoodItemFormId.value = foodId;
+                        roFoodItemFormName.value = food.name || '';
+                        roFoodItemFormDescription.value = food.description || '';
+                        roFoodItemFormCategory.value = food.category || '';
+                        roFoodItemFormPrice.value = food.price !== undefined ? food.price : '';
+                        roFoodItemFormStatus.value = food.status || 'Available';
+                        roFoodItemFormImage.value = ''; 
+                        roFoodItemFormTitle.textContent = 'Edit Food Item';
+                        roFoodItemFormSubmitBtn.textContent = 'Update Food Item';
+                        roAddEditFoodFormContainer.classList.remove('hidden-important');
+                        dashboardHeaderActionBtn.innerHTML = '<i class="fas fa-times"></i>Cancel Editing';
+                        roAddEditFoodFormContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        roFoodItemFormFeedback.textContent = ''; // Clear feedback
+                    } else {
+                        showFeedback(roFoodItemFormFeedback, 'Could not find item to edit.', false);
+                    }
+                } catch (err) {
+                     showFeedback(roFoodItemFormFeedback, 'Error fetching item: ' + err.message, false);
                 }
             } else if (deleteBtn) {
                 const foodId = deleteBtn.dataset.id;
                 openConfirmationModal('Delete Food Item', 'Are you sure you want to delete this food item?', async () => {
                     try {
                         await remove(ref(database, `restaurants/${currentUser.uid}/foods/${foodId}`));
-                        showFeedback(roFoodItemFormFeedback, 'Food item deleted!', true);
+                        showFeedback(roFoodItemFormFeedback, 'Food item deleted!', true); // Show feedback near form or globally
                     } catch (err) {
                         showFeedback(roFoodItemFormFeedback, 'Delete failed: ' + err.message, false);
                     }
@@ -949,8 +962,10 @@
                 dashboardHeaderActionBtn.innerHTML = '<i class="fas fa-plus"></i>Add New Item';
             } else {
                 roFoodItemForm.reset(); roFoodItemFormId.value = '';
+                roFoodItemFormImage.value = ''; // Clear file input
                 roFoodItemFormTitle.textContent = 'Add New Food Item';
                 roFoodItemFormSubmitBtn.textContent = 'Add Food Item';
+                roFoodItemFormFeedback.textContent = ''; // Clear feedback
                 roAddEditFoodFormContainer.classList.remove('hidden-important');
                 dashboardHeaderActionBtn.innerHTML = '<i class="fas fa-times"></i>Cancel Adding';
                 roAddEditFoodFormContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -971,45 +986,34 @@
                 showFeedback(editUserProfileFeedback, 'You must be logged in to update your profile.', false);
                 return;
             }
-
             const newName = editUserFormName.value.trim();
             const imageFile = editUserFormImage.files[0];
-
             if (!newName) {
                 showFeedback(editUserProfileFeedback, 'Full name is required.', false);
                 return;
             }
-
             try {
                 const userRefPath = ref(database, `users/${currentUser.uid}`);
-                const userSnapshot = await get(userRefPath); 
-
                 const updatesToMake = { name: newName };
                 let imageBase64; 
-
                 if (imageFile) {
                     imageBase64 = await compressAndEncodeImage(imageFile);
                     updatesToMake.imageBase64 = imageBase64;
-                } 
-                
-                if (!userSnapshot.exists() || !userSnapshot.val().role) {
+                } else {
+                    const userSnapshot = await get(userRefPath);
+                    if (userSnapshot.exists() && userSnapshot.val().imageBase64) {
+                        updatesToMake.imageBase64 = userSnapshot.val().imageBase64; // Preserve existing
+                    } else {
+                        updatesToMake.imageBase64 = ''; // Or set to empty if no new and no old
+                    }
+                }
+                const userSnapshotCheck = await get(userRefPath);
+                if (!userSnapshotCheck.exists() || !userSnapshotCheck.val().role) {
                     updatesToMake.email = currentUser.email; 
                     updatesToMake.role = 'user';         
-                    updatesToMake.favorites = {};        
+                    updatesToMake.favorites = currentUserDbData?.favorites || {};        
                 }
-
                 await update(userRefPath, updatesToMake);
-
-                if(currentUserDbData) { 
-                    currentUserDbData.name = newName;
-                    if (imageBase64) { 
-                        currentUserDbData.imageBase64 = imageBase64;
-                    }
-                } else { 
-                    currentUserDbData = { ...updatesToMake, uid: currentUser.uid, email: currentUser.email };
-                }
-
-                displayUserProfileInfo(currentUserDbData); 
                 showFeedback(editUserProfileFeedback, 'Profile updated successfully!', true);
                 editUserProfileFormContainer.classList.add('hidden-important');
                 editUserFormImage.value = ''; 
@@ -1018,20 +1022,20 @@
             }
         });
 
-
         editRoRestaurantToggleBtn.addEventListener('click', () => editRoRestaurantFormContainer.classList.toggle('hidden-important'));
 
         updateRoRestaurantDetailsForm.addEventListener('submit', async e => {
             e.preventDefault();
             const imageFile = editRoFormRestaurantLogo.files[0];
-            
             const updates = {
-                name: editRoFormRestaurantName.value,
-                address: editRoFormRestaurantAddress.value,
-                contact: editRoFormRestaurantContact.value,
-                cuisine: editRoFormRestaurantCuisine.value,
+                name: editRoFormRestaurantName.value.trim(),
+                address: editRoFormRestaurantAddress.value.trim(),
+                contact: editRoFormRestaurantContact.value.trim(),
+                cuisine: editRoFormRestaurantCuisine.value.trim(),
             };
-
+            if (!updates.name) {
+                 showFeedback(editRoRestaurantFeedback, 'Restaurant name is required.', false); return;
+            }
             let imageBase64; 
             if(imageFile) {
                 try { 
@@ -1039,8 +1043,14 @@
                     updates.imageBase64 = imageBase64;
                 }
                 catch(err) { showFeedback(editRoRestaurantFeedback, err.message, false); return; }
+            } else {
+                 const existingRestoSnap = await get(ref(database, `restaurants/${currentUser.uid}`));
+                 if (existingRestoSnap.exists() && existingRestoSnap.val().imageBase64) {
+                     updates.imageBase64 = existingRestoSnap.val().imageBase64; // Preserve
+                 } else {
+                    updates.imageBase64 = '';
+                 }
             }
-            
             update(ref(database, `restaurants/${currentUser.uid}`), updates)
                 .then(() => {
                     showFeedback(editRoRestaurantFeedback, 'Restaurant details updated!', true);
@@ -1088,17 +1098,20 @@
         onAuthStateChanged(auth, async (user) => {
             currentUser = user;
 
-            if (currentDbListener) currentDbListener(); 
-            if (currentRestaurantFoodsUnsubscribe) currentRestaurantFoodsUnsubscribe();
-            if (currentRestaurantDailyMenuUnsubscribe) currentRestaurantDailyMenuUnsubscribe();
+            if (currentDbListener) { currentDbListener(); currentDbListener = null; }
+            if (currentRestaurantFoodsUnsubscribe) { currentRestaurantFoodsUnsubscribe(); currentRestaurantFoodsUnsubscribe = null; }
+            if (currentRestaurantDailyMenuUnsubscribe) { currentRestaurantDailyMenuUnsubscribe(); currentRestaurantDailyMenuUnsubscribe = null; }
+            
+            allDashboardPanels.forEach(panel => panel.classList.add('hidden-important')); // Hide all panels initially
+            roAddEditFoodFormContainer.classList.add('hidden-important'); // Ensure form is hidden
 
             authRequiredPrompt.classList.add('hidden-important');
             unifiedDashboardContainer.classList.add('hidden-important');
 
             if (user) {
                 unifiedDashboardContainer.classList.remove('hidden-important');
-                const userRefPath = ref(database, `users/${user.uid}`); // Changed from userRef to userRefPath for clarity
-                currentDbListener = onValue(userRefPath, (userSnapshot) => {
+                const userRef = ref(database, `users/${user.uid}`);
+                currentDbListener = onValue(userRef, (userSnapshot) => {
                     if (userSnapshot.exists() && userSnapshot.val().role === 'user') {
                         currentUserDbData = { uid: user.uid, ...userSnapshot.val() };
                         sidebarUsernameRestaurantName.textContent = currentUserDbData.name || 'Customer';
@@ -1113,22 +1126,19 @@
                         }
                         displayUserFavorites(favoriteRestaurantIds);
 
-                        if (dashboardSidebarNavList.firstChild && dashboardSidebarNavList.firstChild.querySelector('a')) {
-                            const currentActivePanel = Array.from(allDashboardPanels).find(p => !p.classList.contains('hidden-important'));
-                            if(!currentActivePanel) { 
+                        if (dashboardSidebarNavList.firstChild?.querySelector('a')) {
+                            const currentActivePanelId = Array.from(dashboardSidebarNavList.querySelectorAll('a')).find(a => a.classList.contains('active'))?.dataset.panel;
+                            if (!currentActivePanelId || !document.getElementById(currentActivePanelId) || document.getElementById(currentActivePanelId).classList.contains('hidden-important')) {
                                 dashboardSidebarNavList.firstChild.querySelector('a').click();
+                            } else {
+                               setActiveDashboardPanel(currentActivePanelId, document.getElementById(currentActivePanelId).querySelector('.panel-main-title')?.textContent || dashboardSidebarNavList.querySelector(`a[data-panel="${currentActivePanelId}"]`).dataset.title);
                             }
                         }
 
                     } else { 
-                        const restaurantRefPath = ref(database, `restaurants/${user.uid}`); // Changed for clarity
-                        if (currentDbListener && userRefPath.toString() === restaurantRefPath.toString()) { 
-                            // Avoid re-attaching if it's the same path, though unlikely here.
-                        } else {
-                            if (currentDbListener) currentDbListener(); 
-                        }
-                        
-                        currentDbListener = onValue(restaurantRefPath, (restoSnapshot) => {
+                        const restaurantRef = ref(database, `restaurants/${user.uid}`);
+                        if (currentDbListener) { currentDbListener(); currentDbListener = null; } // Detach user listener
+                        currentDbListener = onValue(restaurantRef, (restoSnapshot) => {
                             if (restoSnapshot.exists()) { 
                                 currentUserDbData = { uid: user.uid, role: 'restaurant', ...restoSnapshot.val() };
                                 sidebarUsernameRestaurantName.textContent = currentUserDbData.name || 'Restaurant Owner';
@@ -1136,37 +1146,43 @@
                                 displayRoProfileInfo(currentUserDbData);
                                 setupRoDailyMenuManagement(user.uid);
                                 setupRoFoodItemManagement(user.uid);
-                                if (dashboardSidebarNavList.firstChild && dashboardSidebarNavList.firstChild.querySelector('a')) {
-                                    const currentActivePanel = Array.from(allDashboardPanels).find(p => !p.classList.contains('hidden-important'));
-                                    if(!currentActivePanel) {
-                                        dashboardSidebarNavList.firstChild.querySelector('a').click();
+                                if (dashboardSidebarNavList.firstChild?.querySelector('a')) {
+                                    const currentActivePanelId = Array.from(dashboardSidebarNavList.querySelectorAll('a')).find(a => a.classList.contains('active'))?.dataset.panel;
+                                     if (!currentActivePanelId || !document.getElementById(currentActivePanelId) || document.getElementById(currentActivePanelId).classList.contains('hidden-important')) {
+                                       dashboardSidebarNavList.firstChild.querySelector('a').click();
+                                    } else {
+                                        setActiveDashboardPanel(currentActivePanelId, document.getElementById(currentActivePanelId).querySelector('.panel-main-title')?.textContent || dashboardSidebarNavList.querySelector(`a[data-panel="${currentActivePanelId}"]`).dataset.title);
                                     }
                                 }
                             } else { 
-                                console.warn("User authenticated but no 'user' role profile or 'restaurant' data found. Defaulting to user view or prompting for role.");
-                                currentUserDbData = { uid: user.uid, role: 'user', email: user.email, name: user.displayName || "FoodieX User", favorites: {} };
+                                console.warn("User signed in, but no 'user' role in users/ DB and no data in restaurants/ DB. Prompting to complete profile or defaulting.");
+                                currentUserDbData = { uid: user.uid, role: 'user', email: user.email, name: user.displayName || "New User", favorites: {} };
                                 sidebarUsernameRestaurantName.textContent = currentUserDbData.name;
-                                populateSidebar('user');
+                                populateSidebar('user'); // Default to user sidebar
                                 displayUserProfileInfo(currentUserDbData);
                                 displayUserFavorites([]); 
-                                if (dashboardSidebarNavList.firstChild && dashboardSidebarNavList.firstChild.querySelector('a')) {
-                                     const currentActivePanel = Array.from(allDashboardPanels).find(p => !p.classList.contains('hidden-important'));
-                                    if(!currentActivePanel) {
-                                        dashboardSidebarNavList.firstChild.querySelector('a').click();
-                                    }
+                                if (dashboardSidebarNavList.firstChild?.querySelector('a')) {
+                                     dashboardSidebarNavList.firstChild.querySelector('a').click();
                                 }
-                                // Consider adding logic here to prompt the user to complete their profile / choose a role.
                             }
                         }, (error) => {
                              console.error("Error listening to restaurant data:", error);
+                             authRequiredPrompt.classList.remove('hidden-important'); // Show login if data error
+                             unifiedDashboardContainer.classList.add('hidden-important');
                         });
                     }
                 }, (error) => {
                     console.error("Error listening to user data:", error);
+                    authRequiredPrompt.classList.remove('hidden-important'); // Show login if data error
+                    unifiedDashboardContainer.classList.add('hidden-important');
                 });
             } else { 
                 currentUserDbData = null;
+                allRoFoods = []; // Clear local data
+                roFoodsListContainer.innerHTML = ''; // Clear UI
                 authRequiredPrompt.classList.remove('hidden-important');
+                unifiedDashboardContainer.classList.add('hidden-important');
+
             }
         });
     </script>
