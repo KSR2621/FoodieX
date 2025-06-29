@@ -7,131 +7,74 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            scroll-behavior: smooth;
+        body { scroll-behavior: smooth; }
+        .navbar { background-color: #1f2937; }
+        .card { 
+            transition: transform 0.3s ease, box-shadow 0.3s ease; 
+            position: relative;
         }
-        .navbar {
-            background-color: #1f2937; /* Dark gray-blue */
+        .card:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
         }
-        .card {
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-            position: relative; /* For absolute positioning of heart */
+        .restaurant-image { 
+            width: 100%; 
+            height: 200px; 
+            object-fit: cover; 
+            border-bottom: 1px solid #e5e7eb;
         }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-        .restaurant-image {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            border-radius: 0.5rem 0.5rem 0 0;
-        }
-        .loading-placeholder {
-            min-height: 200px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #9ca3af; /* gray-400 */
-        }
+        .loading-placeholder { min-height: 200px; display: flex; justify-content: center; align-items: center; color: #9ca3af; }
         .mobile-menu { display: none; }
-        @media (max-width: 768px) { /* md breakpoint */
-            .desktop-menu { display: none; }
-            .mobile-menu.open { display: block; }
-        }
+        @media (max-width: 768px) { .desktop-menu { display: none; } .mobile-menu.open { display: block; } }
         .welcome-message { color: #d1d5db; margin-right: 1rem; }
-
-        .favorite-heart-btn {
-            position: absolute;
-            top: 0.75rem; /* 12px */
-            right: 0.75rem; /* 12px */
-            background-color: rgba(255, 255, 255, 0.8);
-            border-radius: 9999px; /* full */
-            padding: 0.5rem; /* 8px */
-            cursor: pointer;
-            z-index: 10;
-            transition: color 0.2s ease-in-out;
-        }
-        .favorite-heart-btn i {
-            font-size: 1.25rem; /* text-xl */
-        }
-        .favorite-heart-btn.favorited i {
-            color: #ef4444; /* red-500 */
-        }
-        .favorite-heart-btn.not-favorited i {
-            color: #6b7280; /* gray-500 */
-        }
-        .favorite-heart-btn.not-favorited:hover i {
-            color: #ef4444; /* red-500 */
-        }
-        .favorite-heart-btn.disabled {
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-        .favorite-heart-btn.disabled i {
-            color: #9ca3af; /* gray-400 */
-        }
+        .btn-orange { background-color: #f97316; color: white; }
+        .btn-orange:hover { background-color: #ea580c; }
+        .search-bar { max-width: 600px; margin: 0 auto 2rem auto; }
         
-        /* Orange button styles */
-        .btn-orange {
-            background-color: #f97316; /* orange-500 */
-            color: white;
-        }
-        .btn-orange:hover {
-            background-color: #ea580c; /* orange-600 */
-        }
-        .search-bar {
-            max-width: 600px;
-            margin: 0 auto 2rem auto;
-        }
+        /* Star Rating Styles */
+        .rating-stars i { transition: color 0.2s ease-in-out; }
+        .user-rating-stars { cursor: pointer; }
+        .user-rating-stars:hover i { color: #facc15; /* Brighter yellow for hover */ }
+        .user-rating-stars i:hover ~ i { color: #d1d5db; }
     </style>
 </head>
 <body class="bg-gray-100 pt-16">
 
     <nav class="navbar p-4 text-white fixed w-full top-0 z-50">
         <div class="container mx-auto flex justify-between items-center">
-            <a href="index.html" class="text-2xl font-bold">FoodieX</a>
+            <a href="/index.html" class="text-2xl font-bold">FoodieX</a>
             <div class="hidden md:flex space-x-6 items-center desktop-menu">
                 <span id="welcome-message" class="welcome-message hidden"></span>
-                <a href="index.html" class="hover:text-gray-300">Home</a>
-                <a href="restaurants.html" class="hover:text-gray-300 font-semibold">Restaurants</a>
-                <a href="foods.html" class="hover:text-gray-300">Foods</a>
-                <a href="login.html" id="nav-login" class="hover:text-gray-300">Login / Signup</a>
-                <a href="profile.html" id="nav-profile" class="hover:text-gray-300 hidden">Profile</a>
+                <a href="/index.html" class="hover:text-gray-300">Home</a>
+                <a href="/restaurants.html" class="hover:text-gray-300 font-semibold">Restaurants</a>
+                <a href="/foods.html" class="hover:text-gray-300">Foods</a>
+                <a href="/login.html" id="nav-login" class="hover:text-gray-300">Login / Signup</a>
+                <a href="/profile.html" id="nav-profile" class="hover:text-gray-300 hidden">Profile</a>
                 <a href="#" id="nav-logout" class="hover:text-gray-300 hidden">Logout</a>
             </div>
             <div class="md:hidden">
-                <button id="mobile-menu-button" class="text-white focus:outline-none">
-                    <i class="fas fa-bars fa-lg"></i>
-                </button>
+                <button id="mobile-menu-button" class="text-white focus:outline-none"><i class="fas fa-bars fa-lg"></i></button>
             </div>
         </div>
         <div id="mobile-menu-items" class="mobile-menu md:hidden mt-3">
             <span id="mobile-welcome-message" class="block px-2 py-1 text-sm welcome-message hidden"></span>
-            <a href="index.html" class="block px-2 py-1 text-sm hover:bg-gray-700">Home</a>
-            <a href="restaurants.html" class="block px-2 py-1 text-sm hover:bg-gray-700 font-semibold">Restaurants</a>
-            <a href="foods.html" class="block px-2 py-1 text-sm hover:bg-gray-700">Foods</a>
-            <a href="login.html" id="mobile-nav-login" class="block px-2 py-1 text-sm hover:bg-gray-700">Login / Signup</a>
-            <a href="profile.html" id="mobile-nav-profile" class="block px-2 py-1 text-sm hover:bg-gray-700 hidden">Profile</a>
+            <a href="/index.html" class="block px-2 py-1 text-sm hover:bg-gray-700">Home</a>
+            <a href="/restaurants.html" class="block px-2 py-1 text-sm hover:bg-gray-700 font-semibold">Restaurants</a>
+            <a href="/foods.html" class="block px-2 py-1 text-sm hover:bg-gray-700">Foods</a>
+            <a href="/login.html" id="mobile-nav-login" class="block px-2 py-1 text-sm hover:bg-gray-700">Login / Signup</a>
+            <a href="/profile.html" id="mobile-nav-profile" class="block px-2 py-1 text-sm hover:bg-gray-700 hidden">Profile</a>
             <a href="#" id="mobile-nav-logout" class="block px-2 py-1 text-sm hover:bg-gray-700 hidden">Logout</a>
         </div>
     </nav>
 
     <section class="container mx-auto py-12 px-4">
         <h2 class="text-4xl font-bold text-center mb-6 text-gray-800">Explore Our Restaurants</h2>
-        
-        <!-- Search Bar -->
         <div class="search-bar">
             <div class="relative">
-                <input type="text" id="restaurant-search" placeholder="Search restaurants by name..." 
-                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
-                <button class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                    <i class="fas fa-search"></i>
-                </button>
+                <input type="text" id="restaurant-search" placeholder="Search restaurants by name..." class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                <button class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"><i class="fas fa-search"></i></button>
             </div>
         </div>
-        
         <div id="restaurants-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             <div class="loading-placeholder col-span-full">Loading restaurants...</div>
         </div>
@@ -146,7 +89,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
         import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
-        import { getDatabase, ref, onValue, get, set, remove } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js';
+        import { getDatabase, ref, onValue, get, set, update } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyABlpJruz0pZN7K6bQgRuqDxPVAG1bi9q8", // Replace with your actual API key
@@ -156,240 +99,180 @@
             storageBucket: "daily-menu-bc700.firebasestorage.app",
             messagingSenderId: "87059586917",
             appId: "1:87059586917:web:d2787e9d4d12dc47decb8c",
-            measurementId: "G-QJJYDQ9M2J"
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const database = getDatabase(app);
 
-        const navLogin = document.getElementById('nav-login');
-        const navProfile = document.getElementById('nav-profile');
-        const navLogout = document.getElementById('nav-logout');
-        const mobileNavLogin = document.getElementById('mobile-nav-login');
-        const mobileNavProfile = document.getElementById('mobile-nav-profile');
-        const mobileNavLogout = document.getElementById('mobile-nav-logout');
-        const welcomeMessage = document.getElementById('welcome-message');
-        const mobileWelcomeMessage = document.getElementById('mobile-welcome-message');
         const restaurantsContainer = document.getElementById('restaurants-container');
+        const restaurantSearch = document.getElementById('restaurant-search');
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const mobileMenuItems = document.getElementById('mobile-menu-items');
-        const restaurantSearch = document.getElementById('restaurant-search');
 
-        mobileMenuButton.addEventListener('click', () => {
-            mobileMenuItems.classList.toggle('open');
-        });
-        
         let currentLoggedInUser = null;
-        let currentUserFavorites = {};
-        let isCustomerUser = false;
-        let allRestaurants = {};
+        let allRestaurantsData = {};
+
+        mobileMenuButton.addEventListener('click', () => mobileMenuItems.classList.toggle('open'));
 
         onAuthStateChanged(auth, async (user) => {
             currentLoggedInUser = user;
+            const isLoggedIn = !!user;
+            document.querySelectorAll('#nav-login, #mobile-nav-login').forEach(el => el.classList.toggle('hidden', isLoggedIn));
+            document.querySelectorAll('#nav-profile, #mobile-nav-profile, #nav-logout, #mobile-nav-logout, #welcome-message, #mobile-welcome-message').forEach(el => el.classList.toggle('hidden', !isLoggedIn));
+
             if (user) {
-                navLogin.classList.add('hidden');
-                mobileNavLogin.classList.add('hidden');
-                navProfile.classList.remove('hidden');
-                mobileNavProfile.classList.remove('hidden');
-                navLogout.classList.remove('hidden');
-                mobileNavLogout.classList.remove('hidden');
-
                 const userDbRef = ref(database, `users/${user.uid}`);
-                onValue(userDbRef, (snapshot) => {
-                    let userName = "User";
-                    isCustomerUser = false;
-                    if (snapshot.exists()) {
-                        const userData = snapshot.val();
-                        currentUserFavorites = userData.favorites || {};
-                        isCustomerUser = true;
-                        if (userData.name) {
-                             userName = userData.name.split(" ")[0];
-                        }
-                    } else {
-                        currentUserFavorites = {};
-                        const restaurantOwnerRef = ref(database, `restaurants/${user.uid}`);
-                        get(restaurantOwnerRef).then(restoSnapshot => {
-                            if (restoSnapshot.exists()) {
-                                userName = restoSnapshot.val().name || "Restaurant Owner";
-                            }
-                            welcomeMessage.textContent = `Hello, ${userName}!`;
-                            welcomeMessage.classList.remove('hidden');
-                            mobileWelcomeMessage.textContent = `Hello, ${userName}!`;
-                            mobileWelcomeMessage.classList.remove('hidden');
-                        });
-                    }
-                     if (isCustomerUser && snapshot.exists() && snapshot.val().name) {
-                        welcomeMessage.textContent = `Hello, ${userName}!`;
-                        welcomeMessage.classList.remove('hidden');
-                        mobileWelcomeMessage.textContent = `Hello, ${userName}!`;
-                        mobileWelcomeMessage.classList.remove('hidden');
-                    }
-                    loadRestaurants();
-                }, (error) => {
-                    console.error("Error fetching user data:", error);
-                    currentUserFavorites = {};
-                    isCustomerUser = false;
-                    loadRestaurants();
-                });
-
-            } else {
-                currentUserFavorites = {};
-                isCustomerUser = false;
-                navLogin.classList.remove('hidden');
-                mobileNavLogin.classList.remove('hidden');
-                navProfile.classList.add('hidden');
-                mobileNavProfile.classList.add('hidden');
-                navLogout.classList.add('hidden');
-                mobileNavLogout.classList.add('hidden');
-                welcomeMessage.classList.add('hidden');
-                mobileWelcomeMessage.classList.add('hidden');
-                loadRestaurants();
+                const userSnapshot = await get(userDbRef);
+                let userName = userSnapshot.exists() ? userSnapshot.val().name.split(" ")[0] : "User";
+                document.getElementById('welcome-message').textContent = `Hello, ${userName}!`;
+                document.getElementById('mobile-welcome-message').textContent = `Hello, ${userName}!`;
             }
+            // This now calls the correct, fully-defined function
+            loadRestaurants();
         });
-
-        function handleLogout(e) {
-            e.preventDefault();
-            signOut(auth).then(() => {
-                window.location.href = 'login.html';
-            }).catch((error) => {
-                console.error('Logout error:', error);
-                alert('Failed to logout.');
-            });
+        
+        function handleLogout(e) { e.preventDefault(); signOut(auth).then(() => { window.location.href = '/login.html'; }); }
+        document.getElementById('nav-logout').addEventListener('click', handleLogout);
+        document.getElementById('mobile-nav-logout').addEventListener('click', handleLogout);
+        
+        function generateStars(rating = 0, interactive = false, restaurantId = '') {
+            let starsHtml = '';
+            const roundedRating = Math.round(rating * 2) / 2;
+            for (let i = 1; i <= 5; i++) {
+                let iconClass = '';
+                if (interactive) {
+                    iconClass = i <= rating ? 'fas fa-star text-yellow-500' : 'far fa-star text-gray-300';
+                    starsHtml += `<i class="${iconClass}" data-value="${i}" data-restaurant-id="${restaurantId}"></i> `;
+                } else {
+                    if (i <= roundedRating) iconClass = 'fas fa-star text-yellow-500';
+                    else if (i - 0.5 === roundedRating) iconClass = 'fas fa-star-half-alt text-yellow-500';
+                    else iconClass = 'far fa-star text-gray-300';
+                    starsHtml += `<i class="${iconClass}"></i> `;
+                }
+            }
+            return starsHtml;
         }
-        navLogout.addEventListener('click', handleLogout);
-        mobileNavLogout.addEventListener('click', handleLogout);
 
+        // --- *** CRITICAL FIX: The loadRestaurants function is now restored *** ---
         function loadRestaurants() {
             restaurantsContainer.innerHTML = '<div class="loading-placeholder col-span-full">Loading restaurants...</div>';
-
             const restaurantsRefDb = ref(database, 'restaurants');
             onValue(restaurantsRefDb, (snapshot) => {
-                restaurantsContainer.innerHTML = '';
-                if (snapshot.exists()) {
-                    allRestaurants = snapshot.val();
-                    renderRestaurants(allRestaurants);
-                } else {
-                    restaurantsContainer.innerHTML = '<p class="text-center text-gray-600 col-span-full py-10">No restaurants available at the moment. Check back soon!</p>';
-                }
+                allRestaurantsData = snapshot.exists() ? snapshot.val() : {};
+                renderRestaurants(allRestaurantsData);
             }, (error) => {
-                console.error('Error loading restaurants:', error);
-                restaurantsContainer.innerHTML = '<p class="text-center text-red-500 col-span-full py-10">Failed to load restaurants. Please try again.</p>';
+                console.error("Firebase read failed: ", error);
+                restaurantsContainer.innerHTML = '<p class="text-center text-red-500 col-span-full py-10">Error loading data. Check console and Firebase security rules.</p>';
             });
         }
 
-        function renderRestaurants(restaurants) {
+        function renderRestaurants(restaurantsToRender) {
             restaurantsContainer.innerHTML = '';
-            
-            Object.keys(restaurants).forEach((restaurantId) => {
-                const restaurant = restaurants[restaurantId];
-                
-                const card = document.createElement('div');
-                card.className = 'card bg-white rounded-lg shadow-md overflow-hidden flex flex-col';
+            const restaurantIds = Object.keys(restaurantsToRender);
 
-                let heartButtonHtml = '';
-                if (currentLoggedInUser && isCustomerUser) {
-                    const isFavorite = !!currentUserFavorites[restaurantId];
-                    const favoriteCount = Object.keys(currentUserFavorites).length;
-                    const canAddMoreFavorites = favoriteCount < 2;
+            if (restaurantIds.length === 0) {
+                restaurantsContainer.innerHTML = '<p class="text-center text-gray-600 col-span-full py-10">No restaurants found.</p>';
+                return;
+            }
 
-                    const heartIconClass = isFavorite ? 'fas fa-heart' : 'far fa-heart';
-                    const buttonClass = isFavorite ? 'favorited' : 'not-favorited';
-                    let title = isFavorite ? 'Remove from favorites' : 'Add to favorites';
-                    let isDisabled = false;
+            restaurantIds.forEach((restaurantId) => {
+                const restaurant = restaurantsToRender[restaurantId];
+                const ratingCount = restaurant.ratingCount || 0;
+                const averageRating = restaurant.averageRating || 0;
+                const ratingCountText = `(${ratingCount} rating${ratingCount !== 1 ? 's' : ''})`;
 
-                    if (!isFavorite && !canAddMoreFavorites) {
-                        title = 'Favorite limit reached (max 2)';
-                        isDisabled = true;
-                    }
-
-                    heartButtonHtml = `
-                        <button 
-                            class="favorite-heart-btn ${buttonClass} ${isDisabled ? 'disabled' : ''}" 
-                            data-id="${restaurantId}" 
-                            title="${title}"
-                            ${isDisabled ? 'disabled' : ''}>
-                            <i class="${heartIconClass}"></i>
-                        </button>
-                    `;
+                const isInteractive = !!currentLoggedInUser;
+                let userOwnRating = 0;
+                if (isInteractive && restaurant.ratings && restaurant.ratings[currentLoggedInUser.uid]) {
+                    userOwnRating = restaurant.ratings[currentLoggedInUser.uid];
                 }
+                
+                const displayRating = (isInteractive && userOwnRating > 0) ? userOwnRating : averageRating;
+                const finalStarsHtml = generateStars(displayRating, isInteractive, restaurantId);
 
+                const card = document.createElement('div');
+                card.className = 'card bg-white rounded-lg shadow-lg overflow-hidden flex flex-col';
                 card.innerHTML = `
-                    ${heartButtonHtml} 
-                    <img class="restaurant-image" src="${restaurant.imageBase64 || 'https://via.placeholder.com/400x200?text=Restaurant'}" alt="${restaurant.name || 'Restaurant Image'}">
+                    <a href="/restaurant-details.html?id=${restaurantId}">
+                        <img class="restaurant-image" src="${restaurant.imageBase64 || 'https://via.placeholder.com/400x200?text=No+Image'}" alt="Image of ${restaurant.name || 'Restaurant'}">
+                    </a>
                     <div class="p-6 flex flex-col flex-grow">
-                        <h3 class="text-2xl font-semibold mb-2 text-gray-800 restaurant-name">${restaurant.name || 'Unnamed Restaurant'}</h3>
-                        <p class="text-gray-600 text-sm mb-1"><i class="fas fa-map-marker-alt mr-2 text-gray-500"></i>${restaurant.address || 'No address provided'}</p>
-                        <p class="text-gray-600 text-sm mb-4"><i class="fas fa-utensils mr-2 text-gray-500"></i>${restaurant.cuisine || 'Cuisine not specified'}</p>
-                        <div class="mt-auto">
-                            <a href="restaurant-details.html?id=${restaurantId}" class="btn-orange font-semibold py-2 px-4 rounded text-sm transition duration-300 inline-block">View Details</a>
+                        <h3 class="text-2xl font-bold mb-2 text-gray-900">${restaurant.name || 'Unnamed Restaurant'}</h3>
+                        
+                        <div class="flex items-center mb-4">
+                            <div class="rating-stars text-2xl ${isInteractive ? 'user-rating-stars' : ''}">${finalStarsHtml}</div>
+                            <span class="text-xs text-gray-500 ml-3">${ratingCountText}</span>
                         </div>
-                    </div>
-                `;
+                        
+                        <div class="mb-4 text-gray-600 text-sm flex-grow">
+                            <p class="flex items-start mb-1">
+                                <i class="fas fa-map-marker-alt text-gray-400 mt-1 w-4 text-center mr-2"></i>
+                                <span>${restaurant.address || 'No address provided'}</span>
+                            </p>
+                        </div>
+                        
+                        <div class="mt-auto pt-4">
+                            <a href="/restaurant-details.html?id=${restaurantId}" class="block w-full text-center btn-orange font-bold py-2 px-4 rounded-lg transition duration-300">View Details</a>
+                        </div>
+                    </div>`;
                 restaurantsContainer.appendChild(card);
             });
         }
 
-        // Search functionality
         restaurantSearch.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            
-            if (!searchTerm) {
-                renderRestaurants(allRestaurants);
-                return;
-            }
-            
-            const filteredRestaurants = Object.keys(allRestaurants).reduce((acc, restaurantId) => {
-                const restaurant = allRestaurants[restaurantId];
-                if (restaurant.name && restaurant.name.toLowerCase().includes(searchTerm)) {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            const filteredRestaurants = Object.keys(allRestaurantsData).reduce((acc, restaurantId) => {
+                const restaurant = allRestaurantsData[restaurantId];
+                if (restaurant.name?.toLowerCase().includes(searchTerm)) {
                     acc[restaurantId] = restaurant;
                 }
                 return acc;
             }, {});
-            
-            if (Object.keys(filteredRestaurants).length === 0) {
-                restaurantsContainer.innerHTML = '<p class="text-center text-gray-600 col-span-full py-10">No restaurants match your search.</p>';
-            } else {
-                renderRestaurants(filteredRestaurants);
-            }
+            renderRestaurants(filteredRestaurants);
         });
+
+        async function submitRating(restaurantId, userId, rating) {
+            await set(ref(database, `restaurants/${restaurantId}/ratings/${userId}`), rating);
+            
+            const snapshot = await get(ref(database, `restaurants/${restaurantId}/ratings`));
+            if (snapshot.exists()) {
+                const ratingValues = Object.values(snapshot.val());
+                const ratingCount = ratingValues.length;
+                const averageRating = ratingValues.reduce((a, b) => a + b, 0) / ratingCount;
+                
+                await update(ref(database, `restaurants/${restaurantId}`), {
+                    averageRating: parseFloat(averageRating.toFixed(2)),
+                    ratingCount: ratingCount
+                });
+            }
+        }
 
         restaurantsContainer.addEventListener('click', async (e) => {
-            const heartButton = e.target.closest('.favorite-heart-btn');
-            if (!heartButton || heartButton.disabled) return;
-            
-            if (!currentLoggedInUser || !isCustomerUser) {
-                alert("Please log in as a customer to manage favorites.");
-                if (!currentLoggedInUser) window.location.href = 'login.html';
-                return;
-            }
-
-            const restaurantId = heartButton.dataset.id;
-            const isCurrentlyFavorite = !!currentUserFavorites[restaurantId];
-            const favoriteCount = Object.keys(currentUserFavorites).length;
-
-            if (isCurrentlyFavorite) {
-                try {
-                    await remove(ref(database, `users/${currentLoggedInUser.uid}/favorites/${restaurantId}`));
-                } catch (error) {
-                    console.error("Error removing favorite:", error);
-                    alert("Failed to remove favorite. Please try again.");
+            if (e.target.tagName === 'I' && e.target.closest('.user-rating-stars')) {
+                if (!currentLoggedInUser) {
+                    alert("Please log in to rate restaurants.");
+                    return;
                 }
-            } else {
-                if (favoriteCount < 2) {
-                    try {
-                        await set(ref(database, `users/${currentLoggedInUser.uid}/favorites/${restaurantId}`), true);
-                    } catch (error) {
-                        console.error("Error adding favorite:", error);
-                        alert("Failed to add favorite. Please try again.");
-                    }
-                } else {
-                    alert("You can only have a maximum of 2 favorite restaurants.");
-                    loadRestaurants(); 
+                
+                const starIcon = e.target;
+                const restaurantId = starIcon.dataset.restaurantId;
+                const ratingValue = parseInt(starIcon.dataset.value, 10);
+                
+                starIcon.parentElement.style.pointerEvents = 'none';
+                starIcon.parentElement.style.opacity = '0.5';
+                
+                try {
+                    await submitRating(restaurantId, currentLoggedInUser.uid, ratingValue);
+                } catch (error) {
+                    console.error("Rating submission failed:", error);
+                    alert("Could not submit rating. Please check the console for errors.");
+                    starIcon.parentElement.style.pointerEvents = 'auto';
+                    starIcon.parentElement.style.opacity = '1';
                 }
             }
         });
-        
+
         document.getElementById('current-year').textContent = new Date().getFullYear();
     </script>
 </body>
