@@ -3,117 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Foodie - Find Your Favorite Meal</title>
+    <title>FoodieX - Find Your Favorite Meal</title>
+    
+    <!-- Tailwind & Font Awesome -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Swiper.js Carousel CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            scroll-behavior: smooth;
+        body { font-family: 'Arial', sans-serif; scroll-behavior: smooth; background-color: #f8fafc; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in-up { animation: fadeInUp 1s ease-out forwards; }
+        .navbar { background-color: #1f2937; }
+        .mobile-menu { display: none; }
+        @media (max-width: 768px) { .desktop-menu { display: none; } .mobile-menu.open { display: block; } }
+        .welcome-message { color: #d1d5db; }
+        .hero-section { background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1740&q=80'); background-size: cover; background-position: center; height: 60vh; }
+        .card { transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; }
+        .card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
+        .item-image { width: 100%; height: 150px; object-fit: cover; border-radius: 0.5rem 0.5rem 0 0; }
+        .btn { transition: all 0.3s ease-in-out; transform-origin: center; }
+        .btn:hover { transform: scale(1.05); }
+        .btn-orange { background-color: #F97316; color: white; }
+        .btn-orange:hover { background-color: #EA580C; }
+        .btn-orange-outline { background-color: transparent; border: 2px solid #F97316; color: #F97316; }
+        .btn-orange-outline:hover { background-color: #F97316; color: white; }
+        .loading-placeholder { min-height: 150px; display: flex; justify-content: center; align-items: center; color: #9ca3af; }
+        .rating-stars i { color: #d1d5db; }
+        .rating-stars .fa-solid { color: #f59e0b; }
+        .favorite-heart-btn i.fa-solid.fa-heart { color: #ef4444; }
+        .favorite-heart-btn:hover i.fa-regular.fa-heart { color: #ef4444; }
+        #daily-menu-container { scrollbar-width: thin; scrollbar-color: #F97316 #e5e7eb; }
+        #daily-menu-container::-webkit-scrollbar { height: 8px; }
+        #daily-menu-container::-webkit-scrollbar-track { background: #e5e7eb; border-radius: 10px; }
+        #daily-menu-container::-webkit-scrollbar-thumb { background: #F97316; border-radius: 10px; }
+        
+        /* --- Custom Swiper Styles --- */
+        .swiper-button-next,
+        .swiper-button-prev {
+            color: #F97316;
         }
-        .navbar {
-            background-color: #1f2937; /* Dark gray-blue */
+        .swiper-pagination-bullet-active {
+            background-color: #F97316;
         }
-        .hero-section {
-            background-image: url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80');
-            background-size: cover;
-            background-position: center;
-            height: 60vh;
-        }
-        .card {
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-        }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-        .item-image {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-            border-radius: 0.5rem 0.5rem 0 0;
-        }
-        .menu-item-list li {
-            padding: 0.25rem 0;
-        }
-        .loading-placeholder {
-            min-height: 150px;
+        .swiper-slide {
             display: flex;
             justify-content: center;
             align-items: center;
-            color: #9ca3af;
-            background-color: #f9fafb;
-            border-radius: 0.5rem;
-            padding: 1rem;
+            height: auto;
         }
-        /* Hamburger Menu */
-        .mobile-menu {
-            display: none;
-        }
-        @media (max-width: 768px) {
-            .desktop-menu {
-                display: none;
-            }
-            .mobile-menu.open {
-                display: block;
-            }
-        }
-        .welcome-message {
-            color: #d1d5db;
-            margin-right: 1rem;
-        }
-        .favorite-heart-btn i.fas.fa-heart {
-            color: #ef4444;
-        }
-        .favorite-heart-btn:hover i.far.fa-heart {
-             color: #ef4444;
-        }
-        /* Orange buttons */
-        .btn-orange {
-            background-color: #F97316;
-            color: white;
-        }
-        .btn-orange:hover {
-            background-color: #EA580C;
-        }
-        .btn-orange-outline {
-            background-color: transparent;
-            border: 2px solid #F97316;
-            color: #F97316;
-        }
-        .btn-orange-outline:hover {
-            background-color: #F97316;
-            color: white;
-        }
-        /* Custom scrollbar for Webkit browsers */
-        #daily-menu-container::-webkit-scrollbar {
-            height: 8px;
-        }
-        #daily-menu-container::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-        #daily-menu-container::-webkit-scrollbar-thumb {
-            background: #ccc;
-            border-radius: 10px;
-        }
-        #daily-menu-container::-webkit-scrollbar-thumb:hover {
-            background: #bbb;
-        }
-        /* For Firefox */
-        #daily-menu-container {
-            scrollbar-width: thin;
-            scrollbar-color: #ccc #f1f1f1;
+        .banner {
+             width: 100%;
+             border-radius: 1rem;
+             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+             padding: 2rem;
+             display: flex;
+             flex-direction: column;
+             justify-content: space-between;
+             color: white;
+             text-align: center;
         }
     </style>
 </head>
-<body class="bg-gray-100">
+<body class="bg-slate-50">
 
-    <!-- Navigation Bar -->
+    <!-- Navbar -->
     <nav class="navbar p-4 text-white fixed w-full top-0 z-50">
         <div class="container mx-auto flex justify-between items-center">
             <a href="index.html" class="text-2xl font-bold">FoodieX</a>
-            
             <div class="hidden md:flex space-x-6 items-center desktop-menu">
                 <span id="welcome-message" class="welcome-message hidden"></span>
                 <a href="index.html" class="hover:text-gray-300">Home</a>
@@ -121,13 +80,9 @@
                 <a href="foods.html" class="hover:text-gray-300">Foods</a>
                 <a href="login.html" id="nav-login" class="hover:text-gray-300">Login / Signup</a>
                 <a href="profile.html" id="nav-profile" class="hover:text-gray-300 hidden">Profile</a>
-                <a href="#" id="nav-logout" class="hover:text-gray-300 hidden">Logout</a>
             </div>
-
             <div class="md:hidden">
-                <button id="mobile-menu-button" class="text-white focus:outline-none">
-                    <i class="fas fa-bars fa-lg"></i>
-                </button>
+                <button id="mobile-menu-button" class="text-white focus:outline-none"><i class="fas fa-bars fa-lg"></i></button>
             </div>
         </div>
         <div id="mobile-menu-items" class="mobile-menu md:hidden mt-3">
@@ -137,55 +92,154 @@
             <a href="foods.html" class="block px-2 py-1 text-sm hover:bg-gray-700">Foods</a>
             <a href="login.html" id="mobile-nav-login" class="block px-2 py-1 text-sm hover:bg-gray-700">Login / Signup</a>
             <a href="profile.html" id="mobile-nav-profile" class="block px-2 py-1 text-sm hover:bg-gray-700 hidden">Profile</a>
-            <a href="#" id="mobile-nav-logout" class="block px-2 py-1 text-sm hover:bg-gray-700 hidden">Logout</a>
         </div>
     </nav>
 
     <!-- Hero Section -->
     <section class="hero-section flex items-center justify-center text-white pt-16">
-        <div class="text-center bg-black bg-opacity-50 p-8 rounded-lg">
-            <h1 class="text-5xl font-bold mb-4">Find Your Favorite Meal Today!</h1>
-            <p class="text-xl mb-8">Discover the best local restaurants and dishes.</p>
-            <div class="flex flex-col space-y-4 items-center md:flex-row md:space-y-0 md:space-x-4 md:justify-center">
-                <a href="/restaurants.html" class="btn-orange hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300 w-full md:w-auto text-center">Explore Restaurants</a>
-                <a href="/login.html#user-signup" id="hero-signup-btn" class="btn-orange-outline hover:bg-orange-500 hover:text-white text-orange-500 font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300 w-full md:w-auto text-center">Sign Up Now</a>
+        <div class="text-center p-8">
+            <div class="fade-in-up">
+                <h1 class="text-5xl font-extrabold mb-4">Find Your Favorite Meal Today!</h1>
+                <p class="text-xl mb-8">Discover the best local restaurants and dishes.</p>
+                <div class="flex flex-col space-y-4 items-center md:flex-row md:space-y-0 md:space-x-4 md:justify-center">
+                    <a href="/restaurants.html" class="btn btn-orange text-white font-semibold py-3 px-8 rounded-lg shadow-lg transition duration-300 w-full md:w-auto text-center">Explore Restaurants</a>
+                    <a href="/login.html#user-signup" id="hero-signup-btn" class="btn btn-orange-outline font-semibold py-3 px-8 rounded-lg shadow-lg transition duration-300 w-full md:w-auto text-center">Sign Up Now</a>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Daily Menu of Favorite Restaurants -->
-    <section id="daily-menu-favorites-section" class="container mx-auto py-12 px-4 hidden">
+    <!-- Daily Menu from Favorites -->
+    <section id="daily-menu-favorites-section" class="container mx-auto py-16 px-4 hidden">
         <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">Today's Specials from Your Favorites</h2>
-        <div id="daily-menu-container" class="flex overflow-x-auto gap-4 pb-4">
-            <!-- Content dynamically loaded by JS -->
-        </div>
-        <p id="no-favorites-message" class="text-center text-gray-600 mt-6 hidden">
-            Add restaurants to your favorites to see their daily specials here!
-        </p>
+        <div id="daily-menu-container" class="flex overflow-x-auto gap-6 pb-4"></div>
+        <p id="no-favorites-message" class="text-center text-gray-600 mt-6 hidden">Add restaurants to your favorites to see their daily specials here!</p>
     </section>
 
-    <!-- Restaurants Preview Section -->
-    <section class="bg-gray-50 py-12 px-4">
+    <!-- Offer Banners Carousel -->
+    <section class="py-16 px-4">
         <div class="container mx-auto">
-            <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">Featured Restaurants</h2>
+            <div class="swiper offer-swiper">
+                <div class="swiper-wrapper">
+                    <!-- Slide 1: 50% OFF -->
+                    <div class="swiper-slide">
+                        <div class="banner h-full" style="background: linear-gradient(to right, #f97316, #ef4444);">
+                            <div>
+                                <h2 class="text-4xl font-extrabold mb-2">Get 50% OFF</h2>
+                                <p class="text-lg opacity-90 mb-6">On your first order! Use code: <span class="font-bold bg-white px-2 py-1 rounded-md" style="color: #f97316;">FOODIEX50</span></p>
+                            </div>
+                            <a href="/restaurants.html" class="btn bg-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-orange-100 self-center" style="color: #f97316;">
+                                Order Now <i class="fas fa-arrow-right ml-2"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Slide 2: Super Saver Combo -->
+                    <div class="swiper-slide">
+                        <div class="banner h-full" style="background: linear-gradient(to right, #4f46e5, #7c3aed);">
+                            <div>
+                                <h2 class="text-4xl font-extrabold mb-2">Super Saver Combo</h2>
+                                <p class="text-lg opacity-90 mb-6">Burger, Fries & Drink at ₹199! Use code: <span class="font-bold bg-white px-2 py-1 rounded-md" style="color: #4f46e5;">COMBO199</span></p>
+                            </div>
+                            <a href="/foods.html" class="btn bg-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-indigo-100 self-center" style="color: #4f46e5;">
+                                Grab Deal <i class="fas fa-utensils ml-2"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Slide 3: Craving Chinese? -->
+                    <div class="swiper-slide">
+                        <div class="banner h-full" style="background: linear-gradient(to right, #dc2626, #991b1b);">
+                            <div>
+                                <h2 class="text-4xl font-extrabold mb-2">Craving Chinese?</h2>
+                                <p class="text-lg opacity-90 mb-6">Flat 20% OFF all Chinese orders. Use code: <span class="font-bold bg-white px-2 py-1 rounded-md" style="color: #dc2626;">CHINA20</span></p>
+                            </div>
+                            <a href="/foods.html" class="btn bg-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-red-100 self-center" style="color: #dc2626;">
+                                Explore Chinese <i class="fas fa-bowl-food ml-2"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Slide 4: Late Night Cravings? -->
+                    <div class="swiper-slide">
+                        <div class="banner h-full" style="background: linear-gradient(to right, #1f2937, #111827);">
+                            <div>
+                                <h2 class="text-4xl font-extrabold mb-2">Late Night Cravings?</h2>
+                                <p class="text-lg opacity-90 mb-6">30% OFF on orders after 10 PM. Use code: <span class="font-bold bg-white px-2 py-1 rounded-md" style="color: #1f2937;">NIGHT30</span></p>
+                            </div>
+                            <a href="/restaurants.html" class="btn btn-orange font-bold py-3 px-8 rounded-lg shadow-md self-center">
+                                Order Now <i class="fas fa-moon ml-2"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Slide 5: Refer a Friend -->
+                    <div class="swiper-slide">
+                        <div class="banner h-full" style="background: linear-gradient(to right, #10b981, #14b8a6);">
+                            <div>
+                                <h2 class="text-4xl font-extrabold mb-2">Refer a Friend</h2>
+                                <p class="text-lg opacity-90 mb-6">And you both get ₹100 off your next order!</p>
+                            </div>
+                            <a href="/profile.html" class="btn bg-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-emerald-100 self-center" style="color: #10b981;">
+                                Get Your Code <i class="fas fa-users ml-2"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Swiper Controls -->
+                <div class="swiper-pagination"></div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Top Rated Restaurants -->
+    <section class="bg-white py-16 px-4">
+        <div class="container mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-10 text-gray-800">Top Rated Restaurants</h2>
             <div id="restaurants-preview-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="loading-placeholder col-span-full">Loading restaurants...</div>
+                <div class="loading-placeholder col-span-full">Loading top restaurants...</div>
             </div>
-            <div class="text-center mt-8">
-                <a href="/restaurants.html" class="btn-orange hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300">View All Restaurants</a>
+            <div class="text-center mt-12">
+                <a href="/restaurants.html" class="btn btn-orange text-white font-semibold py-3 px-8 rounded-lg shadow-md transition duration-300">View All Restaurants</a>
             </div>
         </div>
     </section>
 
-    <!-- Foods Preview Section -->
-    <section class="py-12 px-4">
+    <!-- Static Offer Cards -->
+    <section class="py-16 px-4">
         <div class="container mx-auto">
-            <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">Popular Dishes</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Offer Card: Free Delivery -->
+                <div 
+                    class="rounded-2xl shadow-xl p-8 text-white flex items-center space-x-6"
+                    style="background: linear-gradient(to bottom right, #0ea5e9, #4f46e5);">
+                    <i class="fas fa-truck-fast fa-3x text-white opacity-80"></i>
+                    <div>
+                        <h3 class="text-2xl font-bold">Free Delivery</h3>
+                        <p class="opacity-90">On all orders over ₹299. No code needed!</p>
+                    </div>
+                </div>
+                <!-- Offer Card: Weekend Special -->
+                <div 
+                    class="rounded-2xl shadow-xl p-8 text-white flex items-center space-x-6"
+                    style="background: linear-gradient(to bottom right, #9333ea, #4f46e5);">
+                    <i class="fas fa-tags fa-3x text-white opacity-80"></i>
+                    <div>
+                        <h3 class="text-2xl font-bold">Weekend Specials</h3>
+                        <p class="opacity-90">Exclusive combos and deals every Saturday & Sunday.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Popular Dishes -->
+    <section class="py-16 px-4">
+        <div class="container mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-10 text-gray-800">Popular Dishes This Week</h2>
             <div id="foods-preview-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div class="loading-placeholder col-span-full">Loading popular dishes...</div>
             </div>
-             <div class="text-center mt-8">
-                <a href="/foods.html" class="btn-orange hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300">Explore All Foods</a>
+             <div class="text-center mt-12">
+                <a href="/foods.html" class="btn btn-orange text-white font-semibold py-3 px-8 rounded-lg shadow-md transition duration-300">Explore All Foods</a>
             </div>
         </div>
     </section>
@@ -193,44 +247,44 @@
     <!-- Footer -->
     <footer class="bg-gray-800 text-gray-300 py-12">
         <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div>
-                    <h3 class="text-xl font-semibold text-white mb-4">FoodieX</h3>
-                    <p class="text-sm">Your go-to platform for discovering delicious meals and supporting local restaurants.</p>
-                </div>
-                <div>
-                    <h3 class="text-xl font-semibold text-white mb-4">Quick Links</h3>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="/index.html" class="hover:text-white">Home</a></li>
-                        <li><a href="/restaurants.html" class="hover:text-white">Restaurants</a></li>
-                        <li><a href="/foods.html" class="hover:text-white">Foods</a></li>
-                        <li><a href="https://wa.me/918789548725" target="_blank" rel="noopener noreferrer" class="hover:text-white">Contact Us (WhatsApp)</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="text-xl font-semibold text-white mb-4">Connect With Us</h3>
-                    <div class="flex flex-col space-y-2">
-                        <a href="https://wa.me/918789548725" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white flex items-center">
-                            <i class="fab fa-whatsapp fa-lg mr-2"></i> WhatsApp 1
-                        </a>
-                        <a href="https://wa.me/917987693299" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white flex items-center">
-                            <i class="fab fa-whatsapp fa-lg mr-2"></i> WhatsApp 2
-                        </a>
-                    </div>
-                </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+                <div><h3 class="text-xl font-semibold text-white mb-4">FoodieX</h3><p class="text-sm">Your go-to platform for discovering delicious meals and supporting local restaurants.</p></div>
+                <div><h3 class="text-xl font-semibold text-white mb-4">Quick Links</h3><ul class="space-y-2 text-sm"><li><a href="/index.html" class="hover:text-white">Home</a></li><li><a href="/restaurants.html" class="hover:text-white">Restaurants</a></li><li><a href="/foods.html" class="hover:text-white">Foods</a></li><li><a href="https://wa.me/918789548725" target="_blank" class="hover:text-white">Contact Us</a></li></ul></div>
+                <div><h3 class="text-xl font-semibold text-white mb-4">Connect With Us</h3><div class="flex flex-col space-y-2 items-center md:items-start"><a href="https://wa.me/918789548725" target="_blank" class="hover:text-white flex items-center"><i class="fab fa-whatsapp fa-lg mr-2"></i> WhatsApp 1</a><a href="https://wa.me/917987693299" target="_blank" class="hover:text-white flex items-center"><i class="fab fa-whatsapp fa-lg mr-2"></i> WhatsApp 2</a></div></div>
             </div>
-            <div class="mt-8 border-t border-gray-700 pt-8 text-center text-sm">
-                <p>© <span id="current-year"></span> FoodieX. All rights reserved.</p>
-            </div>
+            <div class="mt-8 border-t border-gray-700 pt-8 text-center text-sm"><p>© <span id="current-year"></span> FoodieX. All rights reserved.</p></div>
         </div>
     </footer>
 
-    <!-- Firebase SDK -->
+    <!-- Swiper.js Carousel JS -->
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+
+    <!-- Firebase & Custom App Logic -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
         import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
-        import { getDatabase, ref, get, onValue, query, limitToFirst, set, remove } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js';
+        import { getDatabase, ref, get, onValue, query, orderByChild, limitToLast, set, remove } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js';
 
+        // --- Initialize Swiper Carousel ---
+        const swiper = new Swiper('.offer-swiper', {
+            loop: true,
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            autoplay: {
+                delay: 4000,
+                disableOnInteraction: false,
+            },
+            slidesPerView: 1,
+            spaceBetween: 30,
+        });
+
+        // --- Firebase Configuration ---
         const firebaseConfig = {
             apiKey: "AIzaSyABlpJruz0pZN7K6bQgRuqDxPVAG1bi9q8",
             authDomain: "daily-menu-bc700.firebaseapp.com",
@@ -238,20 +292,13 @@
             projectId: "daily-menu-bc700",
             storageBucket: "daily-menu-bc700.firebasestorage.app",
             messagingSenderId: "87059586917",
-            appId: "1:87059586917:web:d2787e9d4d12dc47decb8c",
-            measurementId: "G-QJJYDQ9M2J"
+            appId: "1:87059586917:web:d2787e9d4d12dc47decb8c"
         };
-
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const database = getDatabase(app);
 
-        const navLogin = document.getElementById('nav-login');
-        const navProfile = document.getElementById('nav-profile');
-        const navLogout = document.getElementById('nav-logout');
-        const mobileNavLogin = document.getElementById('mobile-nav-login');
-        const mobileNavProfile = document.getElementById('mobile-nav-profile');
-        const mobileNavLogout = document.getElementById('mobile-nav-logout');
+        // --- The rest of your JavaScript remains the same ---
         const welcomeMessage = document.getElementById('welcome-message');
         const mobileWelcomeMessage = document.getElementById('mobile-welcome-message');
         const heroSignupBtn = document.getElementById('hero-signup-btn');
@@ -260,274 +307,156 @@
         const noFavoritesMessage = document.getElementById('no-favorites-message');
         const restaurantsPreviewContainer = document.getElementById('restaurants-preview-container');
         const foodsPreviewContainer = document.getElementById('foods-preview-container');
-
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const mobileMenuItems = document.getElementById('mobile-menu-items');
-        mobileMenuButton.addEventListener('click', () => {
-            mobileMenuItems.classList.toggle('open');
-        });
-
+        
         let currentUserFavorites = {};
 
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                navLogin.classList.add('hidden');
-                mobileNavLogin.classList.add('hidden');
-                navProfile.classList.remove('hidden');
-                mobileNavProfile.classList.remove('hidden');
-                navLogout.classList.remove('hidden');
-                mobileNavLogout.classList.remove('hidden');
-                heroSignupBtn.classList.add('hidden');
+        mobileMenuButton.addEventListener('click', () => mobileMenuItems.classList.toggle('open'));
+        restaurantsPreviewContainer.addEventListener('click', handleFavoriteClick);
 
-                const userRef = ref(database, `users/${user.uid}`);
-                const userSnapshot = await get(userRef);
+        onAuthStateChanged(auth, async (user) => {
+            const isLoggedIn = !!user;
+            document.querySelectorAll('#nav-login, #mobile-nav-login').forEach(el => el.classList.toggle('hidden', isLoggedIn));
+            document.querySelectorAll('#nav-profile, #mobile-nav-profile').forEach(el => el.classList.toggle('hidden', !isLoggedIn));
+
+            if (user) {
+                heroSignupBtn.style.display = 'none';
+                const userSnapshot = await get(ref(database, `users/${user.uid}`));
                 let userName = "User";
                 if (userSnapshot.exists() && userSnapshot.val().name) {
                     userName = userSnapshot.val().name.split(" ")[0];
-                } else {
-                    const restaurantRef = ref(database, `restaurants/${user.uid}`);
-                    const restaurantSnapshot = await get(restaurantRef);
-                    if (restaurantSnapshot.exists() && restaurantSnapshot.val().name) {
-                         userName = restaurantSnapshot.val().name;
-                    }
+                    currentUserFavorites = userSnapshot.val().favorites || {};
                 }
                 welcomeMessage.textContent = `Hello, ${userName}!`;
-                welcomeMessage.classList.remove('hidden');
                 mobileWelcomeMessage.textContent = `Hello, ${userName}!`;
+                welcomeMessage.classList.remove('hidden');
                 mobileWelcomeMessage.classList.remove('hidden');
-
-                const userFavoritesRef = ref(database, `users/${user.uid}/favorites`);
-                const favSnapshot = await get(userFavoritesRef);
-                currentUserFavorites = favSnapshot.exists() ? favSnapshot.val() : {};
-                
-                loadDailyMenuFavorites(user.uid);
                 dailyMenuFavoritesSection.classList.remove('hidden');
-                updateFavoriteHeartsVisuals();
-
+                loadDailyMenuFavorites(user.uid);
             } else {
-                navLogin.classList.remove('hidden');
-                mobileNavLogin.classList.remove('hidden');
-                navProfile.classList.add('hidden');
-                mobileNavProfile.classList.add('hidden');
-                navLogout.classList.add('hidden');
-                mobileNavLogout.classList.add('hidden');
+                heroSignupBtn.style.display = 'flex';
                 welcomeMessage.classList.add('hidden');
                 mobileWelcomeMessage.classList.add('hidden');
-                heroSignupBtn.classList.remove('hidden');
-
                 dailyMenuFavoritesSection.classList.add('hidden');
                 currentUserFavorites = {};
-                updateFavoriteHeartsVisuals();
             }
+            loadRestaurantsPreview();
         });
 
-        function handleLogout(e) {
-            e.preventDefault();
-            signOut(auth).then(() => {
-                window.location.href = '/login.html';
-            }).catch((error) => {
-                console.error('Logout error:', error);
-                alert('Failed to logout.');
-            });
+        function generateStars(rating = 0) {
+            let starsHtml = '';
+            const roundedRating = Math.round(rating * 2) / 2;
+            for (let i = 1; i <= 5; i++) {
+                let iconClass = 'fa-regular fa-star';
+                if (i <= roundedRating) iconClass = 'fa-solid fa-star';
+                else if (i - 0.5 === roundedRating) iconClass = 'fa-solid fa-star-half-stroke';
+                starsHtml += `<i class="${iconClass}"></i> `;
+            }
+            return starsHtml;
         }
-        navLogout.addEventListener('click', handleLogout);
-        mobileNavLogout.addEventListener('click', handleLogout);
 
         async function loadDailyMenuFavorites(userId) {
-            dailyMenuContainer.innerHTML = `
-                <div class="loading-placeholder w-72 flex-shrink-0">Loading favorite menus...</div>`; // Adjusted placeholder
+            dailyMenuContainer.innerHTML = `<div class="loading-placeholder w-72 flex-shrink-0">Loading menus...</div>`;
             noFavoritesMessage.classList.add('hidden');
-
-            try {
-                const userFavoritesRef = ref(database, `users/${userId}/favorites`);
-                const userFavoritesSnapshot = await get(userFavoritesRef);
-
-                let favoriteRestaurantIds = [];
-                if (userFavoritesSnapshot.exists() && Object.keys(userFavoritesSnapshot.val()).length > 0) {
-                    favoriteRestaurantIds = Object.keys(userFavoritesSnapshot.val()); 
-                }
-
-                if (favoriteRestaurantIds.length === 0) {
-                    dailyMenuContainer.innerHTML = ''; 
-                    noFavoritesMessage.classList.remove('hidden');
-                    return;
-                }
-                
-                dailyMenuContainer.innerHTML = ''; 
-                let displayedMenus = 0;
-
-                for (const restaurantId of favoriteRestaurantIds) {
-                    const restaurantRefNode = ref(database, `restaurants/${restaurantId}`);
-                    const restaurantSnapshot = await get(restaurantRefNode);
-
-                    if (restaurantSnapshot.exists()) {
-                        const restaurantData = restaurantSnapshot.val();
-                        const today = new Date().toISOString().split('T')[0];
-                        const menuRef = ref(database, `restaurants/${restaurantId}/dailyMenu/${today}`);
-                        const menuSnapshot = await get(menuRef);
-                        
-                        let menuItemsHtml = '<p class="text-gray-500 text-sm">No menu posted for today.</p>';
-                        if (menuSnapshot.exists() && menuSnapshot.val().items && menuSnapshot.val().items.length > 0) {
-                            menuItemsHtml = `<ul class="menu-item-list list-disc list-inside text-gray-600 text-sm space-y-1">
-                                ${menuSnapshot.val().items.map(item => `<li>${item}</li>`).join('')}
-                            </ul>`;
-                        }
-
-                        // Card width is fixed w-72, flex-shrink-0 for horizontal scrolling
-                        const menuCard = `
-                            <div class="card bg-white p-6 rounded-lg shadow-md flex flex-col justify-between w-72 flex-shrink-0">
-                                <div>
-                                    <h3 class="text-xl font-semibold mb-2 text-gray-800">${restaurantData.name || 'Unnamed Restaurant'}</h3>
-                                    ${menuItemsHtml}
-                                </div>
-                                <a href="/restaurant-details.html?id=${restaurantId}" class="mt-4 self-start inline-block btn-orange hover:bg-orange-600 text-white text-sm font-semibold py-2 px-4 rounded transition duration-300">View Restaurant</a>
-                            </div>
-                        `;
-                        dailyMenuContainer.insertAdjacentHTML('beforeend', menuCard);
-                        displayedMenus++;
-                    }
-                }
-                
-                if (displayedMenus === 0) {
-                    dailyMenuContainer.innerHTML = '<p class="text-gray-600 w-full text-center">None of your favorite restaurants have posted a menu today, or their details could not be loaded.</p>';
-                    noFavoritesMessage.classList.add('hidden'); 
-                }
-
-
-            } catch (error) {
-                console.error("Error loading favorite menus:", error);
-                dailyMenuContainer.innerHTML = '<p class="text-red-500 w-full text-center">Could not load favorite menus.</p>';
-            }
-        }
-
-        function updateFavoriteHeartsVisuals() {
-            document.querySelectorAll('.favorite-heart-btn').forEach(button => {
-                const restaurantId = button.dataset.restaurantId;
-                const heartIcon = button.querySelector('i');
-                if (currentUserFavorites[restaurantId]) {
-                    heartIcon.classList.remove('far', 'fa-heart');
-                    heartIcon.classList.add('fas', 'fa-heart');
-                    // The parent button will handle color via classList if needed, or icon itself
-                    heartIcon.classList.add('text-red-500'); 
-                    heartIcon.classList.remove('text-gray-500');
-                    button.title = "Remove from favorites";
-                } else {
-                    heartIcon.classList.remove('fas', 'fa-heart');
-                    heartIcon.classList.add('far', 'fa-heart');
-                    heartIcon.classList.remove('text-red-500');
-                    heartIcon.classList.add('text-gray-500');
-                    button.title = "Add to favorites";
-                }
-            });
-        }
-
-
-        async function handleFavoriteClick(event) {
-            const button = event.target.closest('.favorite-heart-btn');
-            if (!button) return;
-
-            const user = auth.currentUser;
-            if (!user) {
-                alert('Please log in to add restaurants to your favorites.');
-                window.location.href = '/login.html';
+            const favIds = Object.keys(currentUserFavorites);
+            if (favIds.length === 0) {
+                dailyMenuContainer.innerHTML = '';
+                noFavoritesMessage.classList.remove('hidden');
                 return;
             }
-
-            const restaurantId = button.dataset.restaurantId;
-            const heartIcon = button.querySelector('i');
-            const favoriteRef = ref(database, `users/${user.uid}/favorites/${restaurantId}`);
-
-            try {
-                if (currentUserFavorites[restaurantId]) {
-                    await remove(favoriteRef);
-                    delete currentUserFavorites[restaurantId];
-                    // updateFavoriteHeartsVisuals will handle the visual change correctly
-                } else {
-                    await set(favoriteRef, true);
-                    currentUserFavorites[restaurantId] = true;
-                    // updateFavoriteHeartsVisuals will handle the visual change correctly
+            dailyMenuContainer.innerHTML = ''; 
+            let displayedMenus = 0;
+            const today = new Date().toISOString().split('T')[0];
+            for (const restaurantId of favIds) {
+                const restaurantSnapshot = await get(ref(database, `restaurants/${restaurantId}`));
+                if (restaurantSnapshot.exists()) {
+                    const restaurantData = restaurantSnapshot.val();
+                    const menuSnapshot = await get(ref(database, `restaurants/${restaurantId}/dailyMenu/${today}`));
+                    let menuItemsHtml = '<p class="text-gray-500 text-sm">No specials for today.</p>';
+                    if (menuSnapshot.exists() && menuSnapshot.val().items?.length > 0) {
+                        menuItemsHtml = `<ul class="list-disc list-inside text-gray-600 text-sm space-y-1">${menuSnapshot.val().items.map(item => `<li>${item}</li>`).join('')}</ul>`;
+                    }
+                    dailyMenuContainer.innerHTML += `<div class="card bg-white p-6 rounded-lg shadow-lg flex flex-col justify-between w-72 flex-shrink-0"><div><h3 class="text-xl font-semibold mb-2">${restaurantData.name}</h3>${menuItemsHtml}</div><a href="/restaurant-details.html?id=${restaurantId}" class="mt-4 self-start inline-block btn btn-orange text-white text-sm font-semibold py-2 px-4 rounded">View Restaurant</a></div>`;
+                    displayedMenus++;
                 }
-                updateFavoriteHeartsVisuals(); // Call after DB op and local state update
-                if (user) { 
-                    loadDailyMenuFavorites(user.uid);
-                }
-            } catch (error) {
-                console.error("Error updating favorite:", error);
-                alert("Could not update favorite status. Please try again.");
-                updateFavoriteHeartsVisuals(); // Revert visual to match actual state on error
             }
+            if (displayedMenus === 0) noFavoritesMessage.classList.remove('hidden');
         }
-        restaurantsPreviewContainer.addEventListener('click', handleFavoriteClick);
 
         function loadRestaurantsPreview() {
-            restaurantsPreviewContainer.innerHTML = '<div class="loading-placeholder col-span-full">Loading restaurants...</div>';
-            const restaurantsRef = query(ref(database, 'restaurants'), limitToFirst(3));
+            restaurantsPreviewContainer.innerHTML = '<div class="loading-placeholder col-span-full">Loading top restaurants...</div>';
+            const topRestaurantsQuery = query(ref(database, 'restaurants'), orderByChild('averageRating'), limitToLast(3));
 
-            onValue(restaurantsRef, (snapshot) => {
+            onValue(topRestaurantsQuery, (snapshot) => {
                 restaurantsPreviewContainer.innerHTML = '';
                 if (snapshot.exists()) {
+                    const restaurantsArray = [];
                     snapshot.forEach((childSnapshot) => {
-                        const restaurantId = childSnapshot.key;
-                        const restaurant = childSnapshot.val();
-                        // Visuals will be set by updateFavoriteHeartsVisuals
-                        const isFavorited = currentUserFavorites[restaurantId];
-                        const heartIconClass = isFavorited ? 'fas fa-heart text-red-500' : 'far fa-heart text-gray-500';
-                        const heartTitle = isFavorited ? 'Remove from favorites' : 'Add to favorites';
+                        restaurantsArray.push({ id: childSnapshot.key, ...childSnapshot.val() });
+                    });
+                    restaurantsArray.reverse();
 
-
-                        const card = `
-                            <div class="card bg-white rounded-lg shadow-md overflow-hidden flex flex-col relative">
-                                <button class="favorite-heart-btn absolute top-3 right-3 bg-white bg-opacity-75 p-2 rounded-full hover:text-red-500 z-10 focus:outline-none"
-                                        data-restaurant-id="${restaurantId}"
-                                        title="${heartTitle}">
+                    restaurantsArray.forEach((restaurant) => {
+                        const isFavorited = currentUserFavorites[restaurant.id];
+                        const heartIconClass = isFavorited ? 'fa-solid fa-heart text-red-500' : 'fa-regular fa-heart text-gray-500';
+                        const starsHtml = generateStars(restaurant.averageRating);
+                        restaurantsPreviewContainer.innerHTML += `
+                            <div class="card bg-white rounded-lg shadow-lg overflow-hidden flex flex-col relative">
+                                <button class="favorite-heart-btn absolute top-3 right-3 bg-white bg-opacity-75 p-2 rounded-full z-10" data-restaurant-id="${restaurant.id}">
                                     <i class="${heartIconClass} text-xl"></i>
                                 </button>
                                 <img src="${restaurant.imageBase64 || 'https://via.placeholder.com/300x150?text=Restaurant'}" alt="${restaurant.name}" class="item-image">
                                 <div class="p-6 flex flex-col flex-grow">
-                                    <h3 class="text-xl font-semibold mb-2 text-gray-800">${restaurant.name || 'Unnamed Restaurant'}</h3>
-                                    <p class="text-gray-600 text-sm mb-1">Cuisine: ${restaurant.cuisine || 'Not specified'}</p>
-                                    <p class="text-gray-600 text-sm mb-4 flex-grow">${(restaurant.description || 'No description available.').substring(0,100)}${(restaurant.description && restaurant.description.length > 100) ? '...' : ''}</p>
-                                    <a href="/restaurant-details.html?id=${restaurantId}" class="self-start mt-auto btn-orange hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded text-sm transition duration-300">View Details</a>
+                                    <h3 class="text-xl font-semibold mb-2">${restaurant.name || 'Unnamed'}</h3>
+                                    <div class="flex items-center mb-3">
+                                        <div class="rating-stars text-sm">${starsHtml}</div>
+                                        <span class="text-xs text-gray-500 ml-2">(${restaurant.ratingCount || 0} reviews)</span>
+                                    </div>
+                                    <p class="text-gray-600 text-sm mb-4 flex-grow">${(restaurant.description || 'No description available.').substring(0, 100)}...</p>
+                                    <a href="/restaurant-details.html?id=${restaurant.id}" class="self-start mt-auto btn btn-orange font-semibold py-2 px-4 rounded text-sm">View Details</a>
                                 </div>
-                            </div>
-                        `;
-                        restaurantsPreviewContainer.insertAdjacentHTML('beforeend', card);
+                            </div>`;
                     });
-                    updateFavoriteHeartsVisuals(); 
                 } else {
-                    restaurantsPreviewContainer.innerHTML = '<p class="text-gray-600 col-span-full text-center">No restaurants featured at the moment.</p>';
+                    restaurantsPreviewContainer.innerHTML = '<p class="col-span-full text-center text-gray-600">No restaurants available to feature.</p>';
                 }
-            }, (error) => {
-                console.error("Error loading restaurants preview:", error);
-                restaurantsPreviewContainer.innerHTML = '<p class="text-red-500 col-span-full text-center">Could not load featured restaurants.</p>';
             });
         }
 
-        function loadFoodsPreview() {
-            foodsPreviewContainer.innerHTML = '<div class="loading-placeholder col-span-full">Loading popular dishes...</div>';
-            const foodsData = [];
-            let foodItemsLimit = 4;
+        async function handleFavoriteClick(event) {
+            const button = event.target.closest('.favorite-heart-btn');
+            if (!button) return;
+            const user = auth.currentUser;
+            if (!user) {
+                alert('Please log in to add favorites.');
+                window.location.href = '/login.html';
+                return;
+            }
+            const restaurantId = button.dataset.restaurantId;
+            const favoriteRef = ref(database, `users/${user.uid}/favorites/${restaurantId}`);
+            if (currentUserFavorites[restaurantId]) {
+                await remove(favoriteRef);
+                delete currentUserFavorites[restaurantId];
+            } else {
+                await set(favoriteRef, true);
+                currentUserFavorites[restaurantId] = true;
+            }
+            loadDailyMenuFavorites(user.uid);
+        }
 
-            const restaurantsRef = ref(database, 'restaurants');
-            get(restaurantsRef).then(snapshot => {
+        function loadFoodsPreview() {
+            foodsPreviewContainer.innerHTML = '<div class="loading-placeholder col-span-full">Loading dishes...</div>';
+            const foodsData = [];
+            get(ref(database, 'restaurants')).then(snapshot => {
                 if (snapshot.exists()) {
                     snapshot.forEach(restaurantSnapshot => {
-                        if (foodsData.length >= foodItemsLimit) return;
-
-                        const restaurantId = restaurantSnapshot.key;
+                        if (foodsData.length >= 4) return;
                         const restaurantData = restaurantSnapshot.val();
-                        const foods = restaurantData.foods;
-
-                        if (foods) {
-                            for (const foodKey in foods) {
-                                if (foodsData.length >= foodItemsLimit) break;
-                                const food = foods[foodKey];
-                                foodsData.push({
-                                    ...food,
-                                    foodId: foodKey,
-                                    restaurantId: restaurantId,
-                                    restaurantName: restaurantData.name || "Unknown Restaurant"
-                                });
+                        if (restaurantData.foods) {
+                            for (const foodKey in restaurantData.foods) {
+                                if (foodsData.length >= 4) break;
+                                foodsData.push({ ...restaurantData.foods[foodKey], foodId: foodKey, restaurantId: restaurantSnapshot.key, restaurantName: restaurantData.name });
                             }
                         }
                     });
@@ -535,37 +464,33 @@
                     foodsPreviewContainer.innerHTML = '';
                     if (foodsData.length > 0) {
                         foodsData.forEach(food => {
-                            const orderUrl = `/order.html?restaurantId=${food.restaurantId}&foodId=${food.foodId}&foodName=${encodeURIComponent(food.name || 'Dish')}&foodPrice=${food.price || 0}`;
-                            const card = `
-                                <div class="card bg-white rounded-lg shadow-md overflow-hidden flex flex-col">
-                                    <img src="${food.imageBase64 || 'https://via.placeholder.com/300x150?text=Food'}" alt="${food.name}" class="item-image">
-                                    <div class="p-4 flex flex-col flex-grow">
-                                        <h4 class="text-lg font-semibold mb-1 text-gray-800">${food.name || 'Unnamed Dish'}</h4>
-                                        <p class="text-xs text-gray-500 mb-1">From: ${food.restaurantName}</p>
-                                        <p class="text-green-600 font-semibold text-sm mb-3">₹${food.price ? food.price.toFixed(2) : 'N/A'}</p>
-                                        <a href="${orderUrl}" class="mt-auto self-start btn-orange hover:bg-orange-600 text-white font-semibold py-2 px-3 rounded text-xs transition duration-300">Order Now</a>
-                                    </div>
+                            const orderUrl = `/order.html?restaurantId=${food.restaurantId}&foodId=${food.foodId}&foodName=${encodeURIComponent(food.name)}&foodPrice=${food.price}`;
+                            foodsPreviewContainer.innerHTML += `
+                            <div class="card bg-white rounded-lg shadow-lg overflow-hidden flex flex-col">
+                                <img src="${food.imageBase64 || 'https://via.placeholder.com/300x150?text=Food'}" alt="${food.name}" class="item-image">
+                                <div class="p-4 flex flex-col flex-grow">
+                                    <h4 class="text-lg font-semibold mb-1">${food.name}</h4>
+                                    <p class="text-xs text-gray-500 mb-1">From: ${food.restaurantName}</p>
+                                    <p class="text-green-600 font-semibold text-sm mb-3">₹${(food.price || 0).toFixed(2)}</p>
+                                    <a href="${orderUrl}" class="mt-auto self-start btn btn-orange font-semibold py-2 px-3 rounded text-xs">Order Now</a>
                                 </div>
-                            `;
-                            foodsPreviewContainer.insertAdjacentHTML('beforeend', card);
+                            </div>`;
                         });
                     } else {
-                        foodsPreviewContainer.innerHTML = '<p class="text-gray-600 col-span-full text-center">No popular dishes to show right now.</p>';
+                        foodsPreviewContainer.innerHTML = '<p class="col-span-full text-center text-gray-600">No popular dishes to show right now.</p>';
                     }
                 } else {
-                     foodsPreviewContainer.innerHTML = '<p class="text-gray-600 col-span-full text-center">No restaurants found to fetch dishes from.</p>';
+                     foodsPreviewContainer.innerHTML = '<p class="col-span-full text-center text-gray-600">No restaurants found to display dishes.</p>';
                 }
             }).catch(error => {
                 console.error("Error loading foods preview:", error);
-                foodsPreviewContainer.innerHTML = '<p class="text-red-500 col-span-full text-center">Could not load popular dishes.</p>';
+                foodsPreviewContainer.innerHTML = '<p class="text-red-500 col-span-full text-center">Could not load dishes due to an error.</p>';
             });
         }
 
+        // --- Initial Page Load ---
         document.getElementById('current-year').textContent = new Date().getFullYear();
-
-        loadRestaurantsPreview();
         loadFoodsPreview();
-
     </script>
 </body>
-</html>
+</html> 
