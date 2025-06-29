@@ -7,130 +7,40 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            scroll-behavior: smooth;
-        }
-        .navbar {
-            background-color: #1f2937; /* Dark gray-blue */
-        }
-        .restaurant-hero-image { /* Optional: For a banner image */
-            width: 100%;
-            height: 300px;
-            object-fit: cover;
-            border-radius: 0 0 0.5rem 0.5rem; /* Rounded bottom corners if it's a banner */
-        }
-        .restaurant-logo {
-            width: 150px; /* Slightly smaller for details page layout */
-            height: 150px;
-            object-fit: cover;
-            border-radius: 50%;
-            margin: -75px auto 1rem auto; /* Overlap effect if hero image is used */
-            border: 4px solid white;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            position: relative; /* For z-index if needed */
-            z-index: 10;
-        }
-        .food-card {
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-        }
-        .food-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-        .food-image {
-            width: 100%;
-            height: 150px; /* Consistent height */
-            object-fit: cover;
-            border-radius: 0.5rem 0.5rem 0 0;
-        }
-        .food-price {
-            font-weight: 600;
-        }
-        .error-message, .loading-message {
-            text-align: center;
-            margin: 2rem 0;
-            font-size: 1.125rem;
-        }
-        .error-message { color: #ef4444; } /* red-500 */
-        .loading-message { color: #6b7280; } /* gray-500 */
+        body { scroll-behavior: smooth; }
+        .navbar { background-color: #1f2937; }
+        .restaurant-logo { width: 150px; height: 150px; object-fit: cover; border-radius: 50%; margin: -75px auto 1rem auto; border: 4px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.15); position: relative; z-index: 10; }
+        .food-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); }
+        .food-image { width: 100%; height: 150px; object-fit: cover; border-radius: 0.5rem 0.5rem 0 0; }
+        .error-message, .loading-message { text-align: center; margin: 2rem 0; font-size: 1.125rem; }
+        .error-message { color: #ef4444; }
+        .loading-message { color: #6b7280; }
         .hidden { display: none; }
-
-        /* Hamburger Menu */
         .mobile-menu { display: none; }
-        @media (max-width: 768px) { /* md breakpoint */
-            .desktop-menu { display: none; }
-            .mobile-menu.open { display: block; }
-        }
+        @media (max-width: 768px) { .desktop-menu { display: none; } .mobile-menu.open { display: block; } }
         .welcome-message { color: #d1d5db; margin-right: 1rem; }
-
-        .btn-favorite {
-            padding: 0.625rem 1.25rem; /* Slightly larger */
-            border-radius: 0.375rem;
-            font-size: 0.875rem;
-            font-weight: 600;
-            transition: background-color 0.3s ease;
-            min-width: 180px; /* Ensure buttons have a nice width */
-            text-align: center;
-        }
-        .btn-favorite-add { background-color: #3b82f6; color: white; } /* blue-500 */
-        .btn-favorite-add:hover { background-color: #2563eb; } /* blue-600 */
-        .btn-favorite-remove { background-color: #ef4444; color: white; } /* red-500 */
-        .btn-favorite-remove:hover { background-color: #dc2626; } /* red-600 */
-        .btn-favorite-disabled { background-color: #9ca3af; color: #e5e7eb; cursor: not-allowed; } /* gray-400 */
-
-        .section-title {
-            font-size: 1.875rem; /* text-2xl or 3xl */
-            font-weight: 700;
-            color: #1f2937; /* navbar color for consistency */
-            margin-bottom: 1.5rem; /* mb-6 */
-            padding-bottom: 0.5rem; /* pb-2 */
-            border-bottom: 2px solid #fbbf24; /* amber-400 for accent */
-            display: inline-block;
-        }
-        .info-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 0.75rem; /* mb-3 */
-            color: #4b5563; /* gray-600 */
-        }
-        .info-item i {
-            margin-right: 0.75rem; /* mr-3 */
-            color: #fbbf24; /* amber-400 */
-            width: 20px; /* Fixed width for icon alignment */
-            text-align: center;
-        }
-        .daily-menu-list li {
-            padding: 0.3rem 0;
-            border-bottom: 1px dashed #e5e7eb; /* gray-200 */
-        }
-        .daily-menu-list li:last-child {
-            border-bottom: none;
-        }
-        /* Order Now Button Style - Changed to Orange */
-        .btn-order-now {
-            background-color: #f97316; /* orange-500 */
-            color: white;
-            padding: 0.5rem 1rem; /* py-2 px-4 */
-            border-radius: 0.375rem; /* rounded-md */
-            text-align: center;
-            display: block; /* Full width of its container */
-            font-weight: 600;
-            transition: background-color 0.3s ease;
-        }
-        .btn-order-now:hover {
-            background-color: #ea580c; /* orange-600 */
-        }
-
+        .btn { padding: 0.625rem 1.25rem; border-radius: 0.375rem; font-size: 0.875rem; font-weight: 600; transition: background-color 0.3s ease; text-align: center; }
+        .btn-favorite-add { background-color: #3b82f6; color: white; }
+        .btn-favorite-add:hover { background-color: #2563eb; }
+        .btn-favorite-remove { background-color: #ef4444; color: white; }
+        .btn-favorite-remove:hover { background-color: #dc2626; }
+        .btn:disabled { background-color: #9ca3af; color: #e5e7eb; cursor: not-allowed; }
+        .btn-order-now { background-color: #f97316; color: white; padding: 0.5rem 1rem; display: block; }
+        .btn-order-now:hover { background-color: #ea580c; }
+        .section-title { font-size: 1.875rem; font-weight: 700; color: #1f2937; margin-bottom: 1.5rem; padding-bottom: 0.5rem; border-bottom: 2px solid #fbbf24; display: inline-block; }
+        .info-item { display: flex; align-items: center; margin-bottom: 0.75rem; color: #4b5563; }
+        .info-item i { margin-right: 0.75rem; color: #fbbf24; width: 20px; text-align: center; }
+        .rating-stars i { transition: color 0.2s ease-in-out; }
+        .user-rating-stars { cursor: pointer; }
+        .user-rating-stars:hover i { color: #facc15; }
+        .user-rating-stars i:hover ~ i { color: #d1d5db; }
     </style>
 </head>
-<body class="bg-gray-100 pt-16"> <!-- pt-16 to offset fixed navbar -->
+<body class="bg-gray-100 pt-16">
 
-    <!-- Navigation Bar -->
     <nav class="navbar p-4 text-white fixed w-full top-0 z-50">
         <div class="container mx-auto flex justify-between items-center">
             <a href="/index.html" class="text-2xl font-bold">FoodieX</a>
-            
             <div class="hidden md:flex space-x-6 items-center desktop-menu">
                 <span id="welcome-message" class="welcome-message hidden"></span>
                 <a href="/index.html" class="hover:text-gray-300">Home</a>
@@ -138,95 +48,61 @@
                 <a href="/foods.html" class="hover:text-gray-300">Foods</a>
                 <a href="/login.html" id="nav-login" class="hover:text-gray-300">Login / Signup</a>
                 <a href="/profile.html" id="nav-profile" class="hover:text-gray-300 hidden">Profile</a>
-                <!-- Logout button is intentionally omitted from this page's navbar as requested -->
+                <a href="#" id="nav-logout" class="hover:text-gray-300 hidden">Logout</a>
             </div>
-
-            <div class="md:hidden">
-                <button id="mobile-menu-button" class="text-white focus:outline-none">
-                    <i class="fas fa-bars fa-lg"></i>
-                </button>
-            </div>
+            <div class="md:hidden"><button id="mobile-menu-button" class="text-white focus:outline-none"><i class="fas fa-bars fa-lg"></i></button></div>
         </div>
         <div id="mobile-menu-items" class="mobile-menu md:hidden mt-3">
             <span id="mobile-welcome-message" class="block px-2 py-1 text-sm welcome-message hidden"></span>
-            <a href="index.html" class="block px-2 py-1 text-sm hover:bg-gray-700">Home</a>
-            <a href="restaurants.html" class="block px-2 py-1 text-sm hover:bg-gray-700">Restaurants</a>
-            <a href="foods.html" class="block px-2 py-1 text-sm hover:bg-gray-700">Foods</a>
-            <a href="login.html" id="mobile-nav-login" class="block px-2 py-1 text-sm hover:bg-gray-700">Login / Signup</a>
-            <a href="profile.html" id="mobile-nav-profile" class="block px-2 py-1 text-sm hover:bg-gray-700 hidden">Profile</a>
+            <a href="/index.html" class="block px-2 py-1 text-sm hover:bg-gray-700">Home</a>
+            <a href="/restaurants.html" class="block px-2 py-1 text-sm hover:bg-gray-700">Restaurants</a>
+            <a href="/foods.html" class="block px-2 py-1 text-sm hover:bg-gray-700">Foods</a>
+            <a href="/login.html" id="mobile-nav-login" class="block px-2 py-1 text-sm hover:bg-gray-700">Login / Signup</a>
+            <a href="/profile.html" id="mobile-nav-profile" class="block px-2 py-1 text-sm hover:bg-gray-700 hidden">Profile</a>
+            <a href="#" id="mobile-nav-logout" class="block px-2 py-1 text-sm hover:bg-gray-700 hidden">Logout</a>
         </div>
     </nav>
 
-    <!-- Restaurant Banner Image (Optional) -->
-    <!-- <img id="restaurant-banner" src="https://via.placeholder.com/1200x300?text=Restaurant+Banner" alt="Restaurant Banner" class="restaurant-hero-image hidden"> -->
-
-    <!-- Restaurant Details Section -->
     <section class="container mx-auto py-12 px-4">
         <div id="restaurant-error" class="error-message hidden"></div>
-        <div id="restaurant-content" class="hidden"> <!-- Hide content until loaded -->
+        <div id="restaurant-content" class="hidden"> 
             <div class="max-w-5xl mx-auto bg-white p-8 rounded-lg shadow-xl">
                 <img id="restaurant-logo" class="restaurant-logo mx-auto" src="https://via.placeholder.com/150?text=Logo" alt="Restaurant Logo">
-                
                 <div id="restaurant-info" class="text-center mb-8">
                     <h2 id="restaurant-name" class="text-4xl font-bold mb-3 text-gray-800"></h2>
                     <p id="restaurant-cuisine" class="text-lg text-gray-500 mb-4"></p>
-                    
+                    <div id="unified-rating-display" class="flex flex-col items-center mb-6"></div>
                     <div class="grid md:grid-cols-2 gap-x-8 gap-y-4 max-w-md mx-auto text-left mb-6">
                         <p id="restaurant-address" class="info-item"><i class="fas fa-map-marker-alt"></i><span></span></p>
                         <p id="restaurant-contact" class="info-item"><i class="fas fa-phone-alt"></i><span></span></p>
-                        <p id="restaurant-hours" class="info-item md:col-span-2"><i class="fas fa-clock"></i><span>Operating hours not specified.</span></p> <!-- Placeholder for hours -->
-                    </div>
-
-                    <div class="flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-4">
-                        <button id="favorite-btn" class="btn-favorite btn-favorite-add hidden">Add to Favorites</button>
-                        <button id="contact-btn" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded text-sm transition duration-300 hidden"><i class="fas fa-envelope mr-2"></i>Contact Restaurant</button>
                     </div>
                 </div>
-
-                <div class="my-10 text-center">
-                    <h3 class="section-title">Today's Menu</h3>
-                    <div id="daily-menu" class="bg-yellow-50 p-6 rounded-lg shadow-inner">
-                        <p id="menu-content" class="text-gray-700 loading-message">Loading menu...</p>
-                    </div>
-                </div>
-
-                <div class="my-10 text-center">
-                    <h3 class="section-title">Our Dishes</h3>
-                    <div id="foods-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <p class="loading-message col-span-full">Loading food items...</p>
-                    </div>
-                </div>
-
-                <div class="text-center mt-12">
-                    <a href="restaurants.html" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition duration-300"><i class="fas fa-arrow-left mr-2"></i>Back to Restaurants</a>
-                </div>
+                <div id="user-interaction-section" class="mb-10 pt-6 border-t border-gray-200"></div>
+                <div class="my-10 text-center"><h3 class="section-title">Today's Menu</h3><div id="daily-menu" class="bg-yellow-50 p-6 rounded-lg shadow-inner"><p id="menu-content" class="text-gray-700 loading-message">Loading menu...</p></div></div>
+                <div class="my-10 text-center"><h3 class="section-title">Our Dishes</h3><div id="foods-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"><p class="loading-message col-span-full">Loading food items...</p></div></div>
+                <div class="text-center mt-12"><a href="/restaurants.html" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition duration-300"><i class="fas fa-arrow-left mr-2"></i>Back to Restaurants</a></div>
             </div>
         </div>
         <p id="initial-loading-message" class="loading-message">Loading restaurant details...</p>
     </section>
 
-    <!-- Footer -->
     <footer class="bg-gray-800 text-gray-300 py-12 mt-10">
-        <div class="container mx-auto px-4 text-center">
-            <p>© <span id="current-year"></span> FoodieX. All rights reserved.</p>
-        </div>
+        <div class="container mx-auto px-4 text-center"><p>© <span id="current-year"></span> FoodieX. All rights reserved.</p></div>
     </footer>
 
-    <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
-        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
-        import { getDatabase, ref, get, onValue, update } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
+        import { getDatabase, ref, get, onValue, set, update, remove } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js';
 
         const firebaseConfig = {
-            apiKey: "AIzaSyABlpJruz0pZN7K6bQgRuqDxPVAG1bi9q8", // Replace with your actual API key
+            apiKey: "AIzaSyABlpJruz0pZN7K6bQgRuqDxPVAG1bi9q8",
             authDomain: "daily-menu-bc700.firebaseapp.com",
             databaseURL: "https://daily-menu-bc700-default-rtdb.firebaseio.com",
             projectId: "daily-menu-bc700",
             storageBucket: "daily-menu-bc700.firebasestorage.app",
             messagingSenderId: "87059586917",
             appId: "1:87059586917:web:d2787e9d4d12dc47decb8c",
-            measurementId: "G-QJJYDQ9M2J"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -236,262 +112,221 @@
         const urlParams = new URLSearchParams(window.location.search);
         const restaurantId = urlParams.get('id');
 
-        // DOM Elements for Navbar
-        const navLogin = document.getElementById('nav-login');
-        const navProfile = document.getElementById('nav-profile');
-        const mobileNavLogin = document.getElementById('mobile-nav-login');
-        const mobileNavProfile = document.getElementById('mobile-nav-profile');
-        const welcomeMessage = document.getElementById('welcome-message');
-        const mobileWelcomeMessage = document.getElementById('mobile-welcome-message');
-        
-        // DOM Elements for Page Content
-        const restaurantErrorEl = document.getElementById('restaurant-error');
-        const restaurantContentEl = document.getElementById('restaurant-content');
+        // --- DOM Elements ---
         const initialLoadingMessageEl = document.getElementById('initial-loading-message');
-
-        let currentUserData = null;
-
-        // Mobile Menu Toggle
-        const mobileMenuButton = document.getElementById('mobile-menu-button');
-        const mobileMenuItems = document.getElementById('mobile-menu-items');
-        mobileMenuButton.addEventListener('click', () => {
-            mobileMenuItems.classList.toggle('open');
+        const restaurantContentEl = document.getElementById('restaurant-content');
+        
+        // --- RELIABLE INITIALIZATION ---
+        
+        // This listener only handles nav updates and reloads on state change
+        let initialAuthCheckDone = false;
+        onAuthStateChanged(auth, async (user) => {
+            if (initialAuthCheckDone) {
+                // If the state changes *after* the initial load, reload the page.
+                window.location.reload();
+            } else {
+                // This is the first, automatic check when the page loads.
+                // Call the main function to start rendering the page.
+                initialAuthCheckDone = true;
+                await initializePage(user);
+            }
         });
 
-        function showPageError(message) {
-            initialLoadingMessageEl.classList.add('hidden');
-            restaurantContentEl.classList.add('hidden');
-            restaurantErrorEl.textContent = message;
-            restaurantErrorEl.classList.remove('hidden');
-        }
-
-        function loadRestaurantDetails(userFavorites = []) {
-            const restaurantRefDb = ref(database, `restaurants/${restaurantId}`);
-            
-            get(restaurantRefDb).then((snapshot) => {
-                initialLoadingMessageEl.classList.add('hidden');
-                if (snapshot.exists()) {
-                    restaurantContentEl.classList.remove('hidden');
-                    const data = snapshot.val();
-                    
-                    document.title = `FoodieX - ${data.name || 'Restaurant'}`; // Update page title
-                    document.getElementById('restaurant-name').textContent = data.name || 'Unknown Restaurant';
-                    document.getElementById('restaurant-address').querySelector('span').textContent = data.address || 'No address provided';
-                    document.getElementById('restaurant-contact').querySelector('span').textContent = data.contact || data.email || 'No contact information';
-                    document.getElementById('restaurant-cuisine').textContent = data.cuisine ? `Cuisine: ${data.cuisine}` : 'Cuisine not specified';
-                    document.getElementById('restaurant-logo').src = data.imageBase64 || 'https://via.placeholder.com/150?text=Logo';
-                    
-                    document.getElementById('contact-btn').classList.remove('hidden');
-                    updateFavoriteButtonUI(userFavorites); 
-
-                } else {
-                    showPageError('Restaurant not found.');
-                }
-            }).catch((error) => {
-                console.error('Error loading restaurant details:', error);
-                showPageError('Failed to load restaurant details. Please try again.');
-            });
-        }
-
-        function loadDailyMenu() {
-            const today = new Date().toISOString().split('T')[0];
-            const menuRefDb = ref(database, `restaurants/${restaurantId}/dailyMenu/${today}`);
-            const menuContentEl = document.getElementById('menu-content');
-
-            onValue(menuRefDb, (snapshot) => {
-                menuContentEl.classList.remove('loading-message');
-                if (snapshot.exists()) {
-                    const menu = snapshot.val();
-                    if (menu && menu.items && menu.items.length > 0) {
-                        menuContentEl.innerHTML = `<ul class="daily-menu-list list-none text-left text-gray-700">${menu.items.map(item => `<li>${item}</li>`).join('')}</ul>`;
-                    } else {
-                        menuContentEl.textContent = 'No menu items posted for today.';
-                    }
-                } else {
-                    menuContentEl.textContent = 'No daily menu available for today.';
-                }
-            }, (error) => {
-                console.error('Error loading daily menu:', error);
-                menuContentEl.classList.remove('loading-message');
-                menuContentEl.textContent = 'Failed to load today\'s menu.';
-                menuContentEl.classList.add('text-red-500');
-            });
-        }
-
-        function loadFoods() {
-            const foodsRefDb = ref(database, `restaurants/${restaurantId}/foods`);
-            const foodsContainerEl = document.getElementById('foods-container');
-            const loadingEl = foodsContainerEl.querySelector('.loading-message');
-
-            onValue(foodsRefDb, (snapshot) => {
-                if (loadingEl) loadingEl.remove();
-                foodsContainerEl.innerHTML = ''; 
-
-                if (snapshot.exists()) {
-                    const foods = snapshot.val();
-                    Object.keys(foods).forEach((foodId) => {
-                        const food = foods[foodId];
-                        const card = document.createElement('div');
-                        card.className = 'food-card bg-white rounded-lg shadow-lg overflow-hidden flex flex-col';
-                        
-                        const foodName = food.name || 'Unnamed Food';
-                        const foodPrice = food.price || 0;
-                        const orderUrl = `order.html?restaurantId=${restaurantId}&foodId=${foodId}&foodName=${encodeURIComponent(foodName)}&foodPrice=${foodPrice}`;
-
-                        card.innerHTML = `
-                            <img class="food-image" src="${food.imageBase64 || 'https://via.placeholder.com/300x150?text=Food'}" alt="${foodName}">
-                            <div class="p-4 flex flex-col flex-grow">
-                                <h4 class="text-lg font-semibold mb-1 text-gray-800">${foodName}</h4>
-                                <p class="text-sm text-gray-600 mb-2 flex-grow">${food.description || 'No description available.'}</p>
-                                <p class="text-green-600 food-price text-md mb-2">₹${foodPrice.toFixed(2)}</p>
-                                <div class="mt-auto pt-2">
-                                    <a href="${orderUrl}" class="btn-order-now">Order Now</a>
-                                </div>
-                            </div>
-                        `;
-                        foodsContainerEl.appendChild(card);
-                    });
-                } else {
-                    foodsContainerEl.innerHTML = '<p class="text-center text-gray-600 col-span-full py-6">No individual food items listed by this restaurant.</p>';
-                }
-            }, (error) => {
-                console.error('Error loading food items:', error);
-                if (loadingEl) loadingEl.remove();
-                foodsContainerEl.innerHTML = '<p class="text-center text-red-500 col-span-full py-6">Failed to load food items.</p>';
-            });
-        }
-        
-        function updateFavoriteButtonUI(userFavorites = []) {
-            const favoriteBtn = document.getElementById('favorite-btn');
-            if (!auth.currentUser || !currentUserData || !('favorites' in currentUserData)) { 
-                favoriteBtn.classList.add('hidden');
+        async function initializePage(user) {
+            if (!restaurantId) {
+                showPageError('No restaurant ID provided.');
                 return;
             }
 
-            favoriteBtn.classList.remove('hidden');
-            const isFavorite = userFavorites.includes(restaurantId); 
-            const canAddMoreFavorites = userFavorites.length < 2;
-
-            if (isFavorite) {
-                favoriteBtn.textContent = 'Remove from Favorites';
-                favoriteBtn.className = 'btn-favorite btn-favorite-remove';
-                favoriteBtn.disabled = false;
-            } else if (canAddMoreFavorites) {
-                favoriteBtn.textContent = 'Add to Favorites';
-                favoriteBtn.className = 'btn-favorite btn-favorite-add';
-                favoriteBtn.disabled = false;
+            // Step 1: Get user profile data (if logged in)
+            let userProfile = { favorites: [] };
+            if (user) {
+                try {
+                    const userSnapshot = await get(ref(database, `users/${user.uid}`));
+                    if (userSnapshot.exists()) {
+                        const userData = userSnapshot.val();
+                        userProfile.favorites = Object.keys(userData.favorites || {});
+                        updateNav(user, userData.name);
+                    } else {
+                        updateNav(user); // Still update nav even with no profile
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch user profile:", error);
+                    updateNav(user); // Don't block UI on this optional fetch
+                }
             } else {
-                favoriteBtn.textContent = 'Favorite Limit Reached';
-                favoriteBtn.className = 'btn-favorite btn-favorite-disabled';
-                favoriteBtn.disabled = true;
-                favoriteBtn.title = "Favorite limit reached (max 2)";
+                updateNav(null); // User is logged out
+            }
+
+            // Step 2: Fetch the essential restaurant data
+            const restaurantRefDb = ref(database, `restaurants/${restaurantId}`);
+            onValue(restaurantRefDb, (snapshot) => {
+                initialLoadingMessageEl.classList.add('hidden');
+                if (!snapshot.exists()) {
+                    showPageError('Restaurant not found.');
+                    return;
+                }
+                
+                restaurantContentEl.classList.remove('hidden');
+                const restaurantData = snapshot.val();
+                
+                // Step 3: Render all page components with the data we have
+                renderPageContent(user, restaurantData, userProfile);
+
+            }, (error) => {
+                console.error("Firebase read failed:", error);
+                showPageError("Could not load restaurant data. Check security rules.");
+            });
+        }
+
+        function renderPageContent(user, restaurantData, userProfile) {
+            renderRestaurantInfo(restaurantData);
+            renderUnifiedRating(user, restaurantData);
+            renderFavoriteInteraction(user, userProfile);
+            loadDailyMenu(restaurantData.dailyMenu);
+            loadFoods(restaurantData.foods);
+        }
+
+        // --- All Render Functions and Helpers ---
+
+        function renderRestaurantInfo(data) {
+            document.title = `FoodieX - ${data.name || 'Restaurant'}`;
+            document.getElementById('restaurant-name').textContent = data.name || 'Unnamed Restaurant';
+            document.getElementById('restaurant-cuisine').textContent = data.cuisine ? `Cuisine: ${data.cuisine}` : 'Cuisine not specified';
+            document.getElementById('restaurant-address').querySelector('span').textContent = data.address || 'No address provided';
+            document.getElementById('restaurant-contact').querySelector('span').textContent = data.contact || 'No contact information';
+            document.getElementById('restaurant-logo').src = data.imageBase64 || 'https://via.placeholder.com/150?text=Logo';
+        }
+
+        function renderUnifiedRating(user, restaurantData) {
+            const ratingDisplay = document.getElementById('unified-rating-display');
+            const ratings = restaurantData.ratings || {};
+            const averageRating = restaurantData.averageRating || 0;
+            const ratingCount = restaurantData.ratingCount || 0;
+            const ratingCountText = `(${ratingCount} rating${ratingCount !== 1 ? 's' : ''})`;
+
+            const isInteractive = !!user;
+            let displayRating = averageRating;
+            
+            if (isInteractive) {
+                const userOwnRating = ratings[user.uid] || 0;
+                displayRating = userOwnRating > 0 ? userOwnRating : averageRating;
+            }
+
+            const starsHtml = generateStars(displayRating, isInteractive);
+            const ratingLabel = isInteractive ? "Your Rating:" : "Average Rating:";
+
+            ratingDisplay.innerHTML = `<p class="text-sm font-semibold text-gray-600 mb-2">${ratingLabel}</p><div class="rating-stars text-2xl ${isInteractive ? 'user-rating-stars' : ''}">${starsHtml}</div><span class="text-xs text-gray-500 mt-2">${ratingCountText}</span>`;
+        }
+        
+        function renderFavoriteInteraction(user, userProfile) {
+            const interactionSection = document.getElementById('user-interaction-section');
+            if (!user) {
+                interactionSection.innerHTML = `<p class="text-center text-sm text-gray-500">Log in to add this restaurant to your favorites.</p>`;
+                return;
+            }
+            const isFavorite = userProfile.favorites.includes(restaurantId);
+            interactionSection.innerHTML = `<div class="text-center"><button id="favorite-btn" class="btn ${isFavorite ? 'btn-favorite-remove' : 'btn-favorite-add'} w-full max-w-xs mx-auto"><i class="fas ${isFavorite ? 'fa-heart-crack' : 'fa-heart'} mr-2"></i>${isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}</button></div>`;
+        }
+
+        function loadDailyMenu(dailyMenuData) {
+            const menuContentEl = document.getElementById('menu-content');
+            menuContentEl.classList.remove('loading-message');
+            const today = new Date().toISOString().split('T')[0];
+            if (dailyMenuData?.[today]?.items?.length > 0) {
+                menuContentEl.innerHTML = `<ul class="list-none text-left text-gray-700">${dailyMenuData[today].items.map(item => `<li class="py-1 border-b border-gray-200 last:border-b-0">${item}</li>`).join('')}</ul>`;
+            } else {
+                menuContentEl.textContent = 'No menu posted for today.';
             }
         }
 
-
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                navLogin.classList.add('hidden');
-                mobileNavLogin.classList.add('hidden');
-                navProfile.classList.remove('hidden');
-                mobileNavProfile.classList.remove('hidden');
-
-                const userDbRef = ref(database, `users/${user.uid}`);
-                onValue(userDbRef, (snapshot) => { 
-                    let userFavoritesArray = [];
-                    if (snapshot.exists()) {
-                        currentUserData = snapshot.val();
-                        userFavoritesArray = Array.isArray(currentUserData.favorites) ? currentUserData.favorites : [];
-                        
-                        let userName = "User";
-                        if (currentUserData.name) {
-                             userName = currentUserData.name.split(" ")[0];
-                        }
-                        welcomeMessage.textContent = `Hello, ${userName}!`;
-                        welcomeMessage.classList.remove('hidden');
-                        mobileWelcomeMessage.textContent = `Hello, ${userName}!`;
-                        mobileWelcomeMessage.classList.remove('hidden');
-                    } else {
-                        currentUserData = { favorites: [] }; 
-                        const restaurantUserRef = ref(database, `restaurants/${user.uid}`);
-                        get(restaurantUserRef).then(restoSnapshot => {
-                             if (restoSnapshot.exists()) {
-                                const restaurantName = restoSnapshot.val().name || "Restaurant";
-                                welcomeMessage.textContent = `Welcome, ${restaurantName}!`;
-                                welcomeMessage.classList.remove('hidden');
-                                mobileWelcomeMessage.textContent = `Welcome, ${restaurantName}!`;
-                                mobileWelcomeMessage.classList.remove('hidden');
-                            }
-                        });
-                    }
-                    if (restaurantId) updateFavoriteButtonUI(userFavoritesArray);
+        function loadFoods(foodsData) {
+            const foodsContainerEl = document.getElementById('foods-container');
+            foodsContainerEl.innerHTML = '';
+            if (foodsData && Object.keys(foodsData).length > 0) {
+                Object.keys(foodsData).forEach((foodId) => {
+                    const food = foodsData[foodId];
+                    const card = document.createElement('div');
+                    card.className = 'food-card bg-white rounded-lg shadow-lg overflow-hidden flex flex-col';
+                    const orderUrl = `/order.html?restaurantId=${restaurantId}&foodId=${foodId}&foodName=${encodeURIComponent(food.name)}&foodPrice=${food.price}`;
+                    card.innerHTML = `<img class="food-image" src="${food.imageBase64 || 'https://via.placeholder.com/300x150?text=Food'}" alt="${food.name}"><div class="p-4 flex flex-col flex-grow"><h4 class="text-lg font-semibold mb-1 text-gray-800">${food.name || 'Unnamed'}</h4><p class="text-sm text-gray-600 mb-2 flex-grow">${food.description || ''}</p><p class="text-green-600 font-semibold text-md mb-2">₹${(food.price || 0).toFixed(2)}</p><div class="mt-auto pt-2"><a href="${orderUrl}" class="btn btn-order-now">Order Now</a></div></div>`;
+                    foodsContainerEl.appendChild(card);
                 });
-
             } else {
-                currentUserData = null;
-                navLogin.classList.remove('hidden');
-                mobileNavLogin.classList.remove('hidden');
-                navProfile.classList.add('hidden');
-                mobileNavProfile.classList.add('hidden');
-                welcomeMessage.classList.add('hidden');
-                mobileWelcomeMessage.classList.add('hidden');
-                if (restaurantId) updateFavoriteButtonUI([]); 
+                foodsContainerEl.innerHTML = '<p class="text-center text-gray-600 col-span-full py-6">No individual food items listed.</p>';
             }
-
-            if (!restaurantId) {
-                showPageError('No restaurant ID provided. Please select a restaurant.');
-                setTimeout(() => { window.location.href = '/restaurants.html'; }, 3000);
-            } else {
-                let initialFavorites = [];
-                if (user && currentUserData && Array.isArray(currentUserData.favorites)) {
-                     initialFavorites = currentUserData.favorites;
-                }
-                loadRestaurantDetails(initialFavorites);
-                loadDailyMenu();
-                loadFoods();
-            }
-        });
+        }
         
-        document.getElementById('favorite-btn').addEventListener('click', async () => {
+        restaurantContentEl.addEventListener('click', async (e) => {
             const user = auth.currentUser;
-            if (!user || !currentUserData || !('favorites' in currentUserData) ) {
-                 alert('Please login as a customer to manage favorites.');
-                 return;
+            if (!user) return;
+            
+            const favoriteBtn = e.target.closest('#favorite-btn');
+            if (favoriteBtn) {
+                favoriteBtn.disabled = true;
+                const favRef = ref(database, `users/${user.uid}/favorites/${restaurantId}`);
+                if (favoriteBtn.classList.contains('btn-favorite-remove')) await remove(favRef);
+                else await set(favRef, true);
+                window.location.reload();
             }
+            
+            const starIcon = e.target.closest('.user-rating-stars i');
+            if (starIcon) {
+                starIcon.parentElement.style.opacity = '0.5';
+                await submitRating(restaurantId, user.uid, parseInt(starIcon.dataset.value, 10));
+            }
+        });
 
-            const userRefDb = ref(database, `users/${user.uid}`);
-            const currentFavorites = Array.isArray(currentUserData.favorites) ? currentUserData.favorites : [];
-            let newFavorites;
+        async function submitRating(forRestaurantId, userId, rating) {
+            await set(ref(database, `restaurants/${forRestaurantId}/ratings/${userId}`), rating);
+            const snapshot = await get(ref(database, `restaurants/${forRestaurantId}/ratings`));
+            if (snapshot.exists()) {
+                const ratings = Object.values(snapshot.val());
+                await update(ref(database, `restaurants/${forRestaurantId}`), {
+                    averageRating: parseFloat((ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(2)),
+                    ratingCount: ratings.length
+                });
+            }
+        }
 
-            if (currentFavorites.includes(restaurantId)) {
-                newFavorites = currentFavorites.filter(id => id !== restaurantId);
-            } else {
-                if (currentFavorites.length < 2) {
-                    newFavorites = [...currentFavorites, restaurantId];
-                } else {
-                    alert("You can only have a maximum of 2 favorite restaurants.");
-                    return;
+        function generateStars(rating = 0, interactive = false) {
+            let html = '';
+            for (let i = 1; i <= 5; i++) {
+                let iconClass = 'far fa-star text-gray-300';
+                const rounded = Math.round(rating * 2) / 2;
+                if (interactive) { if (i <= rating) iconClass = 'fas fa-star text-yellow-500'; } 
+                else {
+                    if (i <= rounded) iconClass = 'fas fa-star text-yellow-500';
+                    else if (i - 0.5 === rounded) iconClass = 'fas fa-star-half-alt text-yellow-500';
                 }
+                html += `<i class="${iconClass}" ${interactive ? `data-value="${i}"` : ''}></i> `;
             }
-            try {
-                await update(userRefDb, { favorites: newFavorites });
-            } catch (error) {
-                console.error('Error updating favorites:', error);
-                alert('Failed to update favorites. Please try again.');
-            }
-        });
+            return html;
+        }
 
-        document.getElementById('contact-btn').addEventListener('click', () => {
-            const contactInfo = document.getElementById('restaurant-contact').querySelector('span').textContent;
-            const restaurantName = document.getElementById('restaurant-name').textContent;
-            if (contactInfo && contactInfo !== 'No contact information') {
-                alert(`Contact ${restaurantName} at: ${contactInfo}`);
-            } else {
-                alert(`${restaurantName} has not provided specific contact details.`);
+        function updateNav(user, name) {
+            const isLoggedIn = !!user;
+            document.querySelectorAll('#nav-login, #mobile-nav-login').forEach(el => el.classList.toggle('hidden', isLoggedIn));
+            document.querySelectorAll('#nav-profile, #mobile-nav-profile, #nav-logout, #mobile-nav-logout, #welcome-message, #mobile-welcome-message').forEach(el => el.classList.toggle('hidden', !isLoggedIn));
+            if (isLoggedIn) {
+                const userName = name ? name.split(" ")[0] : "User";
+                document.getElementById('welcome-message').textContent = `Hello, ${userName}!`;
+                document.getElementById('mobile-welcome-message').textContent = `Hello, ${userName}!`;
             }
-        });
+        }
+        
+        function handleLogout(e) { e.preventDefault(); signOut(auth); }
+        function showPageError(message) {
+            initialLoadingMessageEl.classList.add('hidden');
+            restaurantContentEl.classList.add('hidden');
+            document.getElementById('restaurant-error').textContent = message;
+            document.getElementById('restaurant-error').classList.remove('hidden');
+        }
         
         document.getElementById('current-year').textContent = new Date().getFullYear();
+        document.getElementById('mobile-menu-button').addEventListener('click', () => document.getElementById('mobile-menu-items').classList.toggle('open'));
+        document.getElementById('nav-logout').addEventListener('click', handleLogout);
+        document.getElementById('mobile-nav-logout').addEventListener('click', handleLogout);
 
     </script>
 </body>
